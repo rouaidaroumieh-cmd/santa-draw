@@ -1,0 +1,230 @@
+"use client";
+
+import { useRef, useState } from "react";
+import Avatar from "@/components/Avatar";
+import { Overline, PageShell } from "@/components/Chrome";
+import { CampaignProgress } from "@/components/Stats";
+import { SELECTIONS_PER_PARTICIPANT, participantStats } from "@/lib/draw-engine";
+import { formatDateShort, ordinal } from "@/lib/dates";
+import { fileToPhotoDataUrl } from "@/lib/storage";
+import { setParticipantPhoto, useCampaign, useIsAdmin } from "@/lib/store";
+
+export default function ParticipantsPage() {
+  const state = useCampaign();
+  const isAdmin = useIsAdmin();
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const targetRef = useRef<string | null>(null);
+
+  if (!state) {
+    return (
+      <PageShell current="participants">
+        <div className="mx-auto flex min-h-[70vh] max-w-[1240px] items-center justify-center px-5">
+          <p className="label label-gold animate-pulse">Gathering the participants…</p>
+        </div>
+      </PageShell>
+    );
+  }
+
+  const stats = participantStats(state);
+  const editable = Object.keys(state.results).length === 0;
+
+  const openPicker = (id: string) => {
+    targetRef.current = id;
+    inputRef.current?.click();
+  };
+
+  const onFile = async (file: File | undefined) => {
+    if (!file || !targetRef.current) return;
+    const id = targetRef.current;
+    setBusyId(id);
+    setMessage(null);
+    try {
+      const dataUrl = await fileToPhotoDataUrl(file);
+      await setParticipantPhoto(id, dataUrl);
+      setMessage("Photo updated.");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "The photo could not be uploaded.");
+    } finally {
+      setBusyId(null);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  return (
+    <PageShell current="participants">
+      <section className="relative isolate overflow-hidden border-b border-[rgba(214,181,109,0.22)]">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(90% 120% at 12% 0%, rgba(36,92,70,0.85) 0%, rgba(15,43,35,0.9) 55%, #0d2620 100%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-[1240px] px-5 py-16 sm:py-20">
+          <p className="label label-gold">Twenty colleagues · three chances each</p>
+          <h1
+            className="mt-5 text-ivory"
+            style={{ fontSize: "clamp(2.6rem, 7.6vw, 5.8rem)", lineHeight: 0.9, letterSpacing: "-0.035em", fontWeight: 300 }}
+          >
+            Meet our Christmas
+            <span className="block text-gold" style={{ fontWeight: 500 }}>
+              Participants
+            </span>
+          </h1>
+          <p className="mt-6 max-w-[560px] font-display text-[1.15rem] italic leading-relaxed text-ivory/80" style={{ fontWeight: 300 }}>
+            Every person appears exactly three times, on three different working days. The three
+            stars light up as each selection is revealed.
+          </p>
+        </div>
+      </section>
+
+      <section className="px-5 py-14">
+        <div className="mx-auto max-w-[1240px]">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+            <div>
+              <Overline>The list</Overline>
+              <p className="mt-4 text-[0.9rem] leading-relaxed text-ivory/65">
+                {editable
+                  ? "Names and photographs can still be edited by the organiser — the configuration locks as soon as the first draw is completed."
+                  : "Configuration is locked: at least one draw has been completed, so names and photographs can no longer change."}
+              </p>
+              {message ? (
+                <p role="status" className="mt-3 border-l-2 border-gold bg-[rgba(214,181,109,0.12)] px-4 py-2.5 text-[0.85rem] text-ivory/85">
+                  {message}
+                </p>
+              ) : null}
+
+              <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {stats.map((p, i) => (
+                  <article
+                    key={p.id}
+                    className="paper gold-frame lift flex flex-col px-5 py-6"
+                    style={{ borderRadius: 2 }}
+                  >
+                    <div className="flex items-start gap-4">
+                      <Avatar id={p.id} name={p.name} photo={state.photos[p.id]} size={72} />
+                      <div className="min-w-0 flex-1">
+                        <h2 className="font-display text-[1.22rem] leading-tight text-[#173D32]">
+                          {p.name}
+                        </h2>
+                        <p className="mt-1 text-[0.74rem] leading-snug text-[#6E6A5E]">{p.role}</p>
+                        <p
+                          className={`label mt-2 inline-block px-2 py-1 text-[0.5rem] ${
+                            p.completed
+                              ? "bg-[#D6B56D] text-[#2A2113]"
+                              : "border border-[rgba(122,31,43,0.35)] text-[#7A1F2B]"
+                          }`}
+                        >
+                          {p.completed ? "Completed" : "Active"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="rule-solid mt-5 pt-4">
+                      <div className="flex items-baseline justify-between">
+                        <p className="label text-[#B08F4C]">
+                          Selections: <span className="tabular">{p.selected}/3</span>
+                        </p>
+                        <p className="label text-[#6E6A5E]">
+                          Remaining: <span className="tabular">{p.remaining}</span>
+                        </p>
+                      </div>
+
+                      {/* three gift-stars */}
+                      <div className="mt-3 flex items-center gap-2">
+                        {Array.from({ length: SELECTIONS_PER_PARTICIPANT }, (_, s) => {
+                          const lit = s < p.selected;
+                          return (
+                            <svg key={s} width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+                              <path
+                                d="M12 2.6 L14.2 8.6 L20.6 8.8 L15.6 12.6 L17.4 18.8 L12 15.1 L6.6 18.8 L8.4 12.6 L3.4 8.8 L9.8 8.6 Z"
+                                fill={lit ? "#D6B56D" : "none"}
+                                stroke={lit ? "#B08F4C" : "rgba(110,106,94,0.5)"}
+                                strokeWidth="1.1"
+                              />
+                            </svg>
+                          );
+                        })}
+                        <span className="label ml-auto text-[0.5rem] text-[#6E6A5E]">
+                          {p.completed ? "All three revealed" : `${p.remaining} left`}
+                        </span>
+                      </div>
+
+                      {/* progress */}
+                      <div className="mt-3 h-[7px] w-full overflow-hidden rounded-full bg-[rgba(110,106,94,0.18)]">
+                        <div
+                          className="h-full rounded-full transition-[width] duration-500"
+                          style={{
+                            width: `${(p.selected / SELECTIONS_PER_PARTICIPANT) * 100}%`,
+                            background:
+                              p.completed
+                                ? "linear-gradient(90deg,#B08F4C,#E8CD92)"
+                                : "linear-gradient(90deg,#7A1F2B,#A33444)",
+                          }}
+                        />
+                      </div>
+
+                      <p className="mt-3 text-[0.72rem] leading-relaxed text-[#6E6A5E]">
+                        {p.dates.length === 0
+                          ? "No selection revealed yet."
+                          : `Revealed on ${p.dates.map(formatDateShort).join(" · ")}`}
+                      </p>
+                      <p className="sr-only">
+                        Selection {ordinal(p.selected)} of {SELECTIONS_PER_PARTICIPANT}
+                      </p>
+                    </div>
+
+                    {isAdmin ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => openPicker(p.id)}
+                          disabled={!editable || busyId === p.id}
+                          className="btn btn-dark mt-5 w-full py-2.5 text-[0.62rem]"
+                        >
+                          {busyId === p.id ? "Uploading…" : state.photos[p.id] ? "Replace photo" : "Upload photo"}
+                        </button>
+                        {!editable ? (
+                          <p className="mt-2 text-center text-[0.66rem] text-[#6E6A5E]">
+                            Locked — the campaign has started.
+                          </p>
+                        ) : null}
+                      </>
+                    ) : null}
+                    <span className="label mt-3 text-[0.5rem] text-[#6E6A5E]">
+                      Entry {String(i + 1).padStart(2, "0")} of 20
+                    </span>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <aside className="lg:sticky lg:top-28">
+              <CampaignProgress state={state} />
+              <div className="paper-dim gold-frame mt-5 px-6 py-6" style={{ borderRadius: 2 }}>
+                <p className="label text-gold">How the three chances work</p>
+                <ol className="mt-4 space-y-3 text-[0.85rem] leading-relaxed text-ivory/70">
+                  <li>1 · Each person is placed in the schedule exactly three times.</li>
+                  <li>2 · The three dates are always different working days.</li>
+                  <li>3 · Once the third star is lit, the person is excluded from future draws.</li>
+                  <li>4 · Counts are recalculated from the saved results after every reveal.</li>
+                </ol>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="sr-only"
+        aria-label="Upload participant photo"
+        onChange={(e) => void onFile(e.target.files?.[0])}
+      />
+    </PageShell>
+  );
+}
