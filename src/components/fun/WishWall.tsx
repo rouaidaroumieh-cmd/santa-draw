@@ -72,8 +72,12 @@ export default function WishWall() {
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-      <form onSubmit={submit} className="paper gold-frame flex flex-col gap-4 px-6 py-7" style={{ borderRadius: 2 }}>
+    <div className="grid items-start gap-8 lg:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)]">
+      <form
+        onSubmit={submit}
+        className="paper gold-frame flex w-full flex-col gap-4 px-6 py-7 lg:sticky lg:top-24"
+        style={{ borderRadius: 2 }}
+      >
         <div className="flex flex-col gap-2">
           <span id="wish-author-label" className="label text-[#6E6A5E]">
             {t("Your first name")}
@@ -115,7 +119,7 @@ export default function WishWall() {
             required
           />
         </label>
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="text-[0.82rem] text-[#6E6A5E]">{t("Your wish appears on the wall straight away.")}</p>
           <button type="submit" className="btn btn-dark" disabled={sending}>
             {sending ? t("Sending…") : t("Send my wish")}
@@ -128,18 +132,41 @@ export default function WishWall() {
         ) : null}
       </form>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex min-h-0 flex-col gap-3">
         {wishes.length === 0 ? (
           <p className="font-display text-[1.25rem] italic text-ivory/75">
             {t("No wishes yet. Be the first to write one!")}
           </p>
         ) : (
-          wishes.map((w) => (
-            <article key={w.id} className="paper px-5 py-4" style={{ borderRadius: 2 }}>
-              <p className="font-display text-[1.1rem] italic leading-snug text-[#173D32]">“{w.message}”</p>
-              <p className="label mt-3 text-[#B08F4C]">— {w.author}</p>
-            </article>
-          ))
+          <>
+            <div className="flex items-baseline justify-between gap-3 px-0.5">
+              <p className="label label-gold">
+                {t("{count} wishes", { count: wishes.length })}
+              </p>
+              <p className="text-[0.78rem] text-ivory/55">{t("Newest first")}</p>
+            </div>
+            <div
+              className="wish-scroll gold-frame max-h-[min(68vh,640px)] overflow-y-auto overscroll-contain p-3 sm:p-4"
+              style={{ borderRadius: 2 }}
+              tabIndex={0}
+              aria-label={t("Wish wall")}
+            >
+              <div
+                className={`grid gap-3 ${
+                  wishes.length > 4 ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"
+                }`}
+              >
+                {wishes.map((w) => (
+                  <article key={w.id} className="paper px-4 py-3.5 sm:px-5 sm:py-4" style={{ borderRadius: 2 }}>
+                    <p className="font-display text-[1.05rem] italic leading-snug text-[#173D32]">
+                      “{w.message}”
+                    </p>
+                    <p className="label mt-2.5 text-[#B08F4C]">— {w.author}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>

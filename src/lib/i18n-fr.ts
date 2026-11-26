@@ -191,6 +191,8 @@ export const FR: Record<string, string> = {
   "Sending…": "Envoi…",
   "Send my wish": "Envoyer mon vœu",
   "No wishes yet. Be the first to write one!": "Pas encore de vœux. Soyez le premier à en écrire un !",
+  "{count} wishes": "{count} vœux",
+  "Newest first": "Plus récents en premier",
   "Your wish could not be sent.": "Votre vœu n'a pas pu être envoyé.",
   "Christmas wishes": "Vœux de Noël",
   "Wishes appear on the Fun page as soon as they are sent. Remove any that should not stay there.":

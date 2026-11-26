@@ -268,6 +268,32 @@
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
   }
+
+  /* ---- Wish wall scroll panel -------------------------------------- */
+  .wish-scroll {
+    background: rgba(9, 30, 24, 0.35);
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(214, 181, 109, 0.55) rgba(0, 0, 0, 0.22);
+  }
+
+  .wish-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .wish-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 999px;
+  }
+
+  .wish-scroll::-webkit-scrollbar-thumb {
+    background: rgba(214, 181, 109, 0.55);
+    border-radius: 999px;
+  }
+
+  .wish-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(214, 181, 109, 0.8);
+  }
 }
 
 @layer utilities {
