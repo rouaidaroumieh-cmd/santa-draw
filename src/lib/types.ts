@@ -19,7 +19,7 @@ export interface Participant {
 export interface DaySchedule {
   /** ISO date, e.g. "2026-12-01" */
   date: string;
-  /** Exactly 4 distinct participant ids, in reveal order. */
+  /** Distinct participant ids, in reveal order (the planned count for that day). */
   participantIds: string[];
 }
 

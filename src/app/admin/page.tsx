@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import Avatar from "@/components/Avatar";
+import DailyDraw from "@/components/DailyDraw";
 import Dialog from "@/components/Dialog";
 import { Overline, PageShell } from "@/components/Chrome";
 import { CampaignProgress, StatCards } from "@/components/Stats";
-import { campaignStats, participantStats, WINNERS_PER_DAY } from "@/lib/draw-engine";
-import { formatDateLong, formatDateShort, ordinal } from "@/lib/dates";
+import { campaignStats, DRAW_DAY_COUNT, participantStats, TOTAL_SELECTIONS } from "@/lib/draw-engine";
+import { CAMPAIGN_END, CAMPAIGN_START, formatDateLong, formatDateShort, ordinal, winnersOn } from "@/lib/dates";
 import { exportCSV, exportJSON, fileToPhotoDataUrl } from "@/lib/storage";
 import {
   applyBackup,
@@ -78,7 +78,7 @@ export default function AdminPage() {
     setNotice({
       tone: res.ok ? "ok" : "error",
       text: res.ok
-        ? "Schedule valid: 20 participants, 15 working days, 4 winners per day, 3 selections each."
+        ? `Schedule valid: 20 participants, ${DRAW_DAY_COUNT} working days, ${TOTAL_SELECTIONS} selections, 3 per participant.`
         : `Schedule invalid: ${res.errors[0]}`,
     });
   };
@@ -147,8 +147,9 @@ export default function AdminPage() {
             </span>
           </h1>
           <p className="mt-6 max-w-[620px] font-display text-[1.1rem] italic leading-relaxed text-ivory/80" style={{ fontWeight: 300 }}>
-            Everything here is designed to be used without technical knowledge: edit the twenty
-            names, load their photos, keep a backup, and let the daily draw look after itself.
+            Everything here is designed to be used without technical knowledge: run the daily
+            draw, edit the twenty names, load their photos and keep a backup. This section is
+            protected by your password — every other page is public and read-only.
           </p>
 
           {notice ? (
@@ -180,6 +181,18 @@ export default function AdminPage() {
             </div>
             <div className="mt-5">
               <CampaignProgress state={state} />
+            </div>
+          </div>
+
+          {/* ---- Daily draw ------------------------------------------ */}
+          <div id="daily-draw">
+            <Overline>Daily draw</Overline>
+            <p className="mt-4 max-w-[640px] text-[0.9rem] leading-relaxed text-ivory/65">
+              Only you can run the draw. Visitors see the result on the Home page as soon as it is
+              revealed. A draw can never be repeated or changed.
+            </p>
+            <div className="mt-6">
+              <DailyDraw />
             </div>
           </div>
 
@@ -249,9 +262,9 @@ export default function AdminPage() {
             <Overline>Draw schedule</Overline>
             <div className="paper gold-frame mt-6 px-6 py-7 sm:px-8" style={{ borderRadius: 2 }}>
               <p className="text-[0.92rem] leading-relaxed text-[#4A463C]">
-                The complete schedule for all 15 working days is generated up front with the Web
+                The complete schedule for all {DRAW_DAY_COUNT} working days is generated up front with the Web
                 Crypto API and validated before it becomes active: 20 participants × 3 selections =
-                15 days × 4 winners = 60 selections. Future names are never exposed in the interface.
+                60 selections, spread over 9 days with 4 winners and 8 days with 3 winners. Future names are never exposed in the interface.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <button type="button" className="btn btn-dark" onClick={() => void doValidate()}>
@@ -293,8 +306,8 @@ export default function AdminPage() {
                     {(validation.ok
                       ? [
                           "20 participants",
-                          "15 eligible working days (weekends excluded)",
-                          "4 distinct winners per day",
+                          `${DRAW_DAY_COUNT} eligible working days (weekends excluded)`,
+                          "The planned number of distinct winners on each day",
                           "3 appearances per participant on 3 different dates",
                           "60 total selections",
                         ]
@@ -328,10 +341,10 @@ export default function AdminPage() {
                       <td className="py-3 pr-4 text-[0.88rem]">{formatDateLong(row.date)}</td>
                       <td
                         className={`tabular py-3 pr-4 text-[0.88rem] ${
-                          row.count === WINNERS_PER_DAY ? "" : "font-bold text-[#7A1F2B]"
+                          row.count === winnersOn(row.date) ? "" : "font-bold text-[#7A1F2B]"
                         }`}
                       >
-                        {row.count} / {WINNERS_PER_DAY}
+                        {row.count} / {winnersOn(row.date)}
                       </td>
                       <td className="py-3 text-[0.82rem] text-[#4A463C]">{row.status}</td>
                     </tr>
@@ -386,8 +399,8 @@ export default function AdminPage() {
                     <input
                       id="manual-date"
                       type="date"
-                      min="2026-12-01"
-                      max="2026-12-21"
+                      min={CAMPAIGN_START}
+                      max={CAMPAIGN_END}
                       className="field mt-2 w-[190px]"
                       value={state.settings.manualDate ?? ""}
                       disabled={state.settings.dateMode !== "manual"}
@@ -404,14 +417,14 @@ export default function AdminPage() {
               <div className="paper-dim gold-frame px-6 py-7" style={{ borderRadius: 2 }}>
                 <p className="label text-gold">Simulation mode</p>
                 <p className="mt-3 text-[0.88rem] leading-relaxed text-ivory/72">
-                  On the Home page the machine can be rehearsed at any time. A simulation animates
-                  the reels with four random names so you can check the look and timing — the result
-                  is clearly marked <em>Simulation · not recorded</em> and is never written to the
-                  campaign history.
+                  The machine in the Daily draw section can be rehearsed at any time. A simulation
+                  animates the reels with random names so you can check the look and timing — the
+                  result is clearly marked <em>Simulation · not recorded</em> and is never written
+                  to the campaign history.
                 </p>
-                <Link href="/" className="btn btn-gold mt-6 inline-flex">
-                  Open the drawing machine
-                </Link>
+                <a href="#daily-draw" className="btn btn-gold mt-6 inline-flex">
+                  Go to the drawing machine
+                </a>
               </div>
             </div>
           </div>
@@ -564,8 +577,8 @@ export default function AdminPage() {
               {[
                 ["Edit the 20 employees", "Open ADMIN → Participant configuration, type the real names into the twenty fields. Everything stays editable until the first reveal."],
                 ["Upload photos", "Use “Add photo” beside any name (JPG, PNG or WebP). Photos are resized automatically and stored on the server."],
-                ["Perform the daily draw", "On HOME press “Reveal today's 4 names”, read the warning, then confirm. The four reels stop one after another and the result is locked forever."],
-                ["View the calendar", "CALENDAR shows all 21 days. Click a completed day for the full historical view; weekends are marked “Weekend – no draw”."],
+                ["Perform the daily draw", "In ADMIN → Daily draw press “Reveal today's names”, read the warning, then confirm. The reels stop one after another and the result is locked forever."],
+                ["View the calendar", `CALENDAR shows all ${DRAW_DAY_COUNT} working days, from 30 November to 22 December, with weekends marked “Weekend – no draw”. Click a completed day for the full historical view.`],
                 ["Export backups", "ADMIN → Backup & export. Save the JSON file after every reveal and restore it on another device with “Import JSON backup”."],
                 ["Share the link", "Everyone sees the same results. Only you, logged in on this page, can run the daily draw — visitors just watch the names appear."],
               ].map(([title, body]) => (

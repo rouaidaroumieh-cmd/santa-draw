@@ -2,8 +2,8 @@
  * The draw engine.
  *
  * MATHEMATICAL CONTRACT (non-negotiable):
- *   20 participants  × 3 selections = 60 selections
- *   15 working days  × 4 winners    = 60 selections
+ *   20 participants × 3 selections = 60 selections
+ *   the working days of DRAW_PLAN, with their planned winners, add up to 60
  *   • each participant appears exactly 3 times, on 3 different dates
  *   • no participant appears twice on the same date
  *   • no weekend dates, ever
@@ -12,14 +12,13 @@
  * `validateSchedule()`, and stored. The reveal animation is purely cosmetic —
  * winners are always taken from the pre-generated, validated schedule.
  */
-import { getEligibleDates, isEligibleDate } from "./dates";
+import { DRAW_PLAN, getEligibleDates, isEligibleDate, winnersOn } from "./dates";
 import { randomInt, shuffle, weightedPick } from "./random";
 import type { CampaignState, DaySchedule, ValidationResult } from "./types";
 
 export const PARTICIPANT_COUNT = 20;
 export const SELECTIONS_PER_PARTICIPANT = 3;
-export const WINNERS_PER_DAY = 4;
-export const DRAW_DAY_COUNT = 15;
+export const DRAW_DAY_COUNT = DRAW_PLAN.length; // 17 working days
 export const TOTAL_SELECTIONS = PARTICIPANT_COUNT * SELECTIONS_PER_PARTICIPANT; // 60
 
 /* ------------------------------------------------------------------ */
@@ -30,7 +29,7 @@ export const TOTAL_SELECTIONS = PARTICIPANT_COUNT * SELECTIONS_PER_PARTICIPANT; 
  * Builds a complete, valid, randomised schedule.
  *
  * Strategy: weighted greedy dealing with a restart-on-dead-end loop.
- * For every working day we pick 4 distinct participants that still have
+ * For every working day we pick the planned number of distinct participants that still have
  * selections left, strongly preferring those who did NOT appear on the
  * previous day(s) — this reduces back-to-back appearances without ever
  * compromising mathematical validity (the constraint set is re-checked at
@@ -69,7 +68,7 @@ function tryBuildSchedule(
     const picked: string[] = [];
     const usedToday = new Set<string>();
 
-    for (let slot = 0; slot < WINNERS_PER_DAY; slot++) {
+    for (let slot = 0; slot < winnersOn(date); slot++) {
       const pool: string[] = [];
       const weights: number[] = [];
       for (const id of participantIds) {
@@ -138,8 +137,9 @@ export function validateSchedule(
 
   const counts = new Map<string, number>();
   for (const day of schedule) {
-    if (day.participantIds.length !== WINNERS_PER_DAY) {
-      errors.push(`${day.date}: expected ${WINNERS_PER_DAY} winners, found ${day.participantIds.length}.`);
+    const expectedWinners = winnersOn(day.date);
+    if (day.participantIds.length !== expectedWinners) {
+      errors.push(`${day.date}: expected ${expectedWinners} winners, found ${day.participantIds.length}.`);
       continue;
     }
     const seen = new Set<string>();
@@ -176,7 +176,10 @@ export function validateSelection(
 
   if (!isEligibleDate(date)) errors.push(`${date} is not an eligible working day (weekends are excluded).`);
   if (state.results[date]) errors.push(`The draw for ${date} has already been completed and locked.`);
-  if (winnerIds.length !== WINNERS_PER_DAY) errors.push(`A draw must reveal exactly ${WINNERS_PER_DAY} names.`);
+  const expectedWinners = winnersOn(date);
+  if (winnerIds.length !== expectedWinners) {
+    errors.push(`A draw on ${date} must reveal exactly ${expectedWinners} names.`);
+  }
 
   const seen = new Set<string>();
   const known = new Set(state.participants.map((p) => p.id));

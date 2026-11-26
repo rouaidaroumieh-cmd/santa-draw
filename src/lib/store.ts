@@ -340,10 +340,10 @@ export function commitDraw() {
   if (next) setState(next);
 }
 
-/** Rehearsal mode: four names, nothing stored, never part of the real history. */
-export function simulateDraw(): { ok: true; winners: string[] } | { ok: false; error: string } {
+/** Rehearsal mode: random names, nothing stored, never part of the real history. */
+export function simulateDraw(count: number): { ok: true; winners: string[] } | { ok: false; error: string } {
   if (!state) return { ok: false, error: "The campaign is not loaded yet." };
-  const ids = shuffle(state.participants.map((p) => p.id)).slice(0, 4);
+  const ids = shuffle(state.participants.map((p) => p.id)).slice(0, count);
   return { ok: true, winners: ids };
 }
 

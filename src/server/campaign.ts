@@ -235,7 +235,7 @@ export async function updateSettings(patch: {
   }
   if (patch.manualDate !== undefined) {
     if (patch.manualDate !== null && !isCampaignDate(patch.manualDate)) {
-      return fail("The date must be between 1 and 21 December 2026.");
+      return fail("The date must be between 30 November and 22 December 2026.");
     }
     settings.manualDate = patch.manualDate;
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { countWord } from "@/lib/dates";
 import Avatar from "./Avatar";
 
 export interface ReelPerson {
@@ -15,7 +16,6 @@ export interface ReelWinner extends ReelPerson {
 }
 
 const ITEM_H = 172;
-const REEL_COUNT = 4;
 
 /** Deterministic decorative strip shown before the draw. */
 function idleStrip(people: ReelPerson[], reel: number): string[] {
@@ -48,6 +48,7 @@ interface ReelState {
 export default function ReelMachine({
   people,
   winners,
+  reelCount,
   spinning,
   onSpinComplete,
   onCta,
@@ -61,24 +62,27 @@ export default function ReelMachine({
 }: {
   people: ReelPerson[];
   winners: ReelWinner[] | null;
+  /** Number of reels shown while idle (3 or 4, as planned for the day). */
+  reelCount: number;
   spinning: boolean;
   onSpinComplete: () => void;
-  onCta: () => void;
-  ctaLabel: string;
-  ctaDisabled: boolean;
+  /** Without `onCta` the machine is display-only: no button is shown. */
+  onCta?: () => void;
+  ctaLabel?: string;
+  ctaDisabled?: boolean;
   ctaReason?: string;
   statusLine: string;
   statusTone: "ready" | "locked" | "paused";
   dateLabel: string;
   simulation?: boolean;
 }) {
-  const [state, setState] = useState<ReelState>({
-    strips: [0, 1, 2, 3].map((r) => idleStrip(people, r)),
-    offsets: [0, 0, 0, 0],
-    durations: [0, 0, 0, 0],
+  const [state, setState] = useState<ReelState>(() => ({
+    strips: Array.from({ length: reelCount }, (_, r) => idleStrip(people, r)),
+    offsets: Array.from({ length: reelCount }, () => 0),
+    durations: Array.from({ length: reelCount }, () => 0),
     run: false,
-  });
-  const [landed, setLanded] = useState<boolean[]>([false, false, false, false]);
+  }));
+  const [landed, setLanded] = useState<boolean[]>(() => Array.from({ length: reelCount }, () => false));
   const completeRef = useRef(onSpinComplete);
   completeRef.current = onSpinComplete;
 
@@ -97,11 +101,11 @@ export default function ReelMachine({
     if (spinning || !winners) return;
     setState({
       strips: winners.map((w) => [w.id]),
-      offsets: [0, 0, 0, 0],
-      durations: [0, 0, 0, 0],
+      offsets: winners.map(() => 0),
+      durations: winners.map(() => 0),
       run: false,
     });
-    setLanded([true, true, true, true]);
+    setLanded(winners.map(() => true));
   }, [spinning, winners]);
 
   // The spin: purely cosmetic. Winners were decided and validated beforehand.
@@ -114,7 +118,7 @@ export default function ReelMachine({
     const strips = winners.map((w, i) => (reduced ? [w.id] : spinStrip(peopleRef.current, w.id, i)));
     const offsets = strips.map(() => 0);
     const durations = strips.map((s, i) => (reduced ? 0 : 2200 + i * 620));
-    setLanded([false, false, false, false]);
+    setLanded(winners.map(() => false));
     setState({ strips, offsets, durations, run: false });
 
     let raf2 = 0;
@@ -179,7 +183,7 @@ export default function ReelMachine({
             <RibbonBow />
             <p className="label label-gold mt-3">The Christmas Drawing Machine</p>
             <h2 className="mt-2 text-[1.9rem] leading-[0.95] text-ivory sm:text-[2.6rem]">
-              Four names, sealed
+              <span className="capitalize">{countWord(reelCount)}</span> names, sealed
               <span className="block italic text-gold" style={{ fontWeight: 300 }}>
                 until the moment arrives
               </span>
@@ -187,7 +191,9 @@ export default function ReelMachine({
           </div>
 
           {/* ---- Reels ------------------------------------------------ */}
-          <div className="mt-7 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+          <div
+            className={`mt-7 grid grid-cols-2 gap-3 sm:gap-4 ${reelCount === 3 ? "md:grid-cols-3" : "md:grid-cols-4"}`}
+          >
             {state.strips.map((strip, reel) => (
               <div
                 key={reel}
@@ -260,16 +266,18 @@ export default function ReelMachine({
               <span className="text-[0.8rem] tracking-[0.12em] text-ivory/55 uppercase">{dateLabel}</span>
             </div>
 
-            <button
-              type="button"
-              onClick={onCta}
-              disabled={ctaDisabled}
-              className="btn btn-gold w-full max-w-[440px] text-[0.82rem]"
-            >
-              {ctaLabel}
-            </button>
+            {onCta ? (
+              <button
+                type="button"
+                onClick={onCta}
+                disabled={ctaDisabled}
+                className="btn btn-gold w-full max-w-[440px] text-[0.82rem]"
+              >
+                {ctaLabel}
+              </button>
+            ) : null}
 
-            {ctaDisabled && ctaReason ? (
+            {onCta && ctaDisabled && ctaReason ? (
               <p className="max-w-[420px] text-center text-[0.85rem] leading-relaxed text-ivory/60">
                 {ctaReason}
               </p>

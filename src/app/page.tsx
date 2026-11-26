@@ -1,72 +1,28 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Avatar from "@/components/Avatar";
-import Dialog from "@/components/Dialog";
 import { Overline, PageShell } from "@/components/Chrome";
 import ReelMachine, { type ReelWinner } from "@/components/ReelMachine";
 import { CampaignProgress, StatCards } from "@/components/Stats";
-import { fireConfetti } from "@/lib/confetti";
-import {
-  SELECTIONS_PER_PARTICIPANT,
-  WINNERS_PER_DAY,
-  campaignStats,
-} from "@/lib/draw-engine";
-import { formatDateLong, isWeekendDate, ordinal } from "@/lib/dates";
-import {
-  beginDraw,
-  commitDraw,
-  drawStatusFor,
-  simulateDraw,
-  todayStatus,
-  useCampaign,
-  useIsAdmin,
-  type CampaignState,
-} from "@/lib/store";
+import { CAMPAIGN_END, CAMPAIGN_START, countWord, formatDateLong, winnersOn } from "@/lib/dates";
+import { DRAW_DAY_COUNT, campaignStats } from "@/lib/draw-engine";
+import { drawStatusFor, todayStatus, useCampaign } from "@/lib/store";
+import { buildReelWinners } from "@/lib/winners";
 
-function appearancesUpTo(state: CampaignState, date: string, id: string): number {
-  return Object.values(state.results).filter(
-    (r) => r.date <= date && r.participantIds.includes(id),
-  ).length;
-}
+const noop = () => {};
 
+/** Public page: everybody can follow the draw, only the organiser runs it (Admin section). */
 export default function HomePage() {
   const state = useCampaign();
-  const isAdmin = useIsAdmin();
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [spinning, setSpinning] = useState(false);
-  const [liveWinners, setLiveWinners] = useState<ReelWinner[] | null>(null);
-  const [simulation, setSimulation] = useState(false);
-  const [notice, setNotice] = useState<{ tone: "error" | "info"; text: string } | null>(null);
 
   const status = useMemo(() => (state ? todayStatus() : null), [state]);
-
-  const buildReelWinners = useCallback(
-    (ids: string[], date: string, sim: boolean): ReelWinner[] => {
-      if (!state) return [];
-      return ids.map((id) => {
-        const p = state.participants.find((x) => x.id === id);
-        const app = appearancesUpTo(state, date, id) + (state.results[date] ? 0 : 1);
-        return {
-          id,
-          name: p?.name ?? id,
-          photo: state.photos[id],
-          selectionLabel: sim ? "Simulation pick" : `${ordinal(Math.min(app, 3))} selection`,
-          remainingLabel: sim
-            ? "Not recorded"
-            : `${Math.max(0, SELECTIONS_PER_PARTICIPANT - app)} chance${
-                Math.max(0, SELECTIONS_PER_PARTICIPANT - app) === 1 ? "" : "s"
-              } remaining`,
-        };
-      });
-    },
-    [state],
-  );
-
   const today = status?.today ?? "";
   const todayResult = state?.results[today];
-  const isWeekendToday = isWeekendDate(today);
   const drawStatus = state ? drawStatusFor(today) : null;
+
+  // Reels shown: the planned count for the day, or 4 on days without a draw.
+  const slotCount = winnersOn(today) || 4;
 
   const people = useMemo(
     () =>
@@ -80,10 +36,10 @@ export default function HomePage() {
     [state],
   );
 
-  const winners: ReelWinner[] | null = useMemo(() => {
-    if (todayResult) return buildReelWinners(todayResult.participantIds, today, false);
-    return liveWinners;
-  }, [todayResult, liveWinners, buildReelWinners, today]);
+  const winners = useMemo<ReelWinner[] | null>(
+    () => (state && todayResult ? buildReelWinners(state, todayResult.participantIds, today, false) : null),
+    [state, todayResult, today],
+  );
 
   if (!state || !status || !drawStatus) {
     return (
@@ -97,59 +53,27 @@ export default function HomePage() {
 
   const stats = campaignStats(state);
 
-  const openConfirm = () => {
-    setNotice(null);
-    setConfirmOpen(true);
-  };
-
-  const runSimulation = () => {
-    const res = simulateDraw();
-    if (!res.ok) {
-      setNotice({ tone: "error", text: res.error });
-      return;
-    }
-    setNotice({
-      tone: "info",
-      text: "Simulation running — these names are for rehearsal only and will not be recorded.",
-    });
-    setSimulation(true);
-    setLiveWinners(buildReelWinners(res.winners, today, true));
-    setSpinning(true);
-  };
-
-  const confirmDraw = async () => {
-    setConfirmOpen(false);
-    const res = await beginDraw(today);
-    if (!res.ok) {
-      setNotice({ tone: "error", text: res.error });
-      return;
-    }
-    setSimulation(false);
-    setLiveWinners(buildReelWinners(res.winners, today, false));
-    setSpinning(true);
-  };
-
-  const onSpinComplete = () => {
-    setSpinning(false);
-    if (simulation) {
-      fireConfetti(0.55);
-      return;
-    }
-    commitDraw();
-    fireConfetti(1);
-    setNotice({ tone: "info", text: "DRAW COMPLETED – RESULTS LOCKED" });
-  };
-
   /* ---- status banner copy ---------------------------------------- */
   let bannerTitle = "";
   let bannerBody = "";
   let bannerTone: "ready" | "locked" | "paused" = "ready";
 
-  if (isWeekendToday) {
-    bannerTitle = "Santa is taking a little Christmas break today!";
-    bannerBody = status.nextDate
-      ? `The next Christmas surprise arrives on ${formatDateLong(status.nextDate)}.`
-      : "The campaign is complete — thank you for a wonderful Christmas run.";
+  if (drawStatus.kind === "weekend") {
+    // Not a draw day: before the campaign, after it, or a weekend in between.
+    if (today < CAMPAIGN_START) {
+      bannerTitle = "The Christmas draw starts soon!";
+      bannerBody = status.nextDate
+        ? `The first reveal is on ${formatDateLong(status.nextDate)}.`
+        : "The first reveal is coming soon.";
+    } else if (today > CAMPAIGN_END) {
+      bannerTitle = "The Christmas draw is over.";
+      bannerBody = "The campaign is complete — thank you for a wonderful Christmas run.";
+    } else {
+      bannerTitle = "Santa is taking a little Christmas break today!";
+      bannerBody = status.nextDate
+        ? `The next Christmas surprise arrives on ${formatDateLong(status.nextDate)}.`
+        : "The campaign is complete — thank you for a wonderful Christmas run.";
+    }
     bannerTone = "paused";
   } else if (drawStatus.kind === "completed") {
     bannerTitle = "Today's Christmas surprises have already been revealed!";
@@ -166,33 +90,9 @@ export default function HomePage() {
     bannerTone = "paused";
   } else {
     bannerTitle = "Today's Christmas draw is ready.";
-    bannerBody = `Confirm the draw to reveal today's four Christmas names and lock them permanently.`;
+    bannerBody = `The organiser reveals today's ${countWord(slotCount)} Christmas names — this page updates by itself.`;
     bannerTone = "ready";
   }
-
-  const canDraw = isAdmin && drawStatus.kind === "ready" && !spinning;
-  const waitingForOrganiser = !isAdmin && drawStatus.kind === "ready";
-  const machineCtaLabel = canDraw
-    ? "🎄 Reveal today's 4 names"
-    : drawStatus.kind === "completed"
-      ? "Today's results are locked"
-      : waitingForOrganiser
-        ? "Waiting for the organiser's reveal"
-        : spinning
-          ? "The reels are turning…"
-          : "Run a rehearsal of the machine";
-
-  const machineCtaReason = spinning
-    ? "The four names were decided and validated before the animation began."
-    : drawStatus.kind === "completed"
-      ? "Today's Christmas surprises have already been revealed. This draw can never be repeated or changed."
-      : waitingForOrganiser
-        ? "The organiser runs the daily draw. The four names appear here as soon as they are revealed — this page updates by itself."
-        : isWeekendToday
-          ? "Weekend — no draw today. The rehearsal below is only a preview and is never recorded."
-          : drawStatus.kind === "future"
-            ? "This date has not arrived yet, so today's names stay sealed. You can rehearse the machine at any time — rehearsals are never recorded."
-            : undefined;
 
   return (
     <PageShell current="home">
@@ -222,7 +122,7 @@ export default function HomePage() {
 
         <div className="relative mx-auto max-w-[1240px] px-5 pb-28 pt-16 sm:pt-24 lg:pb-36 lg:pt-28">
           <div className="max-w-[820px]">
-            <p className="label label-gold rise">Office Christmas Campaign · 1–21 December 2026</p>
+            <p className="label label-gold rise">Office Christmas Campaign · 30 November – 22 December 2026</p>
             <h1
               className="rise mt-6 text-ivory"
               style={{
@@ -243,14 +143,14 @@ export default function HomePage() {
               className="rise mt-7 max-w-[560px] font-display text-[1.35rem] italic leading-snug text-ivory/85 sm:text-[1.65rem]"
               style={{ animationDelay: "180ms", fontWeight: 300 }}
             >
-              21 days of Christmas magic — four names revealed on every working day, and sealed
+              23 days of Christmas magic — names revealed on every working day, and sealed
               forever the moment they appear.
             </p>
 
             <div className="rise mt-9 flex flex-wrap items-center gap-x-8 gap-y-3" style={{ animationDelay: "260ms" }}>
               {[
                 ["20", "participants"],
-                ["15", "draw days"],
+                [String(DRAW_DAY_COUNT), "draw days"],
                 ["60", "selections"],
                 ["3", "chances each"],
               ].map(([n, label]) => (
@@ -274,24 +174,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ================= THE MACHINE ================= */}
+      {/* ================= THE MACHINE (display only) ================= */}
       <section className="px-5 pt-20 sm:pt-24">
         <div className="mx-auto max-w-[1240px]">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start lg:gap-14">
             <div className="order-2 lg:order-1">
               <ReelMachine
+                key={slotCount}
                 people={people}
                 winners={winners}
-                spinning={spinning}
-                onSpinComplete={onSpinComplete}
-                onCta={canDraw ? openConfirm : runSimulation}
-                ctaLabel={machineCtaLabel}
-                ctaDisabled={spinning || drawStatus.kind === "completed" || waitingForOrganiser}
-                ctaReason={machineCtaReason}
+                reelCount={slotCount}
+                spinning={false}
+                onSpinComplete={noop}
                 statusLine={bannerTitle}
                 statusTone={bannerTone}
                 dateLabel={formatDateLong(today)}
-                simulation={simulation && !todayResult}
               />
             </div>
 
@@ -317,19 +214,6 @@ export default function HomePage() {
                   </p>
                 </div>
               </div>
-
-              {notice ? (
-                <p
-                  role="status"
-                  className={`mt-4 border-l-2 px-4 py-3 text-[0.85rem] leading-relaxed ${
-                    notice.tone === "error"
-                      ? "border-[#A33444] bg-[rgba(163,52,68,0.14)] text-ivory"
-                      : "border-gold bg-[rgba(214,181,109,0.12)] text-ivory/85"
-                  }`}
-                >
-                  {notice.text}
-                </p>
-              ) : null}
             </aside>
           </div>
         </div>
@@ -340,9 +224,13 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1240px]">
           <Overline>{todayResult ? "Today's Christmas picks" : "Awaiting today's picks"}</Overline>
 
-          {winners && winners.length === WINNERS_PER_DAY ? (
+          {winners && winners.length > 0 ? (
             <>
-              <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div
+                className={`mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 ${
+                  winners.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4"
+                }`}
+              >
                 {winners.map((w, i) => (
                   <article
                     key={w.id}
@@ -359,69 +247,32 @@ export default function HomePage() {
                       <p className="mt-2 text-[0.86rem] text-[#4A463C]">{w.remainingLabel}</p>
                     </div>
                     <p className="label mt-4 text-[0.52rem] text-[#6E6A5E]">
-                      {todayResult ? `Locked ${formatDateLong(today)}` : "Simulation · not recorded"}
+                      Locked {formatDateLong(today)}
                     </p>
                   </article>
                 ))}
               </div>
 
-              <div
-                className={`mt-8 flex flex-col items-center gap-3 border px-6 py-6 text-center ${
-                  todayResult
-                    ? "border-[rgba(214,181,109,0.5)] bg-[rgba(214,181,109,0.1)]"
-                    : "border-dashed border-[rgba(214,181,109,0.4)] bg-[rgba(255,255,255,0.03)]"
-                }`}
-              >
+              <div className="mt-8 flex flex-col items-center gap-3 border border-[rgba(214,181,109,0.5)] bg-[rgba(214,181,109,0.1)] px-6 py-6 text-center">
                 <p className="font-display text-[1.55rem] italic text-ivory" style={{ fontWeight: 300 }}>
-                  {todayResult
-                    ? "Congratulations to today's Christmas picks!"
-                    : "This was a rehearsal — nothing has been recorded."}
+                  Congratulations to today&apos;s Christmas picks!
                 </p>
-                <p className="label text-gold">
-                  {todayResult ? "Draw completed – results locked" : "Simulation mode"}
-                </p>
+                <p className="label text-gold">Draw completed – results locked</p>
               </div>
             </>
           ) : (
             <div className="paper-dim gold-frame mt-7 px-6 py-14 text-center" style={{ borderRadius: 2 }}>
               <p className="font-display text-[1.6rem] italic leading-snug text-ivory/85" style={{ fontWeight: 300 }}>
-                Four names are waiting behind the glass.
+                The names are waiting behind the glass.
               </p>
               <p className="mx-auto mt-4 max-w-[440px] text-[0.92rem] leading-relaxed text-ivory/65">
-                When today&apos;s draw is confirmed, the four Christmas picks appear here — with their
+                When today&apos;s draw is confirmed, the Christmas picks appear here — with their
                 photos, their selection number and the chances they have left.
               </p>
             </div>
           )}
         </div>
       </section>
-
-      {/* ================= CONFIRMATION DIALOG ================= */}
-      <Dialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        eyebrow="Confirm the daily draw"
-        title="Are you ready to reveal today's four Christmas names?"
-        actions={
-          <>
-            <button type="button" className="btn btn-dark" onClick={() => setConfirmOpen(false)}>
-              Cancel
-            </button>
-            <button type="button" className="btn btn-gold" onClick={() => void confirmDraw()}>
-              Confirm draw
-            </button>
-          </>
-        }
-      >
-        <p>
-          The four names are chosen by the validated draw schedule and locked permanently as soon as
-          they are revealed. <strong>This cannot be undone</strong> — no repeat, no edit, no redraw.
-        </p>
-        <p className="mt-4">
-          {formatDateLong(today)} · {WINNERS_PER_DAY} names ·{" "}
-          {stats.remainingEmployeeSelections} selections still available.
-        </p>
-      </Dialog>
     </PageShell>
   );
 }

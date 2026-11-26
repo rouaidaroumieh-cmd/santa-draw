@@ -1,7 +1,7 @@
 # 🎄 Santa's Christmas Draw 2026
 
-**21 days of Christmas magic** — a complete, production-quality Christmas lucky-draw web
-application for a company office. Twenty employees, fifteen working days, four names revealed
+**23 days of Christmas magic** — a complete, production-quality Christmas lucky-draw web
+application for a company office. Twenty employees, seventeen working days, three or four names revealed
 every morning from a magical Christmas drawing machine, and every result locked forever.
 
 ---
@@ -10,22 +10,25 @@ every morning from a magical Christmas drawing machine, and every result locked 
 
 | Area | What you get |
 | --- | --- |
-| **Home** | The Christmas gift drawing machine (four animated glass reels), the four statistic cards, the campaign progress bar and the "Today's Christmas Picks" presentation |
-| **Calendar** | The complete 21-day Advent calendar (1–21 December 2026) with weekend tiles, sealed future days and clickable historical days |
-| **Participants** | 20 editable employee profiles with photo, selection progress, three gift-stars and the remaining chances |
-| **Admin** | Name/photo editing, schedule generation and validation, campaign start, completed draws history, CSV + JSON export, validated JSON import, date/rehearsal controls and a two-step full reset |
+| **Home** *(public)* | The statistic cards, the campaign progress bar, today's names once revealed and the "Today's Christmas Picks" presentation. Read-only: no draw button |
+| **Calendar** *(public)* | The 23-day Advent calendar (30 November – 22 December 2026) with weekend tiles, sealed future days and clickable historical days |
+| **Participants** *(public)* | The 20 employee profiles with photo, selection progress, three gift-stars and the remaining chances. Read-only |
+| **Admin** *(password)* | The only place to **run the daily draw** (drawing machine and rehearsal) and to **enter the participants** (names and photos). Also schedule generation and validation, campaign start, completed draws history, CSV + JSON export, validated JSON import, date/rehearsal controls and a two-step full reset |
 
 ### The non-negotiable draw rules (implemented and validated in code)
 
 * 20 participants × 3 selections = **60 selections**
-* 15 working days (Mon–Fri, 1–21 Dec 2026) × 4 winners = **60 selections**
+* 17 working days (Mon–Fri, 30 Nov – 22 Dec 2026) with a planned number of winners per day
+  (9 days × 4 + 8 days × 3 = **60 selections**). The plan lives in `DRAW_PLAN` in `src/lib/dates.ts`.
 * Each participant appears **exactly 3 times, on 3 different dates**
 * Never twice on the same day, never on a weekend, never in the future
 * Completed employees are automatically excluded from future selections
 * The complete schedule is generated **before** the first draw and validated before it becomes active
 
-Eligible dates: 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18 and 21 December 2026
-(5, 6, 12, 13, 19 and 20 December are weekends and are displayed as **“Weekend – no draw”**).
+Draw days: 30 Nov; 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 21 and 22 December 2026.
+Winners per day: 4 on 30/11, 1/12, 2/12, 7/12, 8/12, 9/12, 11/12, 14/12 and 22/12; 3 on 3/12, 4/12,
+10/12, 15/12, 16/12, 17/12, 18/12 and 21/12.
+Weekends (5, 6, 12, 13, 19 and 20 December) are displayed as **“Weekend – no draw”**.
 
 ---
 
@@ -64,7 +67,7 @@ npm run dev:test
 ```
 
 This uses a separate **sandbox** campaign (`dev` instead of `main`) and shows a toolbar to pick any
-"today" in 1–21 December, undo a day's draw, fill the previous days, or reset the sandbox. The
+"today" in the campaign window, undo a day's draw, fill the previous days, or reset the sandbox. The
 real campaign data is never touched, and the dev actions answer `404` when the variable is not set.
 
 ---
@@ -96,7 +99,7 @@ HTTPS by these hosts, which also makes the session cookie `secure`.
    automatically to protect the results.
 
 ### Uploading photos
-* Click **Add photo** next to any name (Admin) or **Upload photo** on a participant card.
+* Log in on **Admin**, then click **Add photo** next to any name. Visitors cannot upload photos.
 * JPG, PNG and WebP are accepted. Images are cropped to a square, resized to 512 px and compressed
   automatically.
 * Photos are stored on the server, shown to everyone and included in JSON backups. Only the
@@ -105,10 +108,10 @@ HTTPS by these hosts, which also makes the session cookie `secure`.
 ### Performing the daily draw
 0. Log in on **ADMIN** (visitors see "Waiting for the organiser's reveal" instead of the button).
 1. Open **HOME**. The banner tells you whether today is ready, completed, a weekend or still ahead.
-2. Press **🎄 Reveal today's 4 names**.
-3. Read the confirmation — *“Are you ready to reveal today's four Christmas names?”* — and press
+2. Press **🎄 Reveal today's names** (the number shown is the planned number for the day).
+3. Read the confirmation — *“Are you ready to reveal today's Christmas names?”* — and press
    **CONFIRM DRAW** (or **CANCEL**).
-4. The four reels slow down one after another and the four names appear with a gold sparkle.
+4. The reels slow down one after another and the names appear with a gold sparkle.
 5. The result is saved immediately and the day is marked **DRAW COMPLETED – RESULTS LOCKED**.
 
 A draw can never be executed twice: the server records it in a single database transaction (one
@@ -117,11 +120,11 @@ come from the pre-validated schedule and are committed *before* the animation st
 animation is purely cosmetic. Visitors see the result at the next refresh, without the animation.
 
 If today is not an eligible day, the same button becomes a **rehearsal**: it animates the machine
-with four random names marked *Simulation · not recorded*. Nothing simulated is ever written to the
+with random names marked *Simulation · not recorded*. Nothing simulated is ever written to the
 campaign history.
 
 ### Viewing the calendar
-Open **CALENDAR**. Working days show their status, completed days show the four winners with photos
+Open **CALENDAR**. Working days show their status, completed days show their winners with photos
 and a lock icon, future days stay sealed with *“A Christmas surprise is waiting…”*, and weekends are
 shown as resting days. Click any completed day to open the full historical view.
 
@@ -145,7 +148,7 @@ There is deliberately **no ordinary undo** for a daily draw.
 randomness   Web Crypto API  →  unbiased rejection-sampled integers
 generation   weighted greedy dealing with restart-on-dead-end,
              preferring participants who did not appear on the previous day
-validation   validateSchedule() — 20 ids, 15 eligible dates, 4 distinct per day,
+validation   validateSchedule() — 20 ids, 17 eligible dates, the planned winners per day,
              3 per participant on 3 distinct dates, 60 total, no weekends
 reveal       POST /api/draw → lock the campaign row, re-validate (eligible day, not
              already drawn, selection rules) and insert the result atomically
@@ -175,7 +178,7 @@ loses nothing — the day is already drawn and locked.
 * **Accessibility:** keyboard-navigable dialogs with focus restore, labelled controls, status
   messages with `role="status"`, progressbar semantics, and every status carried by text as well as
   colour. `prefers-reduced-motion` disables the reels, the snow and the confetti.
-* **Responsive:** tested layouts for desktop, laptop, tablet and phone (the four reels become a 2×2
+* **Responsive:** tested layouts for desktop, laptop, tablet and phone (the reels become a 2×2
   grid on small screens).
 
 ## 7. Mathematical tests included in the engine

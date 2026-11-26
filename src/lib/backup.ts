@@ -2,8 +2,8 @@
  * Backup format and validation. Pure code: it runs on the server, which is the
  * only place where an imported file is accepted.
  */
-import { getDay, isEligibleDate } from "./dates";
-import { SELECTIONS_PER_PARTICIPANT, validateSchedule, WINNERS_PER_DAY } from "./draw-engine";
+import { getDay, isEligibleDate, winnersOn } from "./dates";
+import { SELECTIONS_PER_PARTICIPANT, validateSchedule } from "./draw-engine";
 import {
   CAMPAIGN_ID,
   DATA_VERSION,
@@ -21,7 +21,7 @@ export function isValidPhotoDataUrl(value: unknown): value is string {
   return typeof value === "string" && value.length <= MAX_PHOTO_CHARS && PHOTO_PATTERN.test(value);
 }
 
-/** True for a date inside the 1–21 December campaign calendar. */
+/** True for a date inside the campaign calendar (30 November – 22 December 2026). */
 export function isCampaignDate(value: unknown): value is string {
   return typeof value === "string" && getDay(value) !== undefined;
 }
@@ -115,8 +115,9 @@ function readBackup(data: Partial<BackupFile> | null): ReturnType<typeof parseBa
       return { ok: false, error: `Result for ${date} is not on an eligible working day.` };
     }
     const ids = Array.isArray(r.participantIds) ? r.participantIds.map(String) : [];
-    if (ids.length !== WINNERS_PER_DAY) {
-      return { ok: false, error: `Result for ${date} does not contain ${WINNERS_PER_DAY} winners.` };
+    const expectedWinners = winnersOn(date);
+    if (ids.length !== expectedWinners) {
+      return { ok: false, error: `Result for ${date} does not contain ${expectedWinners} winners.` };
     }
     if (new Set(ids).size !== ids.length) {
       return { ok: false, error: `Result for ${date} contains duplicate winners.` };

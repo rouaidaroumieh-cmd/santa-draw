@@ -1,21 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
 import Avatar from "@/components/Avatar";
 import { Overline, PageShell } from "@/components/Chrome";
 import { CampaignProgress } from "@/components/Stats";
 import { SELECTIONS_PER_PARTICIPANT, participantStats } from "@/lib/draw-engine";
 import { formatDateShort, ordinal } from "@/lib/dates";
-import { fileToPhotoDataUrl } from "@/lib/storage";
-import { setParticipantPhoto, useCampaign, useIsAdmin } from "@/lib/store";
+import { useCampaign } from "@/lib/store";
 
+/** Public, read-only list. Names and photos are edited in the organiser's Admin section. */
 export default function ParticipantsPage() {
   const state = useCampaign();
-  const isAdmin = useIsAdmin();
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const targetRef = useRef<string | null>(null);
 
   if (!state) {
     return (
@@ -29,28 +23,6 @@ export default function ParticipantsPage() {
 
   const stats = participantStats(state);
   const editable = Object.keys(state.results).length === 0;
-
-  const openPicker = (id: string) => {
-    targetRef.current = id;
-    inputRef.current?.click();
-  };
-
-  const onFile = async (file: File | undefined) => {
-    if (!file || !targetRef.current) return;
-    const id = targetRef.current;
-    setBusyId(id);
-    setMessage(null);
-    try {
-      const dataUrl = await fileToPhotoDataUrl(file);
-      await setParticipantPhoto(id, dataUrl);
-      setMessage("Photo updated.");
-    } catch (err) {
-      setMessage(err instanceof Error ? err.message : "The photo could not be uploaded.");
-    } finally {
-      setBusyId(null);
-      if (inputRef.current) inputRef.current.value = "";
-    }
-  };
 
   return (
     <PageShell current="participants">
@@ -90,11 +62,6 @@ export default function ParticipantsPage() {
                   ? "Names and photographs can still be edited by the organiser — the configuration locks as soon as the first draw is completed."
                   : "Configuration is locked: at least one draw has been completed, so names and photographs can no longer change."}
               </p>
-              {message ? (
-                <p role="status" className="mt-3 border-l-2 border-gold bg-[rgba(214,181,109,0.12)] px-4 py-2.5 text-[0.85rem] text-ivory/85">
-                  {message}
-                </p>
-              ) : null}
 
               <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {stats.map((p, i) => (
@@ -176,23 +143,6 @@ export default function ParticipantsPage() {
                       </p>
                     </div>
 
-                    {isAdmin ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => openPicker(p.id)}
-                          disabled={!editable || busyId === p.id}
-                          className="btn btn-dark mt-5 w-full py-2.5 text-[0.62rem]"
-                        >
-                          {busyId === p.id ? "Uploading…" : state.photos[p.id] ? "Replace photo" : "Upload photo"}
-                        </button>
-                        {!editable ? (
-                          <p className="mt-2 text-center text-[0.66rem] text-[#6E6A5E]">
-                            Locked — the campaign has started.
-                          </p>
-                        ) : null}
-                      </>
-                    ) : null}
                     <span className="label mt-3 text-[0.5rem] text-[#6E6A5E]">
                       Entry {String(i + 1).padStart(2, "0")} of 20
                     </span>
@@ -217,14 +167,6 @@ export default function ParticipantsPage() {
         </div>
       </section>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        className="sr-only"
-        aria-label="Upload participant photo"
-        onChange={(e) => void onFile(e.target.files?.[0])}
-      />
     </PageShell>
   );
 }

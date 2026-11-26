@@ -63,7 +63,7 @@ export default function CalendarPage() {
           />
         </div>
         <div className="relative mx-auto max-w-[1240px] px-5 py-16 sm:py-20">
-          <p className="label label-gold">1 – 21 December 2026</p>
+          <p className="label label-gold">30 November – 22 December 2026</p>
           <h1
             className="mt-5 text-ivory"
             style={{ fontSize: "clamp(2.7rem, 8vw, 6.2rem)", lineHeight: 0.88, letterSpacing: "-0.035em", fontWeight: 300 }}
@@ -74,7 +74,7 @@ export default function CalendarPage() {
             </span>
           </h1>
           <p className="mt-6 max-w-[540px] font-display text-[1.15rem] italic leading-relaxed text-ivory/80" style={{ fontWeight: 300 }}>
-            Every working day holds four names. Weekends rest. Future days stay sealed until their
+            Every working day holds three or four names. Weekends rest. Future days stay sealed until their
             morning arrives.
           </p>
           <p className="label mt-8 text-ivory/60">
@@ -124,7 +124,7 @@ export default function CalendarPage() {
 
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {[
-              ["Working day", "Four names are revealed and locked permanently."],
+              ["Working day", "Three or four names are revealed and locked permanently."],
               ["Weekend", "No draw — Santa is taking a little Christmas break."],
               ["Upcoming", "Names stay sealed until the day itself."],
             ].map(([title, body]) => (

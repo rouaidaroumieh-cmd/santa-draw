@@ -8,7 +8,7 @@ export function StatCards({ state }: { state: CampaignState }) {
   const cards = [
     { label: "Total Participants", value: String(s.totalParticipants), note: "Employees in the draw" },
     { label: "Total Draw Days", value: String(s.totalDrawDays), note: "Monday to Friday only" },
-    { label: "Total Selections", value: String(s.totalSelections), note: "20 × 3 = 15 × 4" },
+    { label: "Total Selections", value: String(s.totalSelections), note: "20 × 3 = 9 × 4 + 8 × 3" },
     {
       label: "Completed Selections",
       value: `${s.completedSelections}/${s.totalSelections}`,

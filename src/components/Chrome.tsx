@@ -60,7 +60,7 @@ export function SiteHeader({ current }: { current: SectionKey }) {
               Santa&apos;s Christmas Draw
             </span>
             <span className="label label-gold mt-1 text-[0.58rem] opacity-90">
-              21 Days of Christmas Magic
+              23 Days of Christmas Magic
             </span>
           </span>
         </Link>
@@ -140,7 +140,7 @@ export function PageShell({
       <footer className="relative z-10 mt-20 border-t border-[rgba(214,181,109,0.22)] bg-[rgba(9,30,24,0.7)]">
         <div className="mx-auto flex max-w-[1240px] flex-col gap-3 px-5 py-9 text-center md:flex-row md:items-center md:justify-between md:text-left">
           <p className="label text-ivory/55">
-            Santa&apos;s Christmas Draw 2026 · 21 days · 15 working days · 60 selections
+            Santa&apos;s Christmas Draw 2026 · 23 days · 17 working days · 60 selections
           </p>
           <p className="max-w-md text-[0.82rem] leading-relaxed text-ivory/45">
             Results are stored on the server and shared with everyone. The organiser can export a
