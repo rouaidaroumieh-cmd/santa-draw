@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useT } from "@/lib/language";
-import Avatar from "./Avatar";
-
 export interface ReelPerson {
   id: string;
   name: string;
@@ -212,10 +210,7 @@ export default function ReelMachine({
                       >
                         {person ? (
                           <>
-                            <Avatar id={person.id} name={person.name} photo={person.photo} size={72} />
-                            <p className="line-clamp-2 w-full text-center font-display text-[0.92rem] leading-tight text-ivory">
-                              {person.name}
-                            </p>
+                            <ElfIcon />
                             <span className="label text-[0.52rem] text-gold/70">
                               {simulation ? t("Simulation") : t("Participant")}
                             </span>
@@ -287,6 +282,20 @@ export default function ReelMachine({
 /* ------------------------------------------------------------------ */
 /* Hand-drawn ornament SVGs                                            */
 /* ------------------------------------------------------------------ */
+
+/** Anonymous elf: no face, no name, so nobody is identified on the reels. */
+function ElfIcon() {
+  return (
+    <svg width="72" height="72" viewBox="0 0 64 64" aria-hidden="true">
+      <ellipse cx="32" cy="46" rx="15" ry="12" fill="rgba(214,181,109,0.16)" stroke="rgba(214,181,109,0.5)" strokeWidth="1" />
+      <path d="M16 42 L6 36 L17 50 Z" fill="rgba(214,181,109,0.16)" stroke="rgba(214,181,109,0.5)" strokeWidth="1" />
+      <path d="M48 42 L58 36 L47 50 Z" fill="rgba(214,181,109,0.16)" stroke="rgba(214,181,109,0.5)" strokeWidth="1" />
+      <path d="M14 30 Q18 16 46 6 Q36 18 50 30 Z" fill="#A33444" stroke="#D6B56D" strokeWidth="1.1" strokeLinejoin="round" />
+      <circle cx="47" cy="7" r="4" fill="#F8F3E9" />
+      <rect x="10" y="28" width="44" height="8" rx="4" fill="#245C46" stroke="#D6B56D" strokeWidth="1.1" />
+    </svg>
+  );
+}
 
 function RibbonBow() {
   return (
