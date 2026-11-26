@@ -13,7 +13,7 @@ export const FR: Record<string, string> = {
   "Main navigation": "Navigation principale",
   "23 Days of Christmas Magic": "23 jours de magie de Noël",
   "Santa's Christmas Draw 2026 · 23 days · 17 working days · 60 selections":
-    "Tirage de Noël du Père Noël 2026 · 23 jours · 17 jours ouvrés · 60 sélections",
+    "Tirage de Noël du Père Noël 2026 · 23 jours · 17 jours ouverts · 60 sélections",
   "Results are stored on the server and shared with everyone. The organiser can export a JSON backup from the Admin panel.":
     "Les résultats sont stockés sur le serveur et partagés avec tout le monde. L'organisateur peut exporter une sauvegarde JSON depuis le panneau Admin.",
   "The server cannot be reached. Check your connection.": "Le serveur est injoignable. Vérifiez votre connexion.",
@@ -41,7 +41,7 @@ export const FR: Record<string, string> = {
   "Today's draw is still ahead of us.": "Le tirage du jour est encore à venir.",
   "Next reveal: {date}. Future names stay sealed until their day.":
     "Prochaine révélation : {date}. Les noms futurs restent scellés jusqu'à leur jour.",
-  "All working days have been revealed.": "Tous les jours ouvrés ont été révélés.",
+  "All working days have been revealed.": "Tous les jours ouverts ont été révélés.",
   "Today's Christmas draw is ready.": "Le tirage de Noël du jour est prêt.",
   "The organiser reveals today's {count} Christmas names — this page updates by itself.":
     "L'organisateur révèle les {count} noms de Noël du jour — cette page se met à jour toute seule.",
@@ -50,7 +50,7 @@ export const FR: Record<string, string> = {
   "Santa's": "Le Père Noël",
   "Christmas Draw": "Tirage de Noël",
   "23 days of Christmas magic — names revealed on every working day, and sealed forever the moment they appear.":
-    "23 jours de magie de Noël — des noms révélés chaque jour ouvré, scellés pour toujours dès leur apparition.",
+    "23 jours de magie de Noël — des noms révélés chaque jour ouvert, scellés pour toujours dès leur apparition.",
   "participants": "participants",
   "draw days": "jours de tirage",
   "selections": "sélections",
@@ -59,7 +59,7 @@ export const FR: Record<string, string> = {
   "Campaign status": "État de la campagne",
   "{done}/{total} selections revealed": "{done}/{total} sélections révélées",
   "{days} working days remaining · {people} participants complete":
-    "{days} jours ouvrés restants · {people} participants au complet",
+    "{days} jours ouverts restants · {people} participants au complet",
   "Today's Christmas picks": "Les gagnants de Noël du jour",
   "Awaiting today's picks": "En attente des gagnants du jour",
   "Locked {date}": "Verrouillé le {date}",
@@ -79,11 +79,11 @@ export const FR: Record<string, string> = {
   "Completed Selections": "Sélections effectuées",
   "{count} still to be revealed": "{count} encore à révéler",
   "Campaign completion": "Avancement de la campagne",
-  "{done} of {total} working days revealed": "{done} jours ouvrés sur {total} révélés",
+  "{done} of {total} working days revealed": "{done} jours ouverts sur {total} révélés",
   "per cent": "pour cent",
   "Completed selections": "Sélections effectuées",
-  "Working days done": "Jours ouvrés passés",
-  "Working days left": "Jours ouvrés restants",
+  "Working days done": "Jours ouverts passés",
+  "Working days left": "Jours ouverts restants",
   "Participants completed": "Participants au complet",
   "Selections remaining": "Sélections restantes",
 
@@ -92,7 +92,7 @@ export const FR: Record<string, string> = {
   "Twenty colleagues · three chances each": "Vingt collègues · trois chances chacun",
   "Meet our Christmas": "Découvrez nos",
   "Every person appears exactly three times, on three different working days. The three stars light up as each selection is revealed.":
-    "Chaque personne apparaît exactement trois fois, à trois jours ouvrés différents. Les trois étoiles s'allument à chaque sélection révélée.",
+    "Chaque personne apparaît exactement trois fois, à trois jours ouverts différents. Les trois étoiles s'allument à chaque sélection révélée.",
   "The list": "La liste",
   "Names and photographs can still be edited by the organiser — the configuration locks as soon as the first draw is completed.":
     "Les noms et les photos peuvent encore être modifiés par l'organisateur — la configuration se verrouille dès le premier tirage effectué.",
@@ -111,7 +111,7 @@ export const FR: Record<string, string> = {
   "How the three chances work": "Comment fonctionnent les trois chances",
   "1 · Each person is placed in the schedule exactly three times.":
     "1 · Chaque personne est placée exactement trois fois dans le planning.",
-  "2 · The three dates are always different working days.": "2 · Les trois dates sont toujours des jours ouvrés différents.",
+  "2 · The three dates are always different working days.": "2 · Les trois dates sont toujours des jours ouverts différents.",
   "3 · Once the third star is lit, the person is excluded from future draws.":
     "3 · Une fois la troisième étoile allumée, la personne est exclue des tirages suivants.",
   "4 · Counts are recalculated from the saved results after every reveal.":
@@ -122,11 +122,11 @@ export const FR: Record<string, string> = {
   "30 November – 22 December 2026": "30 novembre – 22 décembre 2026",
   "The Christmas": "Le",
   "Every working day holds three or four names. Weekends rest. Future days stay sealed until their morning arrives.":
-    "Chaque jour ouvré révèle trois ou quatre noms. Les week-ends sont des jours de repos. Les jours à venir restent scellés jusqu'à leur matin.",
+    "Chaque jour ouvert révèle trois ou quatre noms. Les week-ends sont des jours de repos. Les jours à venir restent scellés jusqu'à leur matin.",
   "{done} of {total} working days revealed · {remaining} still to come":
-    "{done} jours ouvrés sur {total} révélés · {remaining} encore à venir",
+    "{done} jours ouverts sur {total} révélés · {remaining} encore à venir",
   "The advent grid": "La grille de l'Avent",
-  "Working day": "Jour ouvré",
+  "Working day": "Jour ouvert",
   "Three or four names are revealed and locked permanently.": "Trois ou quatre noms sont révélés et verrouillés définitivement.",
   "Weekend": "Week-end",
   "No draw — Santa is taking a little Christmas break.": "Pas de tirage — le Père Noël prend une petite pause de Noël.",
@@ -232,7 +232,7 @@ export const FR: Record<string, string> = {
   "{count} chances remaining": "{count} chances restantes",
   "Schedule invalid: {error}": "Planning invalide : {error}",
   "Schedule valid: 20 participants, {days} working days, {selections} selections, 3 per participant.":
-    "Planning valide : 20 participants, {days} jours ouvrés, {selections} sélections, 3 par participant.",
+    "Planning valide : 20 participants, {days} jours ouverts, {selections} sélections, 3 par participant.",
 
   // Admin
   "Opening the administration panel…": "Ouverture du panneau d'administration…",
@@ -250,7 +250,7 @@ export const FR: Record<string, string> = {
   "Today · not drawn yet": "Aujourd'hui · pas encore tiré",
   "Not drawn": "Non tiré",
   "20 participants": "20 participants",
-  "{count} eligible working days (weekends excluded)": "{count} jours ouvrés éligibles (week-ends exclus)",
+  "{count} eligible working days (weekends excluded)": "{count} jours ouverts éligibles (week-ends exclus)",
   "The planned number of distinct winners on each day": "Le nombre prévu de gagnants distincts chaque jour",
   "3 appearances per participant on 3 different dates": "3 apparitions par participant, à 3 dates différentes",
   "{count} total selections": "{count} sélections au total",
@@ -265,7 +265,7 @@ export const FR: Record<string, string> = {
     "Dans ADMIN → Tirage du jour, cliquez sur « Révéler les noms du jour », lisez l'avertissement, puis confirmez. Les rouleaux s'arrêtent l'un après l'autre et le résultat est verrouillé définitivement.",
   "View the calendar": "Consulter le calendrier",
   "CALENDAR shows all {count} working days, from 30 November to 22 December, with weekends marked “Weekend – no draw”. Click a completed day for the full historical view.":
-    "CALENDRIER affiche les {count} jours ouvrés, du 30 novembre au 22 décembre, les week-ends étant marqués « Week-end – pas de tirage ». Cliquez sur un jour terminé pour voir l'historique complet.",
+    "CALENDRIER affiche les {count} jours ouverts, du 30 novembre au 22 décembre, les week-ends étant marqués « Week-end – pas de tirage ». Cliquez sur un jour terminé pour voir l'historique complet.",
   "Export backups": "Exporter les sauvegardes",
   "ADMIN → Backup & export. Save the JSON file after every reveal and restore it on another device with “Import JSON backup”.":
     "ADMIN → Sauvegarde et export. Enregistrez le fichier JSON après chaque révélation et restaurez-le sur un autre appareil avec « Importer une sauvegarde JSON ».",
@@ -296,7 +296,7 @@ export const FR: Record<string, string> = {
   "{selected}/3 used": "{selected}/3 utilisées",
   "Draw schedule": "Planning du tirage",
   "The complete schedule for all {days} working days is generated up front with the Web Crypto API and validated before it becomes active: 20 participants × 3 selections = 60 selections, spread over 9 days with 4 winners and 8 days with 3 winners. Future names are never exposed in the interface.":
-    "Le planning complet des {days} jours ouvrés est généré à l'avance avec l'API Web Crypto puis validé avant d'être activé : 20 participants × 3 sélections = 60 sélections, réparties sur 9 jours à 4 gagnants et 8 jours à 3 gagnants. Les noms futurs ne sont jamais exposés dans l'interface.",
+    "Le planning complet des {days} jours ouverts est généré à l'avance avec l'API Web Crypto puis validé avant d'être activé : 20 participants × 3 sélections = 60 sélections, réparties sur 9 jours à 4 gagnants et 8 jours à 3 gagnants. Les noms futurs ne sont jamais exposés dans l'interface.",
   "Validate schedule": "Valider le planning",
   "Generate new schedule": "Générer un nouveau planning",
   "Campaign started. The draw is live.": "Campagne lancée. Le tirage est en direct.",
