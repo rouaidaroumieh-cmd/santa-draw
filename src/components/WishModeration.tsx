@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Overline } from "@/components/Chrome";
-import { moderateWish } from "@/lib/store";
+import { removeWish } from "@/lib/store";
 
 interface Wish {
   id: string;
@@ -11,33 +11,33 @@ interface Wish {
   createdAt: string;
 }
 
-/** Organiser only: approve or delete the wishes that visitors left on the Fun page. */
+/** Organiser only: remove a wish from the Fun page if it should not stay there. */
 export default function WishModeration() {
-  const [pending, setPending] = useState<Wish[]>([]);
+  const [wishes, setWishes] = useState<Wish[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const loadPending = useCallback(
+  const loadWishes = useCallback(
     () =>
       fetch("/api/wishes", { cache: "no-store" })
-        .then((res) => (res.ok ? (res.json() as Promise<{ pending: Wish[] }>) : null))
+        .then((res) => (res.ok ? (res.json() as Promise<{ approved: Wish[] }>) : null))
         .then((data) => {
-          if (data) setPending(data.pending);
+          if (data) setWishes(data.approved);
         })
         .catch(() => undefined),
     [],
   );
 
   useEffect(() => {
-    void loadPending();
-  }, [loadPending]);
+    void loadWishes();
+  }, [loadWishes]);
 
-  const act = async (id: string, action: "approveWish" | "deleteWish") => {
+  const remove = async (id: string) => {
     setBusy(id);
     setError(null);
-    const res = await moderateWish(id, action);
-    if (!res.ok) setError(res.error ?? "The wish could not be updated.");
-    await loadPending();
+    const res = await removeWish(id);
+    if (!res.ok) setError(res.error ?? "The wish could not be removed.");
+    await loadWishes();
     setBusy(null);
   };
 
@@ -46,31 +46,23 @@ export default function WishModeration() {
       <Overline>Christmas wishes</Overline>
       <div className="paper gold-frame mt-6 px-6 py-7 sm:px-8" style={{ borderRadius: 2 }}>
         <p className="text-[0.92rem] leading-relaxed text-[#4A463C]">
-          Visitors leave wishes on the Fun page. Nothing is shown publicly until you approve it.
+          Wishes appear on the Fun page as soon as they are sent. Remove any that should not stay there.
         </p>
 
-        {pending.length === 0 ? (
-          <p className="mt-6 text-[0.92rem] text-[#6E6A5E]">No wishes waiting for approval.</p>
+        {wishes.length === 0 ? (
+          <p className="mt-6 text-[0.92rem] text-[#6E6A5E]">No wishes yet.</p>
         ) : (
           <ul className="mt-6 space-y-3">
-            {pending.map((w) => (
+            {wishes.map((w) => (
               <li key={w.id} className="border border-[rgba(23,61,50,0.2)] px-4 py-4" style={{ borderRadius: 2 }}>
                 <p className="text-[0.95rem] text-[#173D32]">“{w.message}”</p>
                 <p className="label mt-2 text-[#6E6A5E]">— {w.author}</p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    className="btn btn-dark"
-                    disabled={busy === w.id}
-                    onClick={() => void act(w.id, "approveWish")}
-                  >
-                    Approve
-                  </button>
+                <div className="mt-4">
                   <button
                     type="button"
                     className="btn btn-danger"
                     disabled={busy === w.id}
-                    onClick={() => void act(w.id, "deleteWish")}
+                    onClick={() => void remove(w.id)}
                   >
                     Delete
                   </button>

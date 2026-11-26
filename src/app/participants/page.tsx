@@ -76,12 +76,12 @@ export default function ParticipantsPage() {
                         <h2 className="font-display text-[1.22rem] font-medium leading-tight text-[#173D32]">
                           {p.name}
                         </h2>
-                        <p className="mt-1 text-[0.74rem] leading-snug text-[#6E6A5E]">{p.role}</p>
+                        <p className="mt-1 text-[0.74rem] leading-snug text-[#4A463C]">{p.role}</p>
                         <p
-                          className={`label mt-2 inline-block px-2 py-1 text-[0.5rem] ${
+                          className={`label mt-2 inline-block px-2 py-1 text-[0.58rem] ${
                             p.completed
                               ? "bg-[#D6B56D] text-[#2A2113]"
-                              : "border border-[rgba(122,31,43,0.35)] text-[#7A1F2B]"
+                              : "border border-[rgba(122,31,43,0.45)] text-[#7A1F2B]"
                           }`}
                         >
                           {p.completed ? "Completed" : "Active"}
@@ -90,12 +90,12 @@ export default function ParticipantsPage() {
                     </div>
 
                     <div className="rule-solid mt-5 pt-4">
-                      <div className="flex items-baseline justify-between">
-                        <p className="label text-[#B08F4C]">
-                          Selections: <span className="tabular">{p.selected}/3</span>
+                      <div className="flex items-baseline justify-between gap-3">
+                        <p className="label text-[#5C4A1F]">
+                          Selections: <span className="tabular font-semibold text-[#173D32]">{p.selected}/3</span>
                         </p>
-                        <p className="label text-[#6E6A5E]">
-                          Remaining: <span className="tabular">{p.remaining}</span>
+                        <p className="label text-[#4A463C]">
+                          Remaining: <span className="tabular font-semibold text-[#173D32]">{p.remaining}</span>
                         </p>
                       </div>
 
@@ -108,32 +108,32 @@ export default function ParticipantsPage() {
                               <path
                                 d="M12 2.6 L14.2 8.6 L20.6 8.8 L15.6 12.6 L17.4 18.8 L12 15.1 L6.6 18.8 L8.4 12.6 L3.4 8.8 L9.8 8.6 Z"
                                 fill={lit ? "#D6B56D" : "none"}
-                                stroke={lit ? "#B08F4C" : "rgba(110,106,94,0.5)"}
-                                strokeWidth="1.1"
+                                stroke={lit ? "#8A6F35" : "#5C574C"}
+                                strokeWidth="1.25"
                               />
                             </svg>
                           );
                         })}
-                        <span className="label ml-auto text-[0.5rem] text-[#6E6A5E]">
+                        <span className="label ml-auto text-[0.58rem] text-[#4A463C]">
                           {p.completed ? "All three revealed" : `${p.remaining} left`}
                         </span>
                       </div>
 
                       {/* progress */}
-                      <div className="mt-3 h-[7px] w-full overflow-hidden rounded-full bg-[rgba(110,106,94,0.18)]">
+                      <div className="mt-3 h-[7px] w-full overflow-hidden rounded-full bg-[rgba(74,70,60,0.22)]">
                         <div
                           className="h-full rounded-full transition-[width] duration-500"
                           style={{
                             width: `${(p.selected / SELECTIONS_PER_PARTICIPANT) * 100}%`,
                             background:
                               p.completed
-                                ? "linear-gradient(90deg,#B08F4C,#E8CD92)"
+                                ? "linear-gradient(90deg,#8A6F35,#D6B56D)"
                                 : "linear-gradient(90deg,#7A1F2B,#A33444)",
                           }}
                         />
                       </div>
 
-                      <p className="mt-3 text-[0.72rem] leading-relaxed text-[#6E6A5E]">
+                      <p className="mt-3 text-[0.78rem] leading-relaxed text-[#3D3A32]">
                         {p.dates.length === 0
                           ? "No selection revealed yet."
                           : `Revealed on ${p.dates.map(formatDateShort).join(" · ")}`}
@@ -143,7 +143,7 @@ export default function ParticipantsPage() {
                       </p>
                     </div>
 
-                    <span className="label mt-3 text-[0.5rem] text-[#6E6A5E]">
+                    <span className="label mt-3 text-[0.58rem] text-[#4A463C]">
                       Entry {String(i + 1).padStart(2, "0")} of 20
                     </span>
                   </article>
@@ -153,9 +153,9 @@ export default function ParticipantsPage() {
 
             <aside className="lg:sticky lg:top-28">
               <CampaignProgress state={state} />
-              <div className="paper-dim gold-frame mt-5 px-6 py-6" style={{ borderRadius: 2 }}>
-                <p className="label text-gold">How the three chances work</p>
-                <ol className="mt-4 space-y-3 text-[0.85rem] leading-relaxed text-ivory/70">
+              <div className="paper gold-frame mt-5 px-6 py-6" style={{ borderRadius: 2 }}>
+                <p className="label text-[#B08F4C]">How the three chances work</p>
+                <ol className="mt-4 space-y-3 text-[0.85rem] leading-relaxed text-[#3D3A30]">
                   <li>1 · Each person is placed in the schedule exactly three times.</li>
                   <li>2 · The three dates are always different working days.</li>
                   <li>3 · Once the third star is lit, the person is excluded from future draws.</li>

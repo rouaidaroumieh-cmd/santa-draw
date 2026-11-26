@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 interface Wish {
   id: string;
@@ -19,23 +19,22 @@ export default function WishWall() {
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    const refresh = () => {
+  const loadWishes = useCallback(
+    () =>
       fetch("/api/wishes", { cache: "no-store" })
         .then((res) => (res.ok ? (res.json() as Promise<{ approved: Wish[] }>) : null))
         .then((data) => {
-          if (active && data) setWishes(data.approved);
+          if (data) setWishes(data.approved);
         })
-        .catch(() => undefined);
-    };
-    refresh();
-    const timer = setInterval(refresh, REFRESH_MS);
-    return () => {
-      active = false;
-      clearInterval(timer);
-    };
-  }, []);
+        .catch(() => undefined),
+    [],
+  );
+
+  useEffect(() => {
+    void loadWishes();
+    const timer = setInterval(() => void loadWishes(), REFRESH_MS);
+    return () => clearInterval(timer);
+  }, [loadWishes]);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -50,7 +49,8 @@ export default function WishWall() {
       const data = (await res.json().catch(() => null)) as { error?: string } | null;
       if (res.ok) {
         setMessage("");
-        setNotice({ tone: "ok", text: "Thank you! Your wish appears here once the organiser has approved it." });
+        setNotice({ tone: "ok", text: "Thank you! Your wish is on the wall." });
+        void loadWishes();
       } else {
         setNotice({ tone: "error", text: data?.error ?? "Your wish could not be sent." });
       }
@@ -85,7 +85,7 @@ export default function WishWall() {
           />
         </label>
         <div className="flex items-center justify-between gap-4">
-          <p className="text-[0.82rem] text-[#6E6A5E]">Wishes are read before they appear.</p>
+          <p className="text-[0.82rem] text-[#6E6A5E]">Your wish appears on the wall straight away.</p>
           <button type="submit" className="btn btn-dark" disabled={sending}>
             {sending ? "Sending…" : "Send my wish"}
           </button>

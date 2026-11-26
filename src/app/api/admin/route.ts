@@ -11,7 +11,7 @@ import {
   startCampaign,
   updateSettings,
 } from "@/server/campaign";
-import { approveWish, deleteWish } from "@/server/wishes";
+import { deleteWish } from "@/server/wishes";
 import { errorResponse, handle, json, readJsonBody, requireAdmin } from "@/server/http";
 
 export const dynamic = "force-dynamic";
@@ -43,8 +43,6 @@ function run(action: string, body: Record<string, unknown>): Promise<ActionResul
       return devUndoDraw(body.date);
     case "devFill":
       return devFillBefore(body.date);
-    case "approveWish":
-      return approveWish(body.id);
     case "deleteWish":
       return deleteWish(body.id);
     default:

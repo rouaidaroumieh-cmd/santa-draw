@@ -1,17 +1,14 @@
-import { isAdminRequest } from "@/server/auth";
-import { addWish, approvedWishes, pendingWishes } from "@/server/wishes";
+import { addWish, approvedWishes } from "@/server/wishes";
 import { errorResponse, handle, json, readJsonBody } from "@/server/http";
 
 export const dynamic = "force-dynamic";
 
-/** Approved wishes for everyone; the organiser also receives the pending ones. */
+/** The wish wall, newest first. */
 export const GET = handle(async () => {
-  const admin = await isAdminRequest();
-  const [approved, pending] = await Promise.all([approvedWishes(), admin ? pendingWishes() : Promise.resolve([])]);
-  return json({ ok: true, approved, pending });
+  return json({ ok: true, approved: await approvedWishes() });
 });
 
-/** A visitor leaves a wish. It stays hidden until the organiser approves it. */
+/** A visitor leaves a wish; it appears on the wall straight away. */
 export const POST = handle(async (request: Request) => {
   const body = await readJsonBody(request);
   if (!body) return errorResponse("Please send your wish as JSON.", 400);

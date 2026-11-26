@@ -35,16 +35,6 @@ export async function approvedWishes(): Promise<Wish[]> {
   return rows.map(toWish);
 }
 
-export async function pendingWishes(): Promise<Wish[]> {
-  const rows = await getDb()
-    .select()
-    .from(wishes)
-    .where(and(eq(wishes.campaignId, ROW_ID), eq(wishes.approved, false)))
-    .orderBy(desc(wishes.createdAt))
-    .limit(MAX_LIST);
-  return rows.map(toWish);
-}
-
 export async function addWish(author: unknown, message: unknown): Promise<Outcome> {
   if (typeof author !== "string" || typeof message !== "string") return fail("Please write your name and a message.");
   const name = author.trim();
@@ -54,18 +44,8 @@ export async function addWish(author: unknown, message: unknown): Promise<Outcom
   if (!text) return fail("Please write a short message.");
   if (text.length > MAX_MESSAGE) return fail(`Keep your message under ${MAX_MESSAGE} characters.`);
 
-  await getDb().insert(wishes).values({ campaignId: ROW_ID, author: name, message: text });
+  await getDb().insert(wishes).values({ campaignId: ROW_ID, author: name, message: text, approved: true });
   return { ok: true };
-}
-
-export async function approveWish(id: unknown): Promise<Outcome> {
-  if (typeof id !== "string" || !UUID.test(id)) return fail("Unknown wish.", 404);
-  const rows = await getDb()
-    .update(wishes)
-    .set({ approved: true })
-    .where(and(eq(wishes.id, id), eq(wishes.campaignId, ROW_ID)))
-    .returning({ id: wishes.id });
-  return rows.length > 0 ? { ok: true } : fail("Unknown wish.", 404);
 }
 
 export async function deleteWish(id: unknown): Promise<Outcome> {

@@ -252,8 +252,8 @@ export async function applyBackup(raw: string): Promise<{ ok: boolean; error?: s
   return res.ok ? { ok: true } : { ok: false, error: res.error };
 }
 
-export async function moderateWish(id: string, action: "approveWish" | "deleteWish"): Promise<{ ok: boolean; error?: string }> {
-  const res = await adminCall({ action, id }, false);
+export async function removeWish(id: string): Promise<{ ok: boolean; error?: string }> {
+  const res = await adminCall({ action: "deleteWish", id }, false);
   return res.ok ? { ok: true } : { ok: false, error: res.error };
 }
 

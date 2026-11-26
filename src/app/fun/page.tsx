@@ -1,8 +1,8 @@
 "use client";
 
 import { Overline, PageShell } from "@/components/Chrome";
+import MemoryMatch from "@/components/fun/MemoryMatch";
 import Quiz from "@/components/fun/Quiz";
-import SnowCatch from "@/components/fun/SnowCatch";
 import WishWall from "@/components/fun/WishWall";
 
 /** Public, playful corner. Nothing here touches the draw. */
@@ -24,15 +24,15 @@ export default function FunPage() {
             <span className="block text-gold">Fun Corner</span>
           </h1>
           <p className="mt-6 max-w-[560px] font-display text-[1.15rem] italic leading-relaxed text-ivory/80">
-            Catch some snow, test your Christmas knowledge, or leave a wish for the whole office.
+            Match the office photos, test your Christmas knowledge, or leave a wish for the whole office.
           </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-[1240px] px-5 pt-16 sm:pt-20">
-        <Overline>Catch the snow</Overline>
+        <Overline>Memory match</Overline>
         <div className="mt-7">
-          <SnowCatch />
+          <MemoryMatch />
         </div>
       </section>
 

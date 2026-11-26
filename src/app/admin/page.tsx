@@ -417,9 +417,9 @@ export default function AdminPage() {
                 </p>
               </div>
 
-              <div className="paper-dim gold-frame px-6 py-7" style={{ borderRadius: 2 }}>
-                <p className="label text-gold">Simulation mode</p>
-                <p className="mt-3 text-[0.88rem] leading-relaxed text-ivory/72">
+              <div className="paper gold-frame px-6 py-7" style={{ borderRadius: 2 }}>
+                <p className="label text-[#B08F4C]">Simulation mode</p>
+                <p className="mt-3 text-[0.88rem] leading-relaxed text-[#4A463C]">
                   The machine in the Daily draw section can be rehearsed at any time. A simulation
                   animates the reels with random names so you can check the look and timing — the
                   result is clearly marked <em>Simulation · not recorded</em> and is never written
