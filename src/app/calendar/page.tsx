@@ -10,9 +10,12 @@ import {
   formatDateShort,
   getCalendarDays,
   ordinal,
+  weekdayName,
   type CalendarDay,
 } from "@/lib/dates";
+import { useLang, useT } from "@/lib/language";
 import { useCampaign, type CampaignState } from "@/lib/store";
+import type { Lang } from "@/lib/i18n";
 
 function appearancesUpTo(state: CampaignState, date: string, id: string): number {
   return Object.values(state.results).filter(
@@ -21,6 +24,7 @@ function appearancesUpTo(state: CampaignState, date: string, id: string): number
 }
 
 const WEEKDAY_HEADER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WEEKDAY_HEADER_FR = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
 /** Column index for a Monday-first advent grid. */
 function columnOf(day: CalendarDay): number {
@@ -29,6 +33,8 @@ function columnOf(day: CalendarDay): number {
 
 export default function CalendarPage() {
   const state = useCampaign();
+  const lang = useLang();
+  const t = useT();
   const [openDay, setOpenDay] = useState<string | null>(null);
   const days = useMemo(() => getCalendarDays(), []);
   const leadOffset = columnOf(days[0]);
@@ -37,7 +43,7 @@ export default function CalendarPage() {
     return (
       <PageShell current="calendar">
         <div className="mx-auto flex min-h-[70vh] max-w-[1240px] items-center justify-center px-5">
-          <p className="label label-gold animate-pulse">Opening the calendar…</p>
+          <p className="label label-gold animate-pulse">{t("Opening the calendar…")}</p>
         </div>
       </PageShell>
     );
@@ -46,6 +52,7 @@ export default function CalendarPage() {
   const stats = campaignStats(state);
   const detail = openDay ? days.find((d) => d.date === openDay) ?? null : null;
   const detailResult = openDay ? state.results[openDay] : undefined;
+  const weekdayHeaders = lang === "fr" ? WEEKDAY_HEADER_FR : WEEKDAY_HEADER;
 
   return (
     <PageShell current="calendar">
@@ -63,23 +70,27 @@ export default function CalendarPage() {
           />
         </div>
         <div className="relative mx-auto max-w-[1240px] px-5 py-16 sm:py-20">
-          <p className="label label-gold">30 November – 22 December 2026</p>
+          <p className="label label-gold">{t("30 November – 22 December 2026")}</p>
           <h1
             className="mt-5 text-ivory"
             style={{ fontSize: "clamp(2.7rem, 8vw, 6.2rem)", lineHeight: 0.88, letterSpacing: "-0.035em", fontWeight: 300 }}
           >
-            The Christmas
+            {t("The Christmas")}
             <span className="block text-gold" style={{ fontWeight: 500 }}>
-              Calendar
+              {t("Calendar")}
             </span>
           </h1>
           <p className="mt-6 max-w-[540px] font-display text-[1.15rem] italic leading-relaxed text-ivory/80" style={{ fontWeight: 300 }}>
-            Every working day holds three or four names. Weekends rest. Future days stay sealed until their
-            morning arrives.
+            {t(
+              "Every working day holds three or four names. Weekends rest. Future days stay sealed until their morning arrives.",
+            )}
           </p>
           <p className="label mt-8 text-ivory/60">
-            {stats.completedDays} of {stats.totalDrawDays} working days revealed ·{" "}
-            {stats.remainingDays} still to come
+            {t("{done} of {total} working days revealed · {remaining} still to come", {
+              done: stats.completedDays,
+              total: stats.totalDrawDays,
+              remaining: stats.remainingDays,
+            })}
           </p>
         </div>
       </section>
@@ -87,10 +98,10 @@ export default function CalendarPage() {
       {/* ---- Advent grid -------------------------------------------- */}
       <section className="px-5 py-14 sm:py-18">
         <div className="mx-auto max-w-[1240px]">
-          <Overline>The advent grid</Overline>
+          <Overline>{t("The advent grid")}</Overline>
 
           <div className="mt-6 hidden grid-cols-7 gap-2 md:grid">
-            {WEEKDAY_HEADER.map((d, i) => (
+            {weekdayHeaders.map((d, i) => (
               <div
                 key={d}
                 className={`label pb-2 text-center ${i > 4 ? "text-ivory/35" : "text-gold/75"}`}
@@ -124,9 +135,9 @@ export default function CalendarPage() {
 
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {[
-              ["Working day", "Three or four names are revealed and locked permanently."],
-              ["Weekend", "No draw — Santa is taking a little Christmas break."],
-              ["Upcoming", "Names stay sealed until the day itself."],
+              [t("Working day"), t("Three or four names are revealed and locked permanently.")],
+              [t("Weekend"), t("No draw — Santa is taking a little Christmas break.")],
+              [t("Upcoming"), t("Names stay sealed until the day itself.")],
             ].map(([title, body]) => (
               <div key={title} className="border-l border-[rgba(214,181,109,0.35)] pl-4">
                 <p className="label text-gold">{title}</p>
@@ -141,15 +152,11 @@ export default function CalendarPage() {
       <Dialog
         open={!!detail && !!detailResult}
         onClose={() => setOpenDay(null)}
-        eyebrow={detail ? formatDateLong(detail.date) : ""}
-        title={
-          detailResult
-            ? `The Christmas picks of ${formatDateShort(detailResult.date)}`
-            : ""
-        }
+        eyebrow={detail ? formatDateLong(detail.date, lang) : ""}
+        title={detailResult ? t("The Christmas picks of {date}", { date: formatDateShort(detailResult.date, lang) }) : ""}
         actions={
           <button type="button" className="btn btn-dark" onClick={() => setOpenDay(null)}>
-            Close
+            {t("Close")}
           </button>
         }
       >
@@ -158,6 +165,7 @@ export default function CalendarPage() {
             {detailResult.participantIds.map((id, i) => {
               const p = state.participants.find((x) => x.id === id);
               const app = appearancesUpTo(state, detailResult.date, id);
+              const left = SELECTIONS_PER_PARTICIPANT - app;
               return (
                 <li key={id} className="flex items-center gap-4">
                   <Avatar id={id} name={p?.name ?? id} photo={state.photos[id]} size={58} />
@@ -166,26 +174,27 @@ export default function CalendarPage() {
                       {p?.name ?? id}
                     </p>
                     <p className="label mt-1 text-[0.55rem] text-[#B08F4C]">
-                      {ordinal(app)} selection ·{" "}
-                      {SELECTIONS_PER_PARTICIPANT - app} chance
-                      {SELECTIONS_PER_PARTICIPANT - app === 1 ? "" : "s"} remaining at the time
+                      {t("{ordinal} selection", { ordinal: ordinal(app, lang) })} ·{" "}
+                      {left === 1
+                        ? t("1 chance remaining at the time")
+                        : t("{count} chances remaining at the time", { count: left })}
                     </p>
                   </div>
                   <span className="label text-[0.55rem] text-[#6E6A5E]">
-                    No. {i + 1}
+                    {t("No.")} {i + 1}
                   </span>
                 </li>
               );
             })}
             <li className="rule-solid pt-4">
-              <p className="label text-[#6E6A5E]">Status</p>
+              <p className="label text-[#6E6A5E]">{t("Status")}</p>
               <p className="mt-2 text-[0.88rem] leading-relaxed text-[#4A463C]">
-                DRAW COMPLETED – RESULTS LOCKED. Revealed on{" "}
-                {new Date(detailResult.revealedAt).toLocaleString("en-GB", {
-                  dateStyle: "long",
-                  timeStyle: "short",
+                {t("DRAW COMPLETED – RESULTS LOCKED. Revealed on {date}. These results can never be changed or redrawn.", {
+                  date: new Date(detailResult.revealedAt).toLocaleString(lang === "fr" ? "fr-FR" : "en-GB", {
+                    dateStyle: "long",
+                    timeStyle: "short",
+                  }),
                 })}
-                . These results can never be changed or redrawn.
               </p>
             </li>
           </ul>
@@ -198,6 +207,8 @@ export default function CalendarPage() {
 /* ------------------------------------------------------------------ */
 
 function UpcomingCard({ day }: { day: CalendarDay }) {
+  const lang = useLang();
+  const t = useT();
   return (
     <article
       className="gold-frame lift flex flex-col justify-between bg-[rgba(9,30,24,0.5)] px-3.5 py-4"
@@ -217,14 +228,14 @@ function UpcomingCard({ day }: { day: CalendarDay }) {
             />
           </svg>
         </div>
-        <p className="label mt-2 text-[0.52rem] text-gold/80">{day.weekday}</p>
+        <p className="label mt-2 text-[0.52rem] text-gold/80">{weekdayName(day.date, lang)}</p>
       </div>
       <div>
         <span className="label inline-block border border-[rgba(214,181,109,0.45)] px-2 py-1 text-[0.5rem] text-gold">
-          Upcoming
+          {t("Upcoming")}
         </span>
         <p className="mt-3 text-[0.72rem] leading-relaxed text-ivory/55">
-          A Christmas surprise is waiting…
+          {t("A Christmas surprise is waiting…")}
         </p>
       </div>
     </article>
@@ -240,6 +251,8 @@ function CompletedCard({
   state: CampaignState;
   onOpen: () => void;
 }) {
+  const lang: Lang = useLang();
+  const t = useT();
   const result = state.results[day.date];
   return (
     <button
@@ -247,7 +260,7 @@ function CompletedCard({
       onClick={onOpen}
       className="paper gold-frame lift flex flex-col justify-between px-3.5 py-4 text-left"
       style={{ borderRadius: 2, minHeight: 210 }}
-      aria-label={`Open the results of ${formatDateLong(day.date)}`}
+      aria-label={t("Open the results of {date}", { date: formatDateLong(day.date, lang) })}
     >
       <div>
         <div className="flex items-start justify-between">
@@ -260,7 +273,7 @@ function CompletedCard({
             <circle cx="12" cy="15" r="1.5" fill="#F8F3E9" />
           </svg>
         </div>
-        <p className="label mt-2 text-[0.52rem] text-[#B08F4C]">{day.weekday}</p>
+        <p className="label mt-2 text-[0.52rem] text-[#B08F4C]">{weekdayName(day.date, lang)}</p>
       </div>
 
       <div>
@@ -284,13 +297,15 @@ function CompletedCard({
             );
           })}
         </ul>
-        <p className="label mt-2.5 text-[0.5rem] text-[#B08F4C]">Completed · Locked</p>
+        <p className="label mt-2.5 text-[0.5rem] text-[#B08F4C]">{t("Completed · Locked")}</p>
       </div>
     </button>
   );
 }
 
 function WeekendCard({ day }: { day: CalendarDay }) {
+  const lang = useLang();
+  const t = useT();
   return (
     <article
       className="relative overflow-hidden border border-[rgba(214,181,109,0.22)]"
@@ -314,14 +329,14 @@ function WeekendCard({ day }: { day: CalendarDay }) {
             <span className="tabular font-display text-[2.15rem] leading-none text-ivory/80">
               {day.dayOfMonth}
             </span>
-            <span className="label text-[0.5rem] text-gold/80">Rest</span>
+            <span className="label text-[0.5rem] text-gold/80">{t("Rest")}</span>
           </div>
-          <p className="label mt-2 text-[0.52rem] text-ivory/55">{day.weekday}</p>
+          <p className="label mt-2 text-[0.52rem] text-ivory/55">{weekdayName(day.date, lang)}</p>
         </div>
         <div>
-          <p className="label text-[0.5rem] text-gold">Weekend – no draw</p>
+          <p className="label text-[0.5rem] text-gold">{t("Weekend – no draw")}</p>
           <p className="mt-2 text-[0.7rem] leading-relaxed text-ivory/55">
-            Santa is taking a little Christmas break.
+            {t("Santa is taking a little Christmas break.")}
           </p>
         </div>
       </div>

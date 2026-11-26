@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Overline } from "@/components/Chrome";
+import { useT } from "@/lib/language";
 import { removeWish } from "@/lib/store";
 
 interface Wish {
@@ -13,6 +14,7 @@ interface Wish {
 
 /** Organiser only: remove a wish from the Fun page if it should not stay there. */
 export default function WishModeration() {
+  const t = useT();
   const [wishes, setWishes] = useState<Wish[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,21 +38,21 @@ export default function WishModeration() {
     setBusy(id);
     setError(null);
     const res = await removeWish(id);
-    if (!res.ok) setError(res.error ?? "The wish could not be removed.");
+    if (!res.ok) setError(t(res.error ?? "The wish could not be removed."));
     await loadWishes();
     setBusy(null);
   };
 
   return (
     <div>
-      <Overline>Christmas wishes</Overline>
+      <Overline>{t("Christmas wishes")}</Overline>
       <div className="paper gold-frame mt-6 px-6 py-7 sm:px-8" style={{ borderRadius: 2 }}>
         <p className="text-[0.92rem] leading-relaxed text-[#4A463C]">
-          Wishes appear on the Fun page as soon as they are sent. Remove any that should not stay there.
+          {t("Wishes appear on the Fun page as soon as they are sent. Remove any that should not stay there.")}
         </p>
 
         {wishes.length === 0 ? (
-          <p className="mt-6 text-[0.92rem] text-[#6E6A5E]">No wishes yet.</p>
+          <p className="mt-6 text-[0.92rem] text-[#6E6A5E]">{t("No wishes yet.")}</p>
         ) : (
           <ul className="mt-6 space-y-3">
             {wishes.map((w) => (
@@ -64,7 +66,7 @@ export default function WishModeration() {
                     disabled={busy === w.id}
                     onClick={() => void remove(w.id)}
                   >
-                    Delete
+                    {t("Delete")}
                   </button>
                 </div>
               </li>

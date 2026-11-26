@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useT } from "@/lib/language";
 import { useCampaign } from "@/lib/store";
 
 const PAIRS = 8;
@@ -28,6 +29,7 @@ function shuffle<T>(items: readonly T[]): T[] {
 /** Find the pairs of employee photos. Fewest moves is kept as the best score in this browser. */
 export default function MemoryMatch() {
   const state = useCampaign();
+  const t = useT();
   const [cards, setCards] = useState<Card[]>([]);
   const [open, setOpen] = useState<number[]>([]);
   const [matched, setMatched] = useState<string[]>([]);
@@ -95,7 +97,7 @@ export default function MemoryMatch() {
   if (!state) {
     return (
       <div className="paper gold-frame mx-auto max-w-[720px] px-6 py-10 text-center" style={{ borderRadius: 2 }}>
-        <p className="font-display text-[1.2rem] italic text-[#3D3A30]">Loading the photos…</p>
+        <p className="font-display text-[1.2rem] italic text-[#3D3A30]">{t("Loading the photos…")}</p>
       </div>
     );
   }
@@ -103,10 +105,12 @@ export default function MemoryMatch() {
   if (phase === "idle") {
     return (
       <div className="paper gold-frame mx-auto max-w-[720px] px-6 py-10 text-center" style={{ borderRadius: 2 }}>
-        <p className="font-display text-[1.5rem] italic text-[#173D32]">Find every matching pair of photos.</p>
-        <p className="mt-3 text-[0.92rem] text-[#3D3A30]">Flip two cards at a time. The fewer moves, the better.</p>
+        <p className="font-display text-[1.5rem] italic text-[#173D32]">{t("Find every matching pair of photos.")}</p>
+        <p className="mt-3 text-[0.92rem] text-[#3D3A30]">
+          {t("Flip two cards at a time. The fewer moves, the better.")}
+        </p>
         <button type="button" className="btn btn-dark mt-7" onClick={start}>
-          Start
+          {t("Start")}
         </button>
       </div>
     );
@@ -115,10 +119,10 @@ export default function MemoryMatch() {
   return (
     <div className="paper gold-frame mx-auto max-w-[720px] px-5 py-6 sm:px-8" style={{ borderRadius: 2 }}>
       <div className="flex justify-between">
-        <span className="label text-[#B08F4C]">Moves {moves}</span>
+        <span className="label text-[#B08F4C]">{t("Moves {count}", { count: moves })}</span>
         <span className="label text-[#6E6A5E]">
-          Pairs {matched.length} / {cards.length / 2}
-          {best !== null ? ` · Best ${best}` : ""}
+          {t("Pairs {found} / {total}", { found: matched.length, total: cards.length / 2 })}
+          {best !== null ? ` · ${t("Best {count}", { count: best })}` : ""}
         </span>
       </div>
 
@@ -132,7 +136,7 @@ export default function MemoryMatch() {
               type="button"
               onClick={() => flip(i)}
               disabled={phase !== "playing" || isUp}
-              aria-label={isUp ? card.name : "Face-down card"}
+              aria-label={isUp ? card.name : t("Face-down card")}
               className={`relative aspect-square overflow-hidden border ${
                 isMatched ? "border-[#245C46]" : "border-[rgba(176,143,76,0.7)]"
               }`}
@@ -164,10 +168,10 @@ export default function MemoryMatch() {
       {phase === "won" ? (
         <div className="mt-7 flex flex-col items-center gap-4 text-center">
           <p className="font-display text-[1.5rem] italic text-[#173D32]">
-            All pairs found in {moves} moves!
+            {t("All pairs found in {count} moves!", { count: moves })}
           </p>
           <button type="button" className="btn btn-dark" onClick={start}>
-            Play again
+            {t("Play again")}
           </button>
         </div>
       ) : null}

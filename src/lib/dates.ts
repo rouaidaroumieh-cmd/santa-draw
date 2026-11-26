@@ -3,6 +3,7 @@
  * The draw takes place on the working days listed in DRAW_PLAN, with the number
  * of winners planned for each day (60 selections in total).
  */
+import type { Lang } from "./i18n";
 import { MONTH_NAMES, WEEKDAY_NAMES } from "./types";
 
 export const CAMPAIGN_YEAR = 2026;
@@ -92,11 +93,14 @@ export function winnersOn(date: string): number {
   return DRAW_PLAN.find((d) => d.date === date)?.winners ?? 0;
 }
 
-const COUNT_WORDS = ["no", "one", "two", "three", "four", "five"];
+const COUNT_WORDS: Record<Lang, string[]> = {
+  en: ["no", "one", "two", "three", "four", "five"],
+  fr: ["aucun", "un", "deux", "trois", "quatre", "cinq"],
+};
 
 /** "three" for 3, used in the copy. */
-export function countWord(n: number): string {
-  return COUNT_WORDS[n] ?? String(n);
+export function countWord(n: number, lang: Lang = "en"): string {
+  return COUNT_WORDS[lang][n] ?? String(n);
 }
 
 export function getDay(date: string): CalendarDay | undefined {
@@ -113,25 +117,45 @@ export function isWeekendDate(date: string): boolean {
   return !!d && d.isWeekend;
 }
 
-/** "Tuesday, 1 December 2026" */
-export function formatDateLong(date: string): string {
-  const d = getDay(date);
-  if (d) return `${d.weekday}, ${d.dayOfMonth} ${d.monthName} ${d.year}`;
+const LOCALE: Record<Lang, string> = { en: "en-GB", fr: "fr-FR" };
+
+/** "Tuesday, 1 December 2026" (or "Mardi 1 décembre 2026") */
+export function formatDateLong(date: string, lang: Lang = "en"): string {
   const parsed = new Date(`${date}T12:00:00Z`);
   if (Number.isNaN(parsed.getTime())) return date;
-  const weekday = parsed.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" });
-  const rest = parsed.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  const weekday = parsed.toLocaleDateString(LOCALE[lang], { weekday: "long", timeZone: "UTC" });
+  const rest = parsed.toLocaleDateString(LOCALE[lang], {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  if (lang === "fr") return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)} ${rest}`;
   return `${weekday}, ${rest}`;
 }
 
-/** "Tue 1 Dec" */
-export function formatDateShort(date: string): string {
-  const d = getDay(date);
-  if (!d) return date;
-  return `${d.weekdayShort} ${d.dayOfMonth} ${d.monthName.slice(0, 3)}`;
+/** "Tue 1 Dec" (or "mar. 1 déc.") */
+export function formatDateShort(date: string, lang: Lang = "en"): string {
+  const parsed = new Date(`${date}T12:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return parsed.toLocaleDateString(LOCALE[lang], {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
 }
 
-export function ordinal(n: number): string {
+/** "Tuesday" (or "mardi") for a campaign day, used in the calendar. */
+export function weekdayName(date: string, lang: Lang = "en", style: "long" | "short" = "long"): string {
+  const parsed = new Date(`${date}T12:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return parsed.toLocaleDateString(LOCALE[lang], { weekday: style, timeZone: "UTC" });
+}
+
+/** "1st", "2nd" (or "1re", "2e") */
+export function ordinal(n: number, lang: Lang = "en"): string {
+  if (lang === "fr") return n === 1 ? "1re" : `${n}e`;
   const s = ["th", "st", "nd", "rd"];
   const v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);

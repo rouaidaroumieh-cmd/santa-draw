@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/language";
 import Avatar from "./Avatar";
 
 export interface ReelPerson {
@@ -75,6 +76,7 @@ export default function ReelMachine({
   dateLabel: string;
   simulation?: boolean;
 }) {
+  const t = useT();
   const [state, setState] = useState<ReelState>(() => ({
     strips: Array.from({ length: reelCount }, (_, r) => idleStrip(people, r)),
     offsets: Array.from({ length: reelCount }, () => 0),
@@ -180,7 +182,7 @@ export default function ReelMachine({
         <div className="relative z-10">
           <div className="flex flex-col items-center text-center">
             <RibbonBow />
-            <p className="label label-gold mt-3">The Christmas Drawing Machine</p>
+            <p className="label label-gold mt-3">{t("The Christmas Drawing Machine")}</p>
           </div>
 
           {/* ---- Reels ------------------------------------------------ */}
@@ -215,11 +217,11 @@ export default function ReelMachine({
                               {person.name}
                             </p>
                             <span className="label text-[0.52rem] text-gold/70">
-                              {simulation ? "Simulation" : "Participant"}
+                              {simulation ? t("Simulation") : t("Participant")}
                             </span>
                           </>
                         ) : (
-                          <span className="label text-gold/50">Sealed</span>
+                          <span className="label text-gold/50">{t("Sealed")}</span>
                         )}
                       </div>
                     );
@@ -240,7 +242,7 @@ export default function ReelMachine({
                   className="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-[rgba(214,181,109,0.28)]"
                 />
                 <span className="label absolute bottom-2 left-0 right-0 text-center text-[0.52rem] text-gold/70">
-                  {["First", "Second", "Third", "Fourth"][reel]}
+                  {[t("First"), t("Second"), t("Third"), t("Fourth")][reel]}
                 </span>
               </div>
             ))}

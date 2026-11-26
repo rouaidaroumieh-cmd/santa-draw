@@ -1,8 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useLang, useT } from "@/lib/language";
 
-const QUESTIONS = [
+interface Question {
+  question: string;
+  options: string[];
+  answer: number;
+}
+
+const QUESTIONS: Question[] = [
   {
     question: "Which reindeer has a famously red nose?",
     options: ["Dasher", "Rudolph", "Comet", "Blitzen"],
@@ -30,17 +37,48 @@ const QUESTIONS = [
   },
 ];
 
+const QUESTIONS_FR: Question[] = [
+  {
+    question: "Quel renne a un nez rouge célèbre ?",
+    options: ["Dasher", "Rudolph", "Comet", "Blitzen"],
+    answer: 1,
+  },
+  {
+    question: "Quelle plante aux feuilles rouges est un classique de Noël ?",
+    options: ["Houx", "Gui", "Poinsettia", "Lierre"],
+    answer: 2,
+  },
+  {
+    question: "Quel est le pain de Noël traditionnel italien ?",
+    options: ["Stollen", "Panettone", "Bûche", "Kulich"],
+    answer: 1,
+  },
+  {
+    question: "Combien de portes compte un calendrier de l'Avent traditionnel ?",
+    options: ["12", "20", "24", "31"],
+    answer: 2,
+  },
+  {
+    question: "Combien de rennes tirent le traîneau du Père Noël dans le poème classique ?",
+    options: ["6", "8", "9", "12"],
+    answer: 1,
+  },
+];
+
 const BEST_KEY = "santa-quiz-best";
 
 /** A five-question Christmas quiz. The best score stays in this browser. */
 export default function Quiz() {
+  const lang = useLang();
+  const t = useT();
+  const questions = lang === "fr" ? QUESTIONS_FR : QUESTIONS;
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
   const [best, setBest] = useState<number | null>(null);
 
-  const current = QUESTIONS[index];
+  const current = questions[index];
 
   const choose = (option: number) => {
     if (picked !== null) return;
@@ -49,7 +87,7 @@ export default function Quiz() {
   };
 
   const next = () => {
-    if (index + 1 < QUESTIONS.length) {
+    if (index + 1 < questions.length) {
       setIndex((i) => i + 1);
       setPicked(null);
       return;
@@ -72,11 +110,11 @@ export default function Quiz() {
     return (
       <div className="paper gold-frame mx-auto max-w-[720px] px-6 py-10 text-center" style={{ borderRadius: 2 }}>
         <p className="font-display text-[1.6rem] italic text-[#173D32]">
-          You scored {score} out of {QUESTIONS.length}!
+          {t("You scored {score} out of {total}!", { score, total: questions.length })}
         </p>
-        <p className="label mt-3 text-[#6E6A5E]">Best score: {best}</p>
+        <p className="label mt-3 text-[#6E6A5E]">{t("Best score: {best}", { best: best ?? 0 })}</p>
         <button type="button" className="btn btn-dark mt-7" onClick={restart}>
-          Play again
+          {t("Play again")}
         </button>
       </div>
     );
@@ -85,7 +123,7 @@ export default function Quiz() {
   return (
     <div className="paper gold-frame mx-auto max-w-[720px] px-6 py-8 sm:px-8" style={{ borderRadius: 2 }}>
       <p className="label text-[#B08F4C]">
-        Question {index + 1} of {QUESTIONS.length}
+        {t("Question {number} of {total}", { number: index + 1, total: questions.length })}
       </p>
       <h3 className="mt-3 text-[1.5rem] leading-snug text-[#173D32]">{current.question}</h3>
 
@@ -117,10 +155,12 @@ export default function Quiz() {
       {picked !== null ? (
         <div className="mt-7 flex items-center justify-between gap-4">
           <p className="text-[0.9rem] text-[#3D3A30]">
-            {picked === current.answer ? "Correct!" : `Not quite, the answer is ${current.options[current.answer]}.`}
+            {picked === current.answer
+              ? t("Correct!")
+              : t("Not quite, the answer is {answer}.", { answer: current.options[current.answer] })}
           </p>
           <button type="button" className="btn btn-dark" onClick={next}>
-            {index + 1 < QUESTIONS.length ? "Next" : "See my score"}
+            {index + 1 < questions.length ? t("Next") : t("See my score")}
           </button>
         </div>
       ) : null}

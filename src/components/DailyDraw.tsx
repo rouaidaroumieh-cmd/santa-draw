@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { fireConfetti } from "@/lib/confetti";
 import { CAMPAIGN_END, CAMPAIGN_START, countWord, formatDateLong, winnersOn } from "@/lib/dates";
 import { campaignStats } from "@/lib/draw-engine";
+import { useLang, useT } from "@/lib/language";
 import {
   beginDraw,
   commitDraw,
@@ -19,6 +20,8 @@ import ReelMachine, { type ReelWinner } from "./ReelMachine";
 /** The drawing machine with its controls. Only rendered in the organiser's Admin section. */
 export default function DailyDraw() {
   const state = useCampaign();
+  const lang = useLang();
+  const t = useT();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [spinning, setSpinning] = useState(false);
   const [liveWinners, setLiveWinners] = useState<ReelWinner[] | null>(null);
@@ -41,12 +44,12 @@ export default function DailyDraw() {
 
   const winners = useMemo<ReelWinner[] | null>(() => {
     if (!state) return null;
-    if (todayResult) return buildReelWinners(state, todayResult.participantIds, today, false);
+    if (todayResult) return buildReelWinners(state, todayResult.participantIds, today, false, lang);
     return liveWinners;
-  }, [state, todayResult, liveWinners, today]);
+  }, [state, todayResult, liveWinners, today, lang]);
 
   if (!state || !status) {
-    return <p className="label label-gold animate-pulse">Preparing the Christmas machine…</p>;
+    return <p className="label label-gold animate-pulse">{t("Preparing the Christmas machine…")}</p>;
   }
 
   const drawStatus = drawStatusFor(today);
@@ -56,15 +59,15 @@ export default function DailyDraw() {
   const runSimulation = () => {
     const res = simulateDraw(slotCount);
     if (!res.ok) {
-      setNotice({ tone: "error", text: res.error });
+      setNotice({ tone: "error", text: t(res.error) });
       return;
     }
     setNotice({
       tone: "info",
-      text: "Simulation running — these names are for rehearsal only and will not be recorded.",
+      text: t("Simulation running — these names are for rehearsal only and will not be recorded."),
     });
     setSimulation(true);
-    setLiveWinners(buildReelWinners(state, res.winners, today, true));
+    setLiveWinners(buildReelWinners(state, res.winners, today, true, lang));
     setSpinning(true);
   };
 
@@ -72,11 +75,11 @@ export default function DailyDraw() {
     setConfirmOpen(false);
     const res = await beginDraw(today);
     if (!res.ok) {
-      setNotice({ tone: "error", text: res.error });
+      setNotice({ tone: "error", text: t(res.error) });
       return;
     }
     setSimulation(false);
-    setLiveWinners(buildReelWinners(state, res.winners, today, false));
+    setLiveWinners(buildReelWinners(state, res.winners, today, false, lang));
     setSpinning(true);
   };
 
@@ -88,44 +91,46 @@ export default function DailyDraw() {
     }
     commitDraw();
     fireConfetti(1);
-    setNotice({ tone: "info", text: "DRAW COMPLETED – RESULTS LOCKED" });
+    setNotice({ tone: "info", text: t("DRAW COMPLETED – RESULTS LOCKED") });
   };
 
   const noDrawToday = drawStatus.kind === "weekend";
-  let statusLine = "Today's Christmas draw is ready.";
+  let statusLine = t("Today's Christmas draw is ready.");
   let statusTone: "ready" | "locked" | "paused" = "ready";
   if (noDrawToday) {
     statusLine =
       today < CAMPAIGN_START
-        ? "The Christmas draw has not started yet."
+        ? t("The Christmas draw has not started yet.")
         : today > CAMPAIGN_END
-          ? "The Christmas draw is over."
-          : "Santa is taking a little Christmas break today!";
+          ? t("The Christmas draw is over.")
+          : t("Santa is taking a little Christmas break today!");
     statusTone = "paused";
   } else if (drawStatus.kind === "completed") {
-    statusLine = "Today's Christmas surprises have already been revealed!";
+    statusLine = t("Today's Christmas surprises have already been revealed!");
     statusTone = "locked";
   } else if (drawStatus.kind === "future") {
-    statusLine = "Today's draw is still ahead of us.";
+    statusLine = t("Today's draw is still ahead of us.");
     statusTone = "paused";
   }
 
   const ctaLabel = canDraw
-    ? `🎄 Reveal today's ${slotCount} names`
+    ? t("🎄 Reveal today's {count} names", { count: slotCount })
     : drawStatus.kind === "completed"
-      ? "Today's results are locked"
+      ? t("Today's results are locked")
       : spinning
-        ? "The reels are turning…"
-        : "Run a rehearsal of the machine";
+        ? t("The reels are turning…")
+        : t("Run a rehearsal of the machine");
 
   const ctaReason = spinning
-    ? "The names were decided and validated before the animation began."
+    ? t("The names were decided and validated before the animation began.")
     : drawStatus.kind === "completed"
-      ? "Today's Christmas surprises have already been revealed. This draw can never be repeated or changed."
+      ? t("Today's Christmas surprises have already been revealed. This draw can never be repeated or changed.")
       : noDrawToday
-        ? "No draw today. The rehearsal is only a preview and is never recorded."
+        ? t("No draw today. The rehearsal is only a preview and is never recorded.")
         : drawStatus.kind === "future"
-          ? "This date has not arrived yet, so today's names stay sealed. You can rehearse the machine at any time — rehearsals are never recorded."
+          ? t(
+              "This date has not arrived yet, so today's names stay sealed. You can rehearse the machine at any time — rehearsals are never recorded.",
+            )
           : undefined;
 
   return (
@@ -150,7 +155,7 @@ export default function DailyDraw() {
         ctaReason={ctaReason}
         statusLine={statusLine}
         statusTone={statusTone}
-        dateLabel={formatDateLong(today)}
+        dateLabel={formatDateLong(today, lang)}
         simulation={simulation && !todayResult}
       />
 
@@ -170,26 +175,31 @@ export default function DailyDraw() {
       <Dialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        eyebrow="Confirm the daily draw"
-        title={`Are you ready to reveal today's ${countWord(slotCount)} Christmas names?`}
+        eyebrow={t("Confirm the daily draw")}
+        title={t("Are you ready to reveal today's {count} Christmas names?", { count: countWord(slotCount, lang) })}
         actions={
           <>
             <button type="button" className="btn btn-dark" onClick={() => setConfirmOpen(false)}>
-              Cancel
+              {t("Cancel")}
             </button>
             <button type="button" className="btn btn-gold" onClick={() => void confirmDraw()}>
-              Confirm draw
+              {t("Confirm draw")}
             </button>
           </>
         }
       >
         <p>
-          The names are chosen by the validated draw schedule and locked permanently as soon as
-          they are revealed. <strong>This cannot be undone</strong> — no repeat, no edit, no redraw.
+          {t(
+            "The names are chosen by the validated draw schedule and locked permanently as soon as they are revealed.",
+          )}{" "}
+          <strong>{t("This cannot be undone")}</strong> — {t("no repeat, no edit, no redraw.")}
         </p>
         <p className="mt-4">
-          {formatDateLong(today)} · {slotCount} names · {stats.remainingEmployeeSelections} selections
-          still available.
+          {t("{date} · {count} names · {remaining} selections still available.", {
+            date: formatDateLong(today, lang),
+            count: slotCount,
+            remaining: stats.remainingEmployeeSelections,
+          })}
         </p>
       </Dialog>
     </>

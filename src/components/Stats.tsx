@@ -1,18 +1,20 @@
 "use client";
 
 import { campaignStats } from "@/lib/draw-engine";
+import { useT } from "@/lib/language";
 import type { CampaignState } from "@/lib/types";
 
 export function StatCards({ state }: { state: CampaignState }) {
+  const t = useT();
   const s = campaignStats(state);
   const cards = [
-    { label: "Total Participants", value: String(s.totalParticipants), note: "Employees in the draw" },
-    { label: "Total Draw Days", value: String(s.totalDrawDays), note: "Monday to Friday only" },
-    { label: "Total Selections", value: String(s.totalSelections), note: "20 × 3 = 9 × 4 + 8 × 3" },
+    { label: t("Total Participants"), value: String(s.totalParticipants), note: t("Employees in the draw") },
+    { label: t("Total Draw Days"), value: String(s.totalDrawDays), note: t("Monday to Friday only") },
+    { label: t("Total Selections"), value: String(s.totalSelections), note: t("20 × 3 = 9 × 4 + 8 × 3") },
     {
-      label: "Completed Selections",
+      label: t("Completed Selections"),
       value: `${s.completedSelections}/${s.totalSelections}`,
-      note: `${s.remainingEmployeeSelections} still to be revealed`,
+      note: t("{count} still to be revealed", { count: s.remainingEmployeeSelections }),
     },
   ];
   return (
@@ -40,19 +42,20 @@ export function StatCards({ state }: { state: CampaignState }) {
 }
 
 export function CampaignProgress({ state }: { state: CampaignState }) {
+  const t = useT();
   const s = campaignStats(state);
   return (
     <div className="gold-frame bg-[rgba(9,30,24,0.5)] px-5 py-6 sm:px-8 sm:py-7" style={{ borderRadius: 2 }}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="label label-gold">Campaign completion</p>
+          <p className="label label-gold">{t("Campaign completion")}</p>
           <p className="mt-2 font-display text-[1.65rem] leading-none text-ivory">
-            {s.completedDays} of {s.totalDrawDays} working days revealed
+            {t("{done} of {total} working days revealed", { done: s.completedDays, total: s.totalDrawDays })}
           </p>
         </div>
         <div className="flex items-baseline gap-2">
           <span className="tabular font-display text-[2.6rem] leading-none text-gold">{s.percent}</span>
-          <span className="label text-ivory/60">per cent</span>
+          <span className="label text-ivory/60">{t("per cent")}</span>
         </div>
       </div>
 
@@ -62,7 +65,7 @@ export function CampaignProgress({ state }: { state: CampaignState }) {
         aria-valuenow={s.completedSelections}
         aria-valuemin={0}
         aria-valuemax={s.totalSelections}
-        aria-label="Completed selections"
+        aria-label={t("Completed selections")}
       >
         <div
           className="h-full rounded-full transition-[width] duration-700 ease-out"
@@ -75,10 +78,10 @@ export function CampaignProgress({ state }: { state: CampaignState }) {
 
       <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
         {[
-          ["Working days done", `${s.completedDays}`],
-          ["Working days left", `${s.remainingDays}`],
-          ["Participants completed", `${s.completedParticipants}/${s.totalParticipants}`],
-          ["Selections remaining", `${s.remainingEmployeeSelections}`],
+          [t("Working days done"), `${s.completedDays}`],
+          [t("Working days left"), `${s.remainingDays}`],
+          [t("Participants completed"), `${s.completedParticipants}/${s.totalParticipants}`],
+          [t("Selections remaining"), `${s.remainingEmployeeSelections}`],
         ].map(([label, value]) => (
           <div key={label}>
             <dt className="label text-[0.55rem] text-ivory/55">{label}</dt>

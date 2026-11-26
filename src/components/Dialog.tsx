@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import { useT } from "@/lib/language";
 
 /**
  * Modal dialog used for the draw confirmation and for the historical day view.
@@ -25,6 +26,7 @@ export default function Dialog({
 }) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
+  const t = useT();
 
   useEffect(() => {
     if (!open) return;
@@ -53,7 +55,7 @@ export default function Dialog({
     <div className="fixed inset-0 z-[70] flex items-end justify-center overflow-y-auto p-3 sm:items-center sm:p-6">
       <button
         type="button"
-        aria-label="Close dialog"
+        aria-label={t("Close dialog")}
         onClick={onClose}
         className="fixed inset-0 cursor-default bg-[rgba(6,20,16,0.78)] backdrop-blur-sm"
       />

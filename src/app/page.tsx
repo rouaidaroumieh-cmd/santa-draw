@@ -7,6 +7,7 @@ import ReelMachine, { type ReelWinner } from "@/components/ReelMachine";
 import { CampaignProgress, StatCards } from "@/components/Stats";
 import { CAMPAIGN_END, CAMPAIGN_START, countWord, formatDateLong, winnersOn } from "@/lib/dates";
 import { DRAW_DAY_COUNT, campaignStats } from "@/lib/draw-engine";
+import { useLang, useT } from "@/lib/language";
 import { drawStatusFor, todayStatus, useCampaign } from "@/lib/store";
 import { buildReelWinners } from "@/lib/winners";
 
@@ -15,6 +16,8 @@ const noop = () => {};
 /** Public page: everybody can follow the draw, only the organiser runs it (Admin section). */
 export default function HomePage() {
   const state = useCampaign();
+  const lang = useLang();
+  const t = useT();
 
   const status = useMemo(() => (state ? todayStatus() : null), [state]);
   const today = status?.today ?? "";
@@ -37,15 +40,15 @@ export default function HomePage() {
   );
 
   const winners = useMemo<ReelWinner[] | null>(
-    () => (state && todayResult ? buildReelWinners(state, todayResult.participantIds, today, false) : null),
-    [state, todayResult, today],
+    () => (state && todayResult ? buildReelWinners(state, todayResult.participantIds, today, false, lang) : null),
+    [state, todayResult, today, lang],
   );
 
   if (!state || !status || !drawStatus) {
     return (
       <PageShell current="home">
         <div className="mx-auto flex min-h-[70vh] max-w-[1240px] items-center justify-center px-5">
-          <p className="label label-gold animate-pulse">Preparing the Christmas machine…</p>
+          <p className="label label-gold animate-pulse">{t("Preparing the Christmas machine…")}</p>
         </div>
       </PageShell>
     );
@@ -61,36 +64,40 @@ export default function HomePage() {
   if (drawStatus.kind === "weekend") {
     // Not a draw day: before the campaign, after it, or a weekend in between.
     if (today < CAMPAIGN_START) {
-      bannerTitle = "The Christmas draw starts soon!";
+      bannerTitle = t("The Christmas draw starts soon!");
       bannerBody = status.nextDate
-        ? `The first reveal is on ${formatDateLong(status.nextDate)}.`
-        : "The first reveal is coming soon.";
+        ? t("The first reveal is on {date}.", { date: formatDateLong(status.nextDate, lang) })
+        : t("The first reveal is coming soon.");
     } else if (today > CAMPAIGN_END) {
-      bannerTitle = "The Christmas draw is over.";
-      bannerBody = "The campaign is complete — thank you for a wonderful Christmas run.";
+      bannerTitle = t("The Christmas draw is over.");
+      bannerBody = t("The campaign is complete — thank you for a wonderful Christmas run.");
     } else {
-      bannerTitle = "Santa is taking a little Christmas break today!";
+      bannerTitle = t("Santa is taking a little Christmas break today!");
       bannerBody = status.nextDate
-        ? `The next Christmas surprise arrives on ${formatDateLong(status.nextDate)}.`
-        : "The campaign is complete — thank you for a wonderful Christmas run.";
+        ? t("The next Christmas surprise arrives on {date}.", { date: formatDateLong(status.nextDate, lang) })
+        : t("The campaign is complete — thank you for a wonderful Christmas run.");
     }
     bannerTone = "paused";
   } else if (drawStatus.kind === "completed") {
-    bannerTitle = "Today's Christmas surprises have already been revealed!";
-    bannerBody = "DRAW COMPLETED – RESULTS LOCKED. The results can never be changed or redrawn.";
+    bannerTitle = t("Today's Christmas surprises have already been revealed!");
+    bannerBody = t("DRAW COMPLETED – RESULTS LOCKED. The results can never be changed or redrawn.");
     bannerTone = "locked";
   } else if (drawStatus.kind === "future") {
     bannerTitle =
       status.nextDate && status.nextDate === addDays(today)
-        ? "See you tomorrow for another Christmas surprise!"
-        : "Today's draw is still ahead of us.";
+        ? t("See you tomorrow for another Christmas surprise!")
+        : t("Today's draw is still ahead of us.");
     bannerBody = status.nextDate
-      ? `Next reveal: ${formatDateLong(status.nextDate)}. Future names stay sealed until their day.`
-      : "All working days have been revealed.";
+      ? t("Next reveal: {date}. Future names stay sealed until their day.", {
+          date: formatDateLong(status.nextDate, lang),
+        })
+      : t("All working days have been revealed.");
     bannerTone = "paused";
   } else {
-    bannerTitle = "Today's Christmas draw is ready.";
-    bannerBody = `The organiser reveals today's ${countWord(slotCount)} Christmas names — this page updates by itself.`;
+    bannerTitle = t("Today's Christmas draw is ready.");
+    bannerBody = t("The organiser reveals today's {count} Christmas names — this page updates by itself.", {
+      count: countWord(slotCount, lang),
+    });
     bannerTone = "ready";
   }
 
@@ -122,7 +129,9 @@ export default function HomePage() {
 
         <div className="relative mx-auto max-w-[1240px] px-5 pb-28 pt-16 sm:pt-24 lg:pb-36 lg:pt-28">
           <div className="max-w-[820px]">
-            <p className="label label-gold rise">Office Christmas Campaign · 30 November – 22 December 2026</p>
+            <p className="label label-gold rise">
+              {t("Office Christmas Campaign · 30 November – 22 December 2026")}
+            </p>
             <h1
               className="rise mt-6 text-ivory"
               style={{
@@ -134,25 +143,26 @@ export default function HomePage() {
                 animationDelay: "90ms",
               }}
             >
-              Santa&apos;s
+              {t("Santa's")}
               <span className="block text-gold" style={{ fontWeight: 500 }}>
-                Christmas Draw
+                {t("Christmas Draw")}
               </span>
             </h1>
             <p
               className="rise mt-7 max-w-[560px] font-display text-[1.35rem] italic leading-snug text-ivory/85 sm:text-[1.65rem]"
               style={{ animationDelay: "180ms", fontWeight: 300 }}
             >
-              23 days of Christmas magic — names revealed on every working day, and sealed
-              forever the moment they appear.
+              {t(
+                "23 days of Christmas magic — names revealed on every working day, and sealed forever the moment they appear.",
+              )}
             </p>
 
             <div className="rise mt-9 flex flex-wrap items-center gap-x-8 gap-y-3" style={{ animationDelay: "260ms" }}>
               {[
-                ["20", "participants"],
-                [String(DRAW_DAY_COUNT), "draw days"],
-                ["60", "selections"],
-                ["3", "chances each"],
+                ["20", t("participants")],
+                [String(DRAW_DAY_COUNT), t("draw days")],
+                ["60", t("selections")],
+                ["3", t("chances each")],
               ].map(([n, label]) => (
                 <div key={label} className="flex items-baseline gap-2">
                   <span className="tabular font-display text-[1.9rem] leading-none text-gold">{n}</span>
@@ -188,29 +198,31 @@ export default function HomePage() {
                 onSpinComplete={noop}
                 statusLine={bannerTitle}
                 statusTone={bannerTone}
-                dateLabel={formatDateLong(today)}
+                dateLabel={formatDateLong(today, lang)}
               />
             </div>
 
             <aside className="order-1 lg:order-2">
-              <Overline>Today at a glance</Overline>
+              <Overline>{t("Today at a glance")}</Overline>
               <div className="paper gold-frame mt-5 px-6 py-7" style={{ borderRadius: 2 }}>
-                <p className="label text-[#B08F4C]">{formatDateLong(today)}</p>
-                <h3
-                  className="mt-3 text-[1.55rem] leading-[1.08] text-[#173D32]"
-                  style={{ fontWeight: 400 }}
-                >
+                <p className="label text-[#B08F4C]">{formatDateLong(today, lang)}</p>
+                <h3 className="mt-3 text-[1.55rem] leading-[1.08] text-[#173D32]" style={{ fontWeight: 400 }}>
                   {bannerTitle}
                 </h3>
                 <p className="mt-4 text-[0.92rem] leading-relaxed text-[#4A463C]">{bannerBody}</p>
                 <div className="rule-solid mt-5 pt-5">
-                  <p className="label text-[#6E6A5E]">Campaign status</p>
+                  <p className="label text-[#6E6A5E]">{t("Campaign status")}</p>
                   <p className="tabular mt-2 font-display text-[1.35rem] leading-tight text-[#173D32]">
-                    {stats.completedSelections}/{stats.totalSelections} selections revealed
+                    {t("{done}/{total} selections revealed", {
+                      done: stats.completedSelections,
+                      total: stats.totalSelections,
+                    })}
                   </p>
                   <p className="mt-1 text-[0.82rem] text-[#6E6A5E]">
-                    {stats.remainingDays} working days remaining ·{" "}
-                    {stats.completedParticipants} participants complete
+                    {t("{days} working days remaining · {people} participants complete", {
+                      days: stats.remainingDays,
+                      people: stats.completedParticipants,
+                    })}
                   </p>
                 </div>
               </div>
@@ -222,7 +234,7 @@ export default function HomePage() {
       {/* ================= WINNER PRESENTATION ================= */}
       <section className="px-5 pt-20 sm:pt-24">
         <div className="mx-auto max-w-[1240px]">
-          <Overline>{todayResult ? "Today's Christmas picks" : "Awaiting today's picks"}</Overline>
+          <Overline>{todayResult ? t("Today's Christmas picks") : t("Awaiting today's picks")}</Overline>
 
           {winners && winners.length > 0 ? (
             <>
@@ -247,7 +259,7 @@ export default function HomePage() {
                       <p className="mt-2 text-[0.86rem] text-[#4A463C]">{w.remainingLabel}</p>
                     </div>
                     <p className="label mt-4 text-[0.52rem] text-[#6E6A5E]">
-                      Locked {formatDateLong(today)}
+                      {t("Locked {date}", { date: formatDateLong(today, lang) })}
                     </p>
                   </article>
                 ))}
@@ -255,19 +267,20 @@ export default function HomePage() {
 
               <div className="mt-8 flex flex-col items-center gap-3 border border-[rgba(214,181,109,0.5)] bg-[rgba(214,181,109,0.1)] px-6 py-6 text-center">
                 <p className="font-display text-[1.55rem] italic text-ivory" style={{ fontWeight: 300 }}>
-                  Congratulations to today&apos;s Christmas picks!
+                  {t("Congratulations to today's Christmas picks!")}
                 </p>
-                <p className="label text-gold">Draw completed – results locked</p>
+                <p className="label text-gold">{t("Draw completed – results locked")}</p>
               </div>
             </>
           ) : (
             <div className="paper-dim gold-frame mt-7 px-6 py-14 text-center" style={{ borderRadius: 2 }}>
               <p className="font-display text-[1.6rem] italic leading-snug text-[#173D32]" style={{ fontWeight: 500 }}>
-                The names are waiting behind the glass.
+                {t("The names are waiting behind the glass.")}
               </p>
               <p className="mx-auto mt-4 max-w-[440px] text-[0.92rem] leading-relaxed text-[#3D3A30]">
-                When today&apos;s draw is confirmed, the Christmas picks appear here — with their
-                photos, their selection number and the chances they have left.
+                {t(
+                  "When today's draw is confirmed, the Christmas picks appear here — with their photos, their selection number and the chances they have left.",
+                )}
               </p>
             </div>
           )}

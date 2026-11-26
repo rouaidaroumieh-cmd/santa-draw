@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useT } from "@/lib/language";
 
 interface Wish {
   id: string;
@@ -11,8 +12,9 @@ interface Wish {
 
 const REFRESH_MS = 30000;
 
-/** Visitors leave a Christmas wish. Each one appears only after the organiser approves it. */
+/** Visitors leave a Christmas wish. Each one appears on the wall straight away. */
 export default function WishWall() {
+  const t = useT();
   const [wishes, setWishes] = useState<Wish[]>([]);
   const [author, setAuthor] = useState("");
   const [message, setMessage] = useState("");
@@ -49,13 +51,13 @@ export default function WishWall() {
       const data = (await res.json().catch(() => null)) as { error?: string } | null;
       if (res.ok) {
         setMessage("");
-        setNotice({ tone: "ok", text: "Thank you! Your wish is on the wall." });
+        setNotice({ tone: "ok", text: t("Thank you! Your wish is on the wall.") });
         void loadWishes();
       } else {
-        setNotice({ tone: "error", text: data?.error ?? "Your wish could not be sent." });
+        setNotice({ tone: "error", text: t(data?.error ?? "Your wish could not be sent.") });
       }
     } catch {
-      setNotice({ tone: "error", text: "The server cannot be reached. Check your connection." });
+      setNotice({ tone: "error", text: t("The server cannot be reached. Check your connection.") });
     } finally {
       setSending(false);
     }
@@ -65,7 +67,7 @@ export default function WishWall() {
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
       <form onSubmit={submit} className="paper gold-frame flex flex-col gap-4 px-6 py-7" style={{ borderRadius: 2 }}>
         <label className="flex flex-col gap-2">
-          <span className="label text-[#6E6A5E]">Your first name</span>
+          <span className="label text-[#6E6A5E]">{t("Your first name")}</span>
           <input
             className="field"
             value={author}
@@ -75,7 +77,7 @@ export default function WishWall() {
           />
         </label>
         <label className="flex flex-col gap-2">
-          <span className="label text-[#6E6A5E]">Your wish ({message.length}/200)</span>
+          <span className="label text-[#6E6A5E]">{t("Your wish ({count}/200)", { count: message.length })}</span>
           <textarea
             className="field min-h-[120px] resize-y"
             value={message}
@@ -85,9 +87,9 @@ export default function WishWall() {
           />
         </label>
         <div className="flex items-center justify-between gap-4">
-          <p className="text-[0.82rem] text-[#6E6A5E]">Your wish appears on the wall straight away.</p>
+          <p className="text-[0.82rem] text-[#6E6A5E]">{t("Your wish appears on the wall straight away.")}</p>
           <button type="submit" className="btn btn-dark" disabled={sending}>
-            {sending ? "Sending…" : "Send my wish"}
+            {sending ? t("Sending…") : t("Send my wish")}
           </button>
         </div>
         {notice ? (
@@ -99,7 +101,9 @@ export default function WishWall() {
 
       <div className="flex flex-col gap-4">
         {wishes.length === 0 ? (
-          <p className="font-display text-[1.25rem] italic text-ivory/75">No wishes yet. Be the first to write one!</p>
+          <p className="font-display text-[1.25rem] italic text-ivory/75">
+            {t("No wishes yet. Be the first to write one!")}
+          </p>
         ) : (
           wishes.map((w) => (
             <article key={w.id} className="paper px-5 py-4" style={{ borderRadius: 2 }}>

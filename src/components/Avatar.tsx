@@ -1,5 +1,7 @@
 "use client";
 
+import { useT } from "@/lib/language";
+
 /**
  * Employee photo. Falls back to an SVG monogram medallion (gold ring on a
  * tinted ground) until a real photograph has been uploaded — never a broken
@@ -35,6 +37,7 @@ export default function Avatar({
   ring?: boolean;
   className?: string;
 }) {
+  const t = useT();
   const ground = GROUNDS[hashIndex(id, GROUNDS.length)];
 
   if (photo) {
@@ -68,7 +71,7 @@ export default function Avatar({
       width={size}
       height={size}
       role="img"
-      aria-label={`${name} — placeholder portrait`}
+      aria-label={t("{name} — placeholder portrait", { name })}
       className={className}
     >
       <defs>

@@ -5,17 +5,20 @@ import { Overline, PageShell } from "@/components/Chrome";
 import { CampaignProgress } from "@/components/Stats";
 import { SELECTIONS_PER_PARTICIPANT, participantStats } from "@/lib/draw-engine";
 import { formatDateShort, ordinal } from "@/lib/dates";
+import { useLang, useT } from "@/lib/language";
 import { useCampaign } from "@/lib/store";
 
 /** Public, read-only list. Names and photos are edited in the organiser's Admin section. */
 export default function ParticipantsPage() {
   const state = useCampaign();
+  const lang = useLang();
+  const t = useT();
 
   if (!state) {
     return (
       <PageShell current="participants">
         <div className="mx-auto flex min-h-[70vh] max-w-[1240px] items-center justify-center px-5">
-          <p className="label label-gold animate-pulse">Gathering the participants…</p>
+          <p className="label label-gold animate-pulse">{t("Gathering the participants…")}</p>
         </div>
       </PageShell>
     );
@@ -35,19 +38,20 @@ export default function ParticipantsPage() {
           }}
         />
         <div className="relative mx-auto max-w-[1240px] px-5 py-16 sm:py-20">
-          <p className="label label-gold">Twenty colleagues · three chances each</p>
+          <p className="label label-gold">{t("Twenty colleagues · three chances each")}</p>
           <h1
             className="mt-5 text-ivory"
             style={{ fontSize: "clamp(2.6rem, 7.6vw, 5.8rem)", lineHeight: 0.9, letterSpacing: "-0.035em", fontWeight: 300 }}
           >
-            Meet our Christmas
+            {t("Meet our Christmas")}
             <span className="block text-gold" style={{ fontWeight: 500 }}>
-              Participants
+              {t("Participants")}
             </span>
           </h1>
           <p className="mt-6 max-w-[560px] font-display text-[1.15rem] italic leading-relaxed text-ivory/80" style={{ fontWeight: 300 }}>
-            Every person appears exactly three times, on three different working days. The three
-            stars light up as each selection is revealed.
+            {t(
+              "Every person appears exactly three times, on three different working days. The three stars light up as each selection is revealed.",
+            )}
           </p>
         </div>
       </section>
@@ -56,11 +60,15 @@ export default function ParticipantsPage() {
         <div className="mx-auto max-w-[1240px]">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
             <div>
-              <Overline>The list</Overline>
+              <Overline>{t("The list")}</Overline>
               <p className="mt-4 text-[0.9rem] leading-relaxed text-ivory/65">
                 {editable
-                  ? "Names and photographs can still be edited by the organiser — the configuration locks as soon as the first draw is completed."
-                  : "Configuration is locked: at least one draw has been completed, so names and photographs can no longer change."}
+                  ? t(
+                      "Names and photographs can still be edited by the organiser — the configuration locks as soon as the first draw is completed.",
+                    )
+                  : t(
+                      "Configuration is locked: at least one draw has been completed, so names and photographs can no longer change.",
+                    )}
               </p>
 
               <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -84,7 +92,7 @@ export default function ParticipantsPage() {
                               : "border border-[rgba(122,31,43,0.45)] text-[#7A1F2B]"
                           }`}
                         >
-                          {p.completed ? "Completed" : "Active"}
+                          {p.completed ? t("Completed") : t("Active")}
                         </p>
                       </div>
                     </div>
@@ -92,10 +100,12 @@ export default function ParticipantsPage() {
                     <div className="rule-solid mt-5 pt-4">
                       <div className="flex items-baseline justify-between gap-3">
                         <p className="label text-[#5C4A1F]">
-                          Selections: <span className="tabular font-semibold text-[#173D32]">{p.selected}/3</span>
+                          {t("Selections:")}{" "}
+                          <span className="tabular font-semibold text-[#173D32]">{p.selected}/3</span>
                         </p>
                         <p className="label text-[#4A463C]">
-                          Remaining: <span className="tabular font-semibold text-[#173D32]">{p.remaining}</span>
+                          {t("Remaining:")}{" "}
+                          <span className="tabular font-semibold text-[#173D32]">{p.remaining}</span>
                         </p>
                       </div>
 
@@ -115,7 +125,7 @@ export default function ParticipantsPage() {
                           );
                         })}
                         <span className="label ml-auto text-[0.58rem] text-[#4A463C]">
-                          {p.completed ? "All three revealed" : `${p.remaining} left`}
+                          {p.completed ? t("All three revealed") : t("{count} left", { count: p.remaining })}
                         </span>
                       </div>
 
@@ -135,16 +145,21 @@ export default function ParticipantsPage() {
 
                       <p className="mt-3 text-[0.78rem] leading-relaxed text-[#3D3A32]">
                         {p.dates.length === 0
-                          ? "No selection revealed yet."
-                          : `Revealed on ${p.dates.map(formatDateShort).join(" · ")}`}
+                          ? t("No selection revealed yet.")
+                          : t("Revealed on {dates}", {
+                              dates: p.dates.map((d) => formatDateShort(d, lang)).join(" · "),
+                            })}
                       </p>
                       <p className="sr-only">
-                        Selection {ordinal(p.selected)} of {SELECTIONS_PER_PARTICIPANT}
+                        {t("Selection {ordinal} of {total}", {
+                          ordinal: ordinal(p.selected, lang),
+                          total: SELECTIONS_PER_PARTICIPANT,
+                        })}
                       </p>
                     </div>
 
                     <span className="label mt-3 text-[0.58rem] text-[#4A463C]">
-                      Entry {String(i + 1).padStart(2, "0")} of 20
+                      {t("Entry {number} of 20", { number: String(i + 1).padStart(2, "0") })}
                     </span>
                   </article>
                 ))}
@@ -154,19 +169,18 @@ export default function ParticipantsPage() {
             <aside className="lg:sticky lg:top-28">
               <CampaignProgress state={state} />
               <div className="paper gold-frame mt-5 px-6 py-6" style={{ borderRadius: 2 }}>
-                <p className="label text-[#B08F4C]">How the three chances work</p>
+                <p className="label text-[#B08F4C]">{t("How the three chances work")}</p>
                 <ol className="mt-4 space-y-3 text-[0.85rem] leading-relaxed text-[#3D3A30]">
-                  <li>1 · Each person is placed in the schedule exactly three times.</li>
-                  <li>2 · The three dates are always different working days.</li>
-                  <li>3 · Once the third star is lit, the person is excluded from future draws.</li>
-                  <li>4 · Counts are recalculated from the saved results after every reveal.</li>
+                  <li>{t("1 · Each person is placed in the schedule exactly three times.")}</li>
+                  <li>{t("2 · The three dates are always different working days.")}</li>
+                  <li>{t("3 · Once the third star is lit, the person is excluded from future draws.")}</li>
+                  <li>{t("4 · Counts are recalculated from the saved results after every reveal.")}</li>
                 </ol>
               </div>
             </aside>
           </div>
         </div>
       </section>
-
     </PageShell>
   );
 }
