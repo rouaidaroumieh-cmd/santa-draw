@@ -149,7 +149,7 @@ export default function MemoryMatch() {
                     src={card.photo}
                     alt=""
                     className="h-full w-full object-cover"
-                    style={{ objectPosition: "50% 32%" }}
+                    style={{ objectPosition: "50% 46%" }}
                   />
                   <span className="absolute inset-x-0 bottom-0 truncate bg-[rgba(9,30,24,0.8)] px-2 py-1 text-center text-[0.68rem] text-ivory">
                     {card.name}

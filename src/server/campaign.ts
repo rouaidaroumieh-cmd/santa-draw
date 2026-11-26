@@ -81,7 +81,7 @@ const ELF_PHOTO_FILES: Readonly<Record<(typeof PARTICIPANT_NAMES)[number], strin
   karen: "karen.jpeg",
   elia: "elia.jpeg",
   pia: "pia.jpeg",
-  carole: "carole-realistic.jpeg",
+  carole: "carole.jpeg",
   lara: "lara.jpeg",
   rouaida: "rouaida.jpeg",
 };

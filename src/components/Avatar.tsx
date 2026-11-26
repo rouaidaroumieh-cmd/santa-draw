@@ -59,7 +59,7 @@ export default function Avatar({
           width={size}
           height={size}
           className="h-full w-full object-cover"
-          style={{ objectPosition: "50% 32%" }}
+          style={{ objectPosition: "50% 46%" }}
         />
       </div>
     );
