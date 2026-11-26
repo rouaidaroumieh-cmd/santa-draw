@@ -155,6 +155,11 @@ export const FR: Record<string, string> = {
   "Memory match": "Memory des photos",
   "Christmas quiz": "Quiz de Noël",
   "Wish wall": "Mur des vœux",
+  "Meet the participants": "Les participants",
+  "Twenty colleagues,": "Vingt collègues,",
+  "three chances each": "trois chances chacun",
+  "See the full list": "Voir la liste complète",
+  "{done}/{total} selections": "{done}/{total} sélections",
   "From the office": "Du bureau",
   "Leave a Christmas wish": "Laissez un vœu de Noël",
   "Read every wish — and add your own — in the Fun corner.":

@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import Avatar from "@/components/Avatar";
 import { Overline, PageShell } from "@/components/Chrome";
+import ParticipantGallery from "@/components/ParticipantGallery";
 import ReelMachine, { type ReelWinner } from "@/components/ReelMachine";
 import { CampaignProgress, StatCards } from "@/components/Stats";
 import WishPreview from "@/components/WishPreview";
@@ -287,6 +288,8 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      <ParticipantGallery state={state} />
 
       <WishPreview />
     </PageShell>
