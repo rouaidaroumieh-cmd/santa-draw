@@ -76,15 +76,15 @@ export function CampaignProgress({ state }: { state: CampaignState }) {
         />
       </div>
 
-      <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+      <dl className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] gap-x-6 gap-y-4">
         {[
           [t("Working days done"), `${s.completedDays}`],
           [t("Working days left"), `${s.remainingDays}`],
           [t("Participants completed"), `${s.completedParticipants}/${s.totalParticipants}`],
           [t("Selections remaining"), `${s.remainingEmployeeSelections}`],
         ].map(([label, value]) => (
-          <div key={label}>
-            <dt className="label text-[0.55rem] text-ivory/55">{label}</dt>
+          <div key={label} className="min-w-0">
+            <dt className="label text-[0.55rem] text-ivory/55 [overflow-wrap:anywhere]">{label}</dt>
             <dd className="tabular mt-1.5 font-display text-[1.5rem] leading-none text-ivory">{value}</dd>
           </div>
         ))}
