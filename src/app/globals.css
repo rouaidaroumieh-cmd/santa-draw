@@ -20,6 +20,7 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    font-size: 116%;
   }
 
   body {
@@ -56,7 +57,7 @@
   /* ---- Foil-stamped labels & rules -------------------------------- */
   .label {
     font-family: var(--font-sans);
-    font-size: 0.68rem;
+    font-size: 0.78rem;
     font-weight: 500;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -278,6 +279,21 @@
     -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
     mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
   }
+}
+
+/* ---- Minimum readable size ----------------------------------------- */
+/* Components use very small inline sizes (0.5–0.74rem) for labels; lift them to a readable floor. */
+.text-\[0\.5rem\],
+.text-\[0\.52rem\],
+.text-\[0\.55rem\],
+.text-\[0\.58rem\],
+.text-\[0\.6rem\],
+.text-\[0\.62rem\],
+.text-\[0\.68rem\],
+.text-\[0\.7rem\],
+.text-\[0\.72rem\],
+.text-\[0\.74rem\] {
+  font-size: 0.78rem;
 }
 
 /* ---- Reel animation ------------------------------------------------ */

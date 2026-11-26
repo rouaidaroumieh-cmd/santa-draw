@@ -58,14 +58,14 @@ export function Snow({ count = 16 }: { count?: number }) {
 }
 
 /** Two-letter switch between English and French. The choice is remembered in this browser. */
-export function LanguageToggle() {
+export function LanguageToggle({ className = "" }: { className?: string }) {
   const lang = useLang();
   const t = useT();
   return (
     <div
       role="group"
       aria-label={t("Language")}
-      className="flex shrink-0 items-center border border-[rgba(214,181,109,0.4)]"
+      className={`flex shrink-0 items-center border border-[rgba(214,181,109,0.4)] ${className}`}
       style={{ borderRadius: 2 }}
     >
       {LANGUAGES.map((option) => {
@@ -94,21 +94,23 @@ export function SiteHeader({ current }: { current: SectionKey }) {
   const t = useT();
   return (
     <header className="sticky top-0 z-40 border-b border-[rgba(214,181,109,0.28)] bg-[rgba(15,43,35,0.92)] backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1240px] flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between md:gap-8 md:py-5">
+      <div className="mx-auto grid max-w-[1240px] grid-cols-[1fr_auto] gap-3 px-5 py-4 md:flex md:flex-row md:items-center md:justify-between md:gap-8 md:py-5">
         <Link href="/" className="group flex items-center gap-3">
-          <BrandMark />
-          <span className="flex flex-col leading-none">
-            <span className="font-display text-[1.15rem] tracking-[-0.01em] text-ivory md:text-[1.35rem]">
-              Santa&apos;s Christmas Draw
+            <BrandMark />
+            <span className="flex flex-col leading-none">
+              <span className="font-display text-[1.15rem] tracking-[-0.01em] text-ivory md:text-[1.35rem]">
+                Santa&apos;s Christmas Draw
+              </span>
+              <span className="label label-gold mt-1 text-[0.58rem] opacity-90">
+                {t("23 Days of Christmas Magic")}
+              </span>
             </span>
-            <span className="label label-gold mt-1 text-[0.58rem] opacity-90">
-              {t("23 Days of Christmas Magic")}
-            </span>
-          </span>
         </Link>
 
-        <div className="flex items-center gap-3">
-          <nav aria-label={t("Main navigation")} className="-mx-1 flex items-center gap-1 overflow-x-auto px-1">
+        <nav
+          aria-label={t("Main navigation")}
+          className="-mx-1 col-span-2 row-start-2 flex min-w-0 flex-wrap items-center gap-1 px-1 md:col-auto md:row-auto"
+        >
             {NAV.map((item) => {
               const active = item.key === current;
               return (
@@ -131,9 +133,9 @@ export function SiteHeader({ current }: { current: SectionKey }) {
                 </Link>
               );
             })}
-          </nav>
-          <LanguageToggle />
-        </div>
+        </nav>
+
+        <LanguageToggle className="col-start-2 row-start-1 justify-self-end md:order-last md:col-auto md:row-auto md:justify-self-auto" />
       </div>
       <div className="rule" />
     </header>
