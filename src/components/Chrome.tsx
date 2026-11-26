@@ -15,7 +15,6 @@ const NAV: { key: SectionKey; href: string; label: string }[] = [
   { key: "calendar", href: "/calendar", label: "Calendar" },
   { key: "participants", href: "/participants", label: "Participants" },
   { key: "fun", href: "/fun", label: "Fun" },
-  { key: "admin", href: "/admin", label: "Admin" },
 ];
 
 const LANGUAGES: { code: Lang; label: string }[] = [
