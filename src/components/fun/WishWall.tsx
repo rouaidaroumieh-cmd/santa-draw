@@ -72,10 +72,10 @@ export default function WishWall() {
   };
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)]">
+    <div className="flex flex-col gap-8">
       <form
         onSubmit={submit}
-        className="paper gold-frame flex w-full flex-col gap-4 px-6 py-7 lg:sticky lg:top-24"
+        className="paper gold-frame flex w-full flex-col gap-4 px-6 py-7"
         style={{ borderRadius: 2 }}
       >
         <div className="flex flex-col gap-2">
@@ -151,11 +151,7 @@ export default function WishWall() {
               tabIndex={0}
               aria-label={t("Wish wall")}
             >
-              <div
-                className={`grid gap-3 ${
-                  wishes.length > 4 ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"
-                }`}
-              >
+              <div className="flex flex-col gap-3">
                 {wishes.map((w) => (
                   <article key={w.id} className="paper px-4 py-3.5 sm:px-5 sm:py-4" style={{ borderRadius: 2 }}>
                     <p className="font-display text-[1.05rem] italic leading-snug text-[#173D32]">
