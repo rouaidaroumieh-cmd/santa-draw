@@ -12,7 +12,7 @@ import {
 } from "@/lib/backup";
 import { isEligibleDate } from "@/lib/dates";
 import { DEV_MODE } from "@/lib/dev-mode";
-import { generateSchedule, validateSchedule, validateSelection } from "@/lib/draw-engine";
+import { generateSchedule, respectsDeadlines, validateSchedule, validateSelection } from "@/lib/draw-engine";
 import {
   CAMPAIGN_ID,
   DATA_VERSION,
@@ -83,7 +83,7 @@ function createInitialConfig(): CampaignConfig {
 async function loadConfig(db: Executor): Promise<CampaignConfig> {
   const [row] = await db.select().from(campaigns).where(eq(campaigns.id, ROW_ID));
   const config = row?.config ?? (await insertInitialConfig(db));
-  return fillPlaceholderNames(db, config);
+  return repairDraft(db, config);
 }
 
 async function insertInitialConfig(db: Executor): Promise<CampaignConfig> {
@@ -92,14 +92,26 @@ async function insertInitialConfig(db: Executor): Promise<CampaignConfig> {
   return created.config;
 }
 
-/** Replace the generated "Participant 01…" labels once, before any draw is locked. */
-async function fillPlaceholderNames(db: Executor, config: CampaignConfig): Promise<CampaignConfig> {
+/**
+ * Before any draw is locked, bring a stored campaign up to the current rules:
+ * the real names replace the placeholders, and a schedule built from an older
+ * plan (wrong winner counts, or a broken participant deadline) is regenerated.
+ */
+async function repairDraft(db: Executor, config: CampaignConfig): Promise<CampaignConfig> {
+  const ids = config.participants.map((p) => p.id);
+  const namesOutdated =
+    config.participants.length === PARTICIPANT_NAMES.length &&
+    config.participants.every((p) => /^Participant \d{2}$/.test(p.name));
+  const scheduleOutdated = !validateSchedule(config.schedule, ids).ok || !respectsDeadlines(config.schedule);
+  if (!namesOutdated && !scheduleOutdated) return config;
   if (await isLocked(db)) return config;
-  if (config.participants.length !== PARTICIPANT_NAMES.length) return config;
-  if (!config.participants.every((p) => /^Participant \d{2}$/.test(p.name))) return config;
+
   const next: CampaignConfig = {
     ...config,
-    participants: config.participants.map((p, i) => ({ ...p, name: PARTICIPANT_NAMES[i], role: "Employee" })),
+    participants: namesOutdated
+      ? config.participants.map((p, i) => ({ ...p, name: PARTICIPANT_NAMES[i], role: "Employee" }))
+      : config.participants,
+    schedule: scheduleOutdated ? generateSchedule(ids) : config.schedule,
   };
   await saveConfig(db, next);
   return next;

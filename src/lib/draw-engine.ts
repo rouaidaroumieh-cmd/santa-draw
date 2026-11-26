@@ -63,7 +63,7 @@ export function generateSchedule(participantIds: readonly string[]): DaySchedule
   throw new Error("Could not build a valid schedule after 500 attempts.");
 }
 
-function respectsDeadlines(schedule: DaySchedule[]): boolean {
+export function respectsDeadlines(schedule: DaySchedule[]): boolean {
   return schedule.every((day) =>
     day.participantIds.every((id) => {
       const deadline = PARTICIPANT_DEADLINES[id];

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { countWord } from "@/lib/dates";
 import Avatar from "./Avatar";
 
 export interface ReelPerson {
@@ -182,12 +181,6 @@ export default function ReelMachine({
           <div className="flex flex-col items-center text-center">
             <RibbonBow />
             <p className="label label-gold mt-3">The Christmas Drawing Machine</p>
-            <h2 className="mt-2 text-[1.9rem] leading-[0.95] text-ivory sm:text-[2.6rem]">
-              <span className="capitalize">{countWord(reelCount)}</span> names, sealed
-              <span className="block italic text-gold" style={{ fontWeight: 300 }}>
-                until the moment arrives
-              </span>
-            </h2>
           </div>
 
           {/* ---- Reels ------------------------------------------------ */}

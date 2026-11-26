@@ -73,7 +73,7 @@ export default function ParticipantsPage() {
                     <div className="flex items-start gap-4">
                       <Avatar id={p.id} name={p.name} photo={state.photos[p.id]} size={72} />
                       <div className="min-w-0 flex-1">
-                        <h2 className="font-display text-[1.22rem] leading-tight text-[#173D32]">
+                        <h2 className="font-display text-[1.22rem] font-medium leading-tight text-[#173D32]">
                           {p.name}
                         </h2>
                         <p className="mt-1 text-[0.74rem] leading-snug text-[#6E6A5E]">{p.role}</p>

@@ -95,7 +95,7 @@ export default function Avatar({
         textAnchor="middle"
         dominantBaseline="central"
         fill="#F8F3E9"
-        fontFamily="Fraunces, Georgia, serif"
+        fontFamily="Poppins, Georgia, serif"
         fontSize="34"
         fontWeight="400"
         letterSpacing="1"

@@ -15,7 +15,7 @@ export const viewport: Viewport = {
 };
 
 const FONT_HREF =
-  "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Jost:wght@300;400;500;600&display=swap";
+  "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

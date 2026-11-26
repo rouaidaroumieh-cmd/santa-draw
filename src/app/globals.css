@@ -12,8 +12,9 @@
   --color-gold-deep: #b08f4c;
   --color-stone: #6e6a5e;
 
-  --font-display: "Fraunces", "Hoefler Text", Georgia, "Times New Roman", serif;
-  --font-sans: "Jost", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --font-festive: "Playfair Display", Georgia, "Times New Roman", serif;
 }
 
 @layer base {
@@ -44,10 +45,10 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-display);
-    font-weight: 300;
-    letter-spacing: -0.025em;
-    line-height: 0.95;
+    font-family: var(--font-festive);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.05;
   }
 }
 

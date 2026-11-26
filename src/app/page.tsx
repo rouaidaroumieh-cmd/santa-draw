@@ -239,7 +239,7 @@ export default function HomePage() {
                   >
                     <FestiveAccent />
                     <Avatar id={w.id} name={w.name} photo={state.photos[w.id]} size={112} />
-                    <h3 className="mt-5 font-display text-[1.35rem] leading-tight text-[#173D32]">
+                    <h3 className="font-display mt-5 text-[1.35rem] font-medium leading-tight text-[#173D32]">
                       {w.name}
                     </h3>
                     <div className="rule-solid mt-4 w-full pt-4">
@@ -262,10 +262,10 @@ export default function HomePage() {
             </>
           ) : (
             <div className="paper-dim gold-frame mt-7 px-6 py-14 text-center" style={{ borderRadius: 2 }}>
-              <p className="font-display text-[1.6rem] italic leading-snug text-ivory/85" style={{ fontWeight: 300 }}>
+              <p className="font-display text-[1.6rem] italic leading-snug text-[#173D32]" style={{ fontWeight: 500 }}>
                 The names are waiting behind the glass.
               </p>
-              <p className="mx-auto mt-4 max-w-[440px] text-[0.92rem] leading-relaxed text-ivory/65">
+              <p className="mx-auto mt-4 max-w-[440px] text-[0.92rem] leading-relaxed text-[#3D3A30]">
                 When today&apos;s draw is confirmed, the Christmas picks appear here — with their
                 photos, their selection number and the chances they have left.
               </p>

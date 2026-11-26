@@ -116,8 +116,12 @@ export function isWeekendDate(date: string): boolean {
 /** "Tuesday, 1 December 2026" */
 export function formatDateLong(date: string): string {
   const d = getDay(date);
-  if (!d) return date;
-  return `${d.weekday}, ${d.dayOfMonth} ${d.monthName} ${d.year}`;
+  if (d) return `${d.weekday}, ${d.dayOfMonth} ${d.monthName} ${d.year}`;
+  const parsed = new Date(`${date}T12:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return date;
+  const weekday = parsed.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" });
+  const rest = parsed.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  return `${weekday}, ${rest}`;
 }
 
 /** "Tue 1 Dec" */
