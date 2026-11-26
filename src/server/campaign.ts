@@ -213,6 +213,12 @@ function toPublicState(
   };
 }
 
+/** Current participant names, including any rename made before the first draw. */
+export async function listParticipantNames(db: Executor = getDb()): Promise<string[]> {
+  const config = await loadConfig(db);
+  return config.participants.map((p) => p.name);
+}
+
 export async function getPublicState(db: Executor = getDb()): Promise<CampaignState> {
   const config = await loadConfig(db);
   const results = await loadResults(db);

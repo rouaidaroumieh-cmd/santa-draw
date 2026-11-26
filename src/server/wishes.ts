@@ -1,7 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { wishes } from "@/db/schema";
-import { ROW_ID, type Outcome } from "./campaign";
+import { listParticipantNames, ROW_ID, type Outcome } from "./campaign";
 
 const MAX_AUTHOR = 40;
 const MAX_MESSAGE = 200;
@@ -39,12 +39,15 @@ export async function addWish(author: unknown, message: unknown): Promise<Outcom
   if (typeof author !== "string" || typeof message !== "string") return fail("Please write your name and a message.");
   const name = author.trim();
   const text = message.trim();
-  if (!name) return fail("Please enter your name.");
+  if (!name) return fail("Please choose a name from the participant list.");
   if (name.length > MAX_AUTHOR) return fail(`Keep your name under ${MAX_AUTHOR} characters.`);
+  const names = await listParticipantNames();
+  const known = names.find((n) => n.trim().toLowerCase() === name.toLowerCase());
+  if (!known) return fail("Please choose a name from the participant list.");
   if (!text) return fail("Please write a short message.");
   if (text.length > MAX_MESSAGE) return fail(`Keep your message under ${MAX_MESSAGE} characters.`);
 
-  await getDb().insert(wishes).values({ campaignId: ROW_ID, author: name, message: text, approved: true });
+  await getDb().insert(wishes).values({ campaignId: ROW_ID, author: known, message: text, approved: true });
   return { ok: true };
 }
 

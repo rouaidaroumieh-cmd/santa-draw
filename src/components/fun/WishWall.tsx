@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useT } from "@/lib/language";
+import { useCampaign } from "@/lib/store";
 
 interface Wish {
   id: string;
@@ -15,6 +16,8 @@ const REFRESH_MS = 30000;
 /** Visitors leave a Christmas wish. Each one appears on the wall straight away. */
 export default function WishWall() {
   const t = useT();
+  const state = useCampaign();
+  const names = state?.participants.map((p) => p.name) ?? [];
   const [wishes, setWishes] = useState<Wish[]>([]);
   const [author, setAuthor] = useState("");
   const [message, setMessage] = useState("");
@@ -50,6 +53,7 @@ export default function WishWall() {
       });
       const data = (await res.json().catch(() => null)) as { error?: string } | null;
       if (res.ok) {
+        setAuthor("");
         setMessage("");
         setNotice({ tone: "ok", text: t("Thank you! Your wish is on the wall.") });
         void loadWishes();
@@ -68,13 +72,20 @@ export default function WishWall() {
       <form onSubmit={submit} className="paper gold-frame flex flex-col gap-4 px-6 py-7" style={{ borderRadius: 2 }}>
         <label className="flex flex-col gap-2">
           <span className="label text-[#6E6A5E]">{t("Your first name")}</span>
-          <input
+          <select
             className="field"
             value={author}
-            maxLength={40}
             onChange={(e) => setAuthor(e.target.value)}
             required
-          />
+            disabled={names.length === 0}
+          >
+            <option value="">{t("Choose your name")}</option>
+            {names.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="flex flex-col gap-2">
           <span className="label text-[#6E6A5E]">{t("Your wish ({count}/200)", { count: message.length })}</span>

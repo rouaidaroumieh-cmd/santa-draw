@@ -174,6 +174,8 @@ export const FR: Record<string, string> = {
   "See my score": "Voir mon score",
   "Thank you! Your wish is on the wall.": "Merci ! Votre vœu est sur le mur.",
   "Your first name": "Votre prénom",
+  "Choose your name": "Choisissez votre prénom",
+  "Please choose a name from the participant list.": "Choisissez un prénom dans la liste des participants.",
   "Your wish ({count}/200)": "Votre vœu ({count}/200)",
   "Your wish appears on the wall straight away.": "Votre vœu apparaît sur le mur immédiatement.",
   "Sending…": "Envoi…",
