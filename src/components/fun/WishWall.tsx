@@ -43,6 +43,10 @@ export default function WishWall() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!author) {
+      setNotice({ tone: "error", text: t("Please choose a name from the participant list.") });
+      return;
+    }
     setSending(true);
     setNotice(null);
     try {
@@ -70,23 +74,37 @@ export default function WishWall() {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
       <form onSubmit={submit} className="paper gold-frame flex flex-col gap-4 px-6 py-7" style={{ borderRadius: 2 }}>
-        <label className="flex flex-col gap-2">
-          <span className="label text-[#6E6A5E]">{t("Your first name")}</span>
-          <select
-            className="field"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            required
-            disabled={names.length === 0}
-          >
-            <option value="">{t("Choose your name")}</option>
-            {names.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="flex flex-col gap-2">
+          <span id="wish-author-label" className="label text-[#6E6A5E]">
+            {t("Your first name")}
+          </span>
+          <div role="radiogroup" aria-labelledby="wish-author-label" className="flex flex-wrap gap-2">
+            {names.length === 0 ? (
+              <span className="text-[0.85rem] text-[#6E6A5E]">{t("Loading…")}</span>
+            ) : (
+              names.map((name) => {
+                const selected = name === author;
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => setAuthor(name)}
+                    className={`border px-3 py-1.5 text-[0.85rem] capitalize transition-colors ${
+                      selected
+                        ? "border-[#173D32] bg-[#173D32] text-ivory"
+                        : "border-[rgba(23,61,50,0.3)] text-[#173D32] hover:border-[#B08F4C]"
+                    }`}
+                    style={{ borderRadius: 2 }}
+                  >
+                    {name}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
         <label className="flex flex-col gap-2">
           <span className="label text-[#6E6A5E]">{t("Your wish ({count}/200)", { count: message.length })}</span>
           <textarea

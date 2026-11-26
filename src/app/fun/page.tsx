@@ -45,7 +45,7 @@ export default function FunPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1240px] px-5 pt-16 pb-4 sm:pt-20">
+      <section id="wish-wall" className="mx-auto max-w-[1240px] scroll-mt-24 px-5 pt-16 pb-4 sm:pt-20">
         <Overline>{t("Wish wall")}</Overline>
         <div className="mt-7">
           <WishWall />

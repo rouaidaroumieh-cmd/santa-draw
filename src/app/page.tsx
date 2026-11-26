@@ -5,6 +5,7 @@ import Avatar from "@/components/Avatar";
 import { Overline, PageShell } from "@/components/Chrome";
 import ReelMachine, { type ReelWinner } from "@/components/ReelMachine";
 import { CampaignProgress, StatCards } from "@/components/Stats";
+import WishPreview from "@/components/WishPreview";
 import { CAMPAIGN_END, CAMPAIGN_START, countWord, formatDateLong, winnersOn } from "@/lib/dates";
 import { DRAW_DAY_COUNT, campaignStats } from "@/lib/draw-engine";
 import { useLang, useT } from "@/lib/language";
@@ -286,6 +287,8 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      <WishPreview />
     </PageShell>
   );
 }
