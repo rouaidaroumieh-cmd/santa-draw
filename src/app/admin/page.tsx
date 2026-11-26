@@ -575,7 +575,7 @@ export default function AdminPage() {
             <Overline>Quick user guide</Overline>
             <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {[
-                ["Edit the 20 employees", "Open ADMIN → Participant configuration, type the real names into the twenty fields. Everything stays editable until the first reveal."],
+                ["Check the 20 employees", "Open ADMIN → Participant configuration. The twenty names are already filled in — correct a spelling if needed. Everything stays editable until the first reveal."],
                 ["Upload photos", "Use “Add photo” beside any name (JPG, PNG or WebP). Photos are resized automatically and stored on the server."],
                 ["Perform the daily draw", "In ADMIN → Daily draw press “Reveal today's names”, read the warning, then confirm. The reels stop one after another and the result is locked forever."],
                 ["View the calendar", `CALENDAR shows all ${DRAW_DAY_COUNT} working days, from 30 November to 22 December, with weekends marked “Weekend – no draw”. Click a completed day for the full historical view.`],

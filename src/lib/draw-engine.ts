@@ -21,6 +21,15 @@ export const SELECTIONS_PER_PARTICIPANT = 3;
 export const DRAW_DAY_COUNT = DRAW_PLAN.length; // 17 working days
 export const TOTAL_SELECTIONS = PARTICIPANT_COUNT * SELECTIONS_PER_PARTICIPANT; // 60
 
+/**
+ * Organiser exceptions: the last date on which a participant may be drawn.
+ * p01 is Yann — his three selections all fall before 17 December 2026.
+ * Applied when a schedule is generated; it only makes the schedule stricter.
+ */
+export const PARTICIPANT_DEADLINES: Readonly<Record<string, string>> = {
+  p01: "2026-12-16",
+};
+
 /* ------------------------------------------------------------------ */
 /* Schedule generation                                                 */
 /* ------------------------------------------------------------------ */
@@ -44,14 +53,23 @@ export function generateSchedule(participantIds: readonly string[]): DaySchedule
     throw new Error(`Schedule requires exactly ${DRAW_DAY_COUNT} eligible dates.`);
   }
 
-  for (let attempt = 0; attempt < 200; attempt++) {
+  for (let attempt = 0; attempt < 500; attempt++) {
     const schedule = tryBuildSchedule(participantIds, dates);
     if (schedule) {
       const check = validateSchedule(schedule, participantIds);
-      if (check.ok) return schedule;
+      if (check.ok && respectsDeadlines(schedule)) return schedule;
     }
   }
-  throw new Error("Could not build a valid schedule after 200 attempts.");
+  throw new Error("Could not build a valid schedule after 500 attempts.");
+}
+
+function respectsDeadlines(schedule: DaySchedule[]): boolean {
+  return schedule.every((day) =>
+    day.participantIds.every((id) => {
+      const deadline = PARTICIPANT_DEADLINES[id];
+      return deadline === undefined || day.date <= deadline;
+    }),
+  );
 }
 
 function tryBuildSchedule(
@@ -74,6 +92,8 @@ function tryBuildSchedule(
       for (const id of participantIds) {
         const left = remaining.get(id) ?? 0;
         if (left <= 0 || usedToday.has(id)) continue;
+        const deadline = PARTICIPANT_DEADLINES[id];
+        if (deadline !== undefined && date > deadline) continue;
         pool.push(id);
         // Prefer participants who are far from their next forced appearance:
         // more remaining selections = more scheduling freedom.

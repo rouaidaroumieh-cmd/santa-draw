@@ -38,11 +38,39 @@ function fail(error: string, status = 400): { ok: false; error: string; status: 
 /* Loading                                                             */
 /* ------------------------------------------------------------------ */
 
-function createInitialConfig(): CampaignConfig {
-  const participants: Participant[] = Array.from({ length: 20 }, (_, i) => {
+/** The twenty employees, in display order. Each id still appears exactly three times. */
+const PARTICIPANT_NAMES = [
+  "yann",
+  "samer",
+  "eliane",
+  "maroun",
+  "sarah",
+  "marie-ange",
+  "maria",
+  "rida",
+  "cynthia",
+  "joseph",
+  "yara mezher",
+  "christina",
+  "yara kh",
+  "georges",
+  "karen",
+  "elia",
+  "pia",
+  "carole",
+  "lara",
+  "rouaida",
+] as const;
+
+function defaultParticipants(): Participant[] {
+  return PARTICIPANT_NAMES.map((name, i) => {
     const n = String(i + 1).padStart(2, "0");
-    return { id: `p${n}`, name: `Participant ${n}`, role: "Photo & name to be confirmed" };
+    return { id: `p${n}`, name, role: "Employee" };
   });
+}
+
+function createInitialConfig(): CampaignConfig {
+  const participants = defaultParticipants();
   return {
     createdAt: new Date().toISOString(),
     status: "draft",
@@ -54,10 +82,27 @@ function createInitialConfig(): CampaignConfig {
 
 async function loadConfig(db: Executor): Promise<CampaignConfig> {
   const [row] = await db.select().from(campaigns).where(eq(campaigns.id, ROW_ID));
-  if (row) return row.config;
+  const config = row?.config ?? (await insertInitialConfig(db));
+  return fillPlaceholderNames(db, config);
+}
+
+async function insertInitialConfig(db: Executor): Promise<CampaignConfig> {
   await db.insert(campaigns).values({ id: ROW_ID, config: createInitialConfig() }).onConflictDoNothing();
   const [created] = await db.select().from(campaigns).where(eq(campaigns.id, ROW_ID));
   return created.config;
+}
+
+/** Replace the generated "Participant 01…" labels once, before any draw is locked. */
+async function fillPlaceholderNames(db: Executor, config: CampaignConfig): Promise<CampaignConfig> {
+  if (await isLocked(db)) return config;
+  if (config.participants.length !== PARTICIPANT_NAMES.length) return config;
+  if (!config.participants.every((p) => /^Participant \d{2}$/.test(p.name))) return config;
+  const next: CampaignConfig = {
+    ...config,
+    participants: config.participants.map((p, i) => ({ ...p, name: PARTICIPANT_NAMES[i], role: "Employee" })),
+  };
+  await saveConfig(db, next);
+  return next;
 }
 
 async function saveConfig(db: Executor, config: CampaignConfig): Promise<void> {

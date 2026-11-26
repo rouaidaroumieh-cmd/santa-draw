@@ -94,7 +94,7 @@ HTTPS by these hosts, which also makes the session cookie `secure`.
 
 ### Editing the 20 employees
 1. Open **ADMIN → Participant configuration**.
-2. Type the real names into the twenty fields (the placeholder names are `Participant 01 … 20`).
+2. The twenty names are already filled in. Correct a spelling here if needed.
 3. Everything stays editable until the first draw is completed — after that the configuration locks
    automatically to protect the results.
 
