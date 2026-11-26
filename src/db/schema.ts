@@ -1,4 +1,4 @@
-import { jsonb, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, jsonb, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import type { CampaignConfig } from "../lib/types";
 
 /** One row per campaign ("main", or "dev" when dev mode is on). */
@@ -19,6 +19,16 @@ export const drawResults = pgTable(
   },
   (table) => [primaryKey({ columns: [table.campaignId, table.date] })],
 );
+
+/** Christmas wishes left by visitors. Hidden until the organiser approves them. */
+export const wishes = pgTable("wishes", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  campaignId: text("campaign_id").notNull(),
+  author: text("author").notNull(),
+  message: text("message").notNull(),
+  approved: boolean("approved").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
 
 export const photos = pgTable(
   "photos",

@@ -6,12 +6,13 @@ import DevToolbar from "@/components/DevToolbar";
 import { DEV_MODE } from "@/lib/dev-mode";
 import { useSyncError } from "@/lib/store";
 
-export type SectionKey = "home" | "calendar" | "participants" | "admin";
+export type SectionKey = "home" | "calendar" | "participants" | "fun" | "admin";
 
 const NAV: { key: SectionKey; href: string; label: string }[] = [
   { key: "home", href: "/", label: "Home" },
   { key: "calendar", href: "/calendar", label: "Calendar" },
   { key: "participants", href: "/participants", label: "Participants" },
+  { key: "fun", href: "/fun", label: "Fun" },
   { key: "admin", href: "/admin", label: "Admin" },
 ];
 

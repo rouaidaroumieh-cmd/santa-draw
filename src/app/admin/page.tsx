@@ -3,6 +3,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import Avatar from "@/components/Avatar";
 import DailyDraw from "@/components/DailyDraw";
+import WishModeration from "@/components/WishModeration";
 import Dialog from "@/components/Dialog";
 import { Overline, PageShell } from "@/components/Chrome";
 import { CampaignProgress, StatCards } from "@/components/Stats";
@@ -195,6 +196,8 @@ export default function AdminPage() {
               <DailyDraw />
             </div>
           </div>
+
+          <WishModeration />
 
           {/* ---- Participants --------------------------------------- */}
           <div>

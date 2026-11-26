@@ -26,7 +26,7 @@ import {
 type Executor = PgDatabase<NodePgQueryResultHKT>;
 
 /** Dev mode works on its own campaign so it never touches the real one. */
-const ROW_ID = DEV_MODE ? "dev" : "main";
+export const ROW_ID = DEV_MODE ? "dev" : "main";
 
 export type Outcome<T extends object = object> = ({ ok: true } & T) | { ok: false; error: string; status: number };
 
@@ -62,11 +62,40 @@ const PARTICIPANT_NAMES = [
   "rouaida",
 ] as const;
 
+/** Filename under `public/elfs/` for each participant name (source originals live in `/elfs`). */
+const ELF_PHOTO_FILES: Readonly<Record<(typeof PARTICIPANT_NAMES)[number], string>> = {
+  yann: "yann.jpeg",
+  samer: "samer.jpeg",
+  eliane: "eliane.jpeg",
+  maroun: "maroun.jpeg",
+  sarah: "sarah.jpeg",
+  "marie-ange": "marie-ange.jpeg",
+  maria: "maria.jpeg",
+  rida: "rida.jpeg",
+  cynthia: "cynthia.jpeg",
+  joseph: "joseph.jpeg",
+  "yara mezher": "yaran-m.jpeg",
+  christina: "christina.jpeg",
+  "yara kh": "yara-kh.jpeg",
+  georges: "georges.jpeg",
+  karen: "karen.jpeg",
+  elia: "elia.jpeg",
+  pia: "pia.jpeg",
+  carole: "carole-realistic.jpeg",
+  lara: "lara.jpeg",
+  rouaida: "rouaida.jpeg",
+};
+
 function defaultParticipants(): Participant[] {
   return PARTICIPANT_NAMES.map((name, i) => {
     const n = String(i + 1).padStart(2, "0");
     return { id: `p${n}`, name, role: "Employee" };
   });
+}
+
+function defaultElfPhotoUrl(name: string): string | undefined {
+  const file = ELF_PHOTO_FILES[name as (typeof PARTICIPANT_NAMES)[number]];
+  return file ? `/elfs/${file}` : undefined;
 }
 
 function createInitialConfig(): CampaignConfig {
@@ -131,17 +160,24 @@ async function loadResults(db: Executor): Promise<Record<string, DrawResult>> {
   );
 }
 
-async function loadPhotoUrls(db: Executor): Promise<Record<string, string>> {
+async function loadPhotoUrls(
+  db: Executor,
+  participants: readonly Participant[],
+): Promise<Record<string, string>> {
+  const urls: Record<string, string> = {};
+  for (const p of participants) {
+    const elf = defaultElfPhotoUrl(p.name);
+    if (elf) urls[p.id] = elf;
+  }
+
   const rows = await db
     .select({ participantId: photos.participantId, updatedAt: photos.updatedAt })
     .from(photos)
     .where(eq(photos.campaignId, ROW_ID));
-  return Object.fromEntries(
-    rows.map((r) => [
-      r.participantId,
-      `/api/photos/${encodeURIComponent(r.participantId)}?v=${r.updatedAt.getTime()}`,
-    ]),
-  );
+  for (const r of rows) {
+    urls[r.participantId] = `/api/photos/${encodeURIComponent(r.participantId)}?v=${r.updatedAt.getTime()}`;
+  }
+  return urls;
 }
 
 /** Today's date in the campaign time zone (CAMPAIGN_TIMEZONE, UTC by default). */
@@ -180,7 +216,7 @@ function toPublicState(
 export async function getPublicState(db: Executor = getDb()): Promise<CampaignState> {
   const config = await loadConfig(db);
   const results = await loadResults(db);
-  const photoUrls = await loadPhotoUrls(db);
+  const photoUrls = await loadPhotoUrls(db, config.participants);
   return toPublicState(config, results, photoUrls);
 }
 
