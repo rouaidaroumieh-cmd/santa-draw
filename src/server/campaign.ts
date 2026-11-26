@@ -74,7 +74,7 @@ const ELF_PHOTO_FILES: Readonly<Record<(typeof PARTICIPANT_NAMES)[number], strin
   rida: "rida.jpeg",
   cynthia: "cynthia.jpeg",
   joseph: "joseph.jpeg",
-  "yara mezher": "yaran-m.jpeg",
+  "yara mezher": "yara-m.jpeg",
   christina: "christina.jpeg",
   "yara kh": "yara-kh.jpeg",
   georges: "georges.jpeg",
