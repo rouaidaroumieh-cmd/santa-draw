@@ -29,6 +29,9 @@ export default function FunLabResultsPreview() {
     };
   }, []);
 
+  const mostLikelyReady =
+    results && results.mostLikely.questions.some((q) => Boolean(q.leader));
+
   return (
     <section className="px-5 pt-20 sm:pt-24">
       <div className="mx-auto max-w-[1240px]">
@@ -42,7 +45,7 @@ export default function FunLabResultsPreview() {
           </Link>
         </div>
 
-        <div className="mt-7 grid gap-5 lg:grid-cols-3">
+        <div className="mt-7 grid gap-5 lg:grid-cols-2">
           <article className="paper gold-frame flex flex-col gap-4 px-5 py-6" style={{ borderRadius: 2 }}>
             <div>
               <p className="label text-[#B08F4C]">{t("Poll of the day")}</p>
@@ -105,46 +108,117 @@ export default function FunLabResultsPreview() {
               {t("{count} votes so far", { count: results?.elfVote.total ?? 0 })}
             </p>
           </article>
+        </div>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-2">
+          <article className="paper gold-frame flex flex-col gap-4 px-5 py-6" style={{ borderRadius: 2 }}>
+            <div>
+              <p className="label text-[#B08F4C]">{t("Memory match")}</p>
+              <h3 className="mt-2 text-[1.2rem] leading-snug text-[#173D32]">
+                {t("Fewest moves")}
+              </h3>
+            </div>
+            {!results || results.memoryMatch.leaders.length === 0 ? (
+              <p className="text-[0.9rem] text-[#6E6A5E]">{t("No scores yet.")}</p>
+            ) : (
+              <ol className="flex flex-col gap-3">
+                {results.memoryMatch.leaders.map((row, i) => (
+                  <li key={row.name} className="flex items-center gap-3 text-[#173D32]">
+                    <span className="label w-7 text-[#B08F4C]">#{i + 1}</span>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={row.photo} alt="" className="h-11 w-11 rounded-full object-cover" />
+                    <span className="capitalize">{row.name}</span>
+                    <span className="ml-auto text-[0.85rem] text-[#6E6A5E]">
+                      {t("{count} moves", { count: row.value })}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <p className="mt-auto pt-2 text-[0.78rem] text-[#6E6A5E]">
+              {t("{count} players", { count: results?.memoryMatch.total ?? 0 })}
+            </p>
+          </article>
 
           <article className="paper gold-frame flex flex-col gap-4 px-5 py-6" style={{ borderRadius: 2 }}>
             <div>
-              <p className="label text-[#B08F4C]">{t("Most likely to…")}</p>
+              <p className="label text-[#B08F4C]">{t("Who is this elf?")}</p>
               <h3 className="mt-2 text-[1.2rem] leading-snug text-[#173D32]">
-                {t("Current leaders")}
+                {t("Best blur scores")}
               </h3>
             </div>
-            {!results || results.mostLikely.questions.every((q) => !q.leader) ? (
-              <p className="text-[0.9rem] text-[#6E6A5E]">{t("No votes yet.")}</p>
+            {!results || results.guessElf.leaders.length === 0 ? (
+              <p className="text-[0.9rem] text-[#6E6A5E]">{t("No scores yet.")}</p>
             ) : (
-              <ul className="flex flex-col gap-3">
-                {results.mostLikely.questions.map((q) => (
-                  <li
-                    key={q.id}
-                    className="border-t border-[rgba(23,61,50,0.12)] pt-3 first:border-t-0 first:pt-0"
-                  >
-                    <p className="text-[0.8rem] leading-snug text-[#6E6A5E]">{t(q.labelKey)}</p>
-                    {q.leader ? (
-                      <div className="mt-2 flex items-center gap-2.5 text-[#173D32]">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={q.leader.photo}
-                          alt=""
-                          className="h-9 w-9 rounded-full object-cover"
-                        />
-                        <span className="capitalize">{q.leader.name}</span>
-                        <span className="ml-auto text-[0.8rem] text-[#6E6A5E]">
-                          {t("{count} votes", { count: q.leader.count })}
-                        </span>
-                      </div>
-                    ) : (
-                      <p className="mt-1 text-[0.85rem] text-[#6E6A5E]">{t("No votes yet.")}</p>
-                    )}
+              <ol className="flex flex-col gap-3">
+                {results.guessElf.leaders.map((row, i) => (
+                  <li key={row.name} className="flex items-center gap-3 text-[#173D32]">
+                    <span className="label w-7 text-[#B08F4C]">#{i + 1}</span>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={row.photo} alt="" className="h-11 w-11 rounded-full object-cover" />
+                    <span className="capitalize">{row.name}</span>
+                    <span className="ml-auto text-[0.85rem] text-[#6E6A5E]">
+                      {row.value}/{results.guessElf.max}
+                    </span>
                   </li>
                 ))}
-              </ul>
+              </ol>
             )}
+            <p className="mt-auto pt-2 text-[0.78rem] text-[#6E6A5E]">
+              {t("{count} players", { count: results?.guessElf.total ?? 0 })}
+            </p>
           </article>
         </div>
+
+        <article className="paper gold-frame mt-5 px-5 py-6" style={{ borderRadius: 2 }}>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="label text-[#B08F4C]">{t("Most likely to…")}</p>
+              <h3 className="mt-2 text-[1.25rem] leading-snug text-[#173D32]">
+                {t("Leaders for each question")}
+              </h3>
+              <p className="mt-2 text-[0.85rem] text-[#6E6A5E]">
+                {t("Only finished ballots count on the home page.")}
+              </p>
+            </div>
+          </div>
+
+          {!mostLikelyReady ? (
+            <p className="mt-5 text-[0.9rem] text-[#6E6A5E]">{t("No votes yet.")}</p>
+          ) : (
+            <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              {results!.mostLikely.questions.map((q) => (
+                <li
+                  key={q.id}
+                  className="border border-[rgba(23,61,50,0.12)] px-3 py-3"
+                  style={{ borderRadius: 2 }}
+                >
+                  <p className="min-h-[2.6rem] text-[0.78rem] leading-snug text-[#6E6A5E]">
+                    {t(q.labelKey)}
+                  </p>
+                  {q.leader ? (
+                    <div className="mt-3 flex items-center gap-2.5 text-[#173D32]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={q.leader.photo}
+                        alt=""
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+                      <div className="min-w-0">
+                        <p className="truncate capitalize">{q.leader.name}</p>
+                        <p className="text-[0.75rem] text-[#6E6A5E]">
+                          {t("{count} votes", { count: q.leader.count })}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-[0.85rem] text-[#6E6A5E]">{t("No votes yet.")}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
       </div>
     </section>
   );

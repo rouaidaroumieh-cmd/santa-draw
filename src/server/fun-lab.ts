@@ -7,9 +7,12 @@ import {
   type FunLabChallengeId,
 } from "@/lib/fun-lab-challenges";
 import {
+  GUESS_ELF_ROUNDS,
   MOST_LIKELY_QUESTIONS,
   POLL_OPTIONS,
   type FunLabPublicResults,
+  type FunLabScore,
+  type MostLikelyBallot,
 } from "@/lib/fun-lab-games";
 import {
   FUN_LAB_ROSTER,
@@ -22,12 +25,16 @@ import {
 export type FunLabPublicState = {
   poll: Record<string, string>;
   elfVote: Record<string, string>;
-  mostLikely: Record<string, Record<string, string>>;
+  mostLikely: Record<string, MostLikelyBallot>;
+  memoryMatch: Record<string, FunLabScore>;
+  guessElf: Record<string, FunLabScore>;
   challenge: { id: FunLabChallengeId; joined: string[]; done: string[] };
   mine: {
     poll?: string;
     elfVote?: string;
-    mostLikely?: Record<string, string>;
+    mostLikely?: MostLikelyBallot;
+    memoryMatch?: FunLabScore;
+    guessElf?: FunLabScore;
     challenge?: { id: FunLabChallengeId; joined: boolean; done: boolean };
   };
 };
@@ -45,6 +52,25 @@ function asStringRecord(value: unknown): Record<string, string> {
   return out;
 }
 
+/** Accepts `{ picks, finished }` or legacy flat name maps. */
+function asMostLikelyBallot(value: unknown): MostLikelyBallot {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return { picks: {}, finished: false };
+  }
+  const obj = value as Record<string, unknown>;
+  if (obj.picks && typeof obj.picks === "object" && !Array.isArray(obj.picks)) {
+    return { picks: asStringRecord(obj.picks), finished: Boolean(obj.finished) };
+  }
+  return { picks: asStringRecord(value), finished: Boolean(obj.finished) };
+}
+
+function asScore(value: unknown): FunLabScore | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const best = (value as { best?: unknown }).best;
+  if (typeof best !== "number" || !Number.isFinite(best) || best < 0) return null;
+  return { best: Math.floor(best) };
+}
+
 function asChallengeProgress(
   value: unknown,
 ): { id: FunLabChallengeId; joined: boolean; done: boolean } | null {
@@ -54,6 +80,10 @@ function asChallengeProgress(
   const joined = Boolean(obj.joined);
   const done = Boolean(obj.done);
   return { id: obj.id, joined: joined || done, done };
+}
+
+function rosterPhoto(name: string): string {
+  return FUN_LAB_ROSTER.find((p) => p.name === name)?.photo ?? "";
 }
 
 export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabPublicState> {
@@ -71,7 +101,9 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
   const todayId = challengeOfTheDay();
   const poll: Record<string, string> = {};
   const elfVote: Record<string, string> = {};
-  const mostLikely: Record<string, Record<string, string>> = {};
+  const mostLikely: Record<string, MostLikelyBallot> = {};
+  const memoryMatch: Record<string, FunLabScore> = {};
+  const guessElf: Record<string, FunLabScore> = {};
   const joined: string[] = [];
   const done: string[] = [];
   let mineChallenge: FunLabPublicState["mine"]["challenge"];
@@ -84,7 +116,13 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
       const v = asString(row.value);
       if (v) elfVote[row.voterName] = v;
     } else if (row.game === "most-likely") {
-      mostLikely[row.voterName] = asStringRecord(row.value);
+      mostLikely[row.voterName] = asMostLikelyBallot(row.value);
+    } else if (row.game === "memory-match") {
+      const score = asScore(row.value);
+      if (score) memoryMatch[row.voterName] = score;
+    } else if (row.game === "guess-elf") {
+      const score = asScore(row.value);
+      if (score) guessElf[row.voterName] = score;
     } else if (row.game === "challenge") {
       const progress = asChallengeProgress(row.value);
       if (!progress) continue;
@@ -99,7 +137,9 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
   if (voter) {
     if (poll[voter]) mine.poll = poll[voter];
     if (elfVote[voter]) mine.elfVote = elfVote[voter];
-    mine.mostLikely = mostLikely[voter] ?? {};
+    mine.mostLikely = mostLikely[voter] ?? { picks: {}, finished: false };
+    if (memoryMatch[voter]) mine.memoryMatch = memoryMatch[voter];
+    if (guessElf[voter]) mine.guessElf = guessElf[voter];
     if (mineChallenge) mine.challenge = mineChallenge;
   }
 
@@ -107,6 +147,8 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
     poll,
     elfVote,
     mostLikely,
+    memoryMatch,
+    guessElf,
     challenge: { id: todayId, joined, done },
     mine,
   };
@@ -122,39 +164,58 @@ export async function saveFunLabVote(
   const normalized = normalizeValue(game, value);
   if (!normalized.ok) return normalized;
 
-  // Elf costume vote is one-shot: once cast, it stays locked.
-  if (game === "elf-vote") {
-    try {
-      const db = getDb();
-      const existing = await db
-        .select({ value: funLabEntries.value })
-        .from(funLabEntries)
-        .where(and(eq(funLabEntries.game, game), eq(funLabEntries.voterName, voter)))
-        .limit(1);
-      if (existing.length > 0) {
-        return { ok: false, error: "Your elf vote is locked and cannot be changed.", status: 409 };
-      }
-    } catch (error) {
-      console.error("Fun Lab vote lock check failed:", error);
-      throw new Error(
-        "Fun Lab database is unavailable. Start Postgres (`docker-compose up -d db`) then run `npm run db:push`.",
-      );
-    }
-  }
-
   try {
     const db = getDb();
+    const existing = await db
+      .select({ value: funLabEntries.value })
+      .from(funLabEntries)
+      .where(and(eq(funLabEntries.game, game), eq(funLabEntries.voterName, voter)))
+      .limit(1);
+
+    // Poll + elf costume: one-shot. Most likely: locked after Finish.
+    if (game === "poll" && existing.length > 0) {
+      return { ok: false, error: "Your poll vote is locked and cannot be changed.", status: 409 };
+    }
+    if (game === "elf-vote" && existing.length > 0) {
+      return { ok: false, error: "Your elf vote is locked and cannot be changed.", status: 409 };
+    }
+    if (game === "most-likely" && existing.length > 0) {
+      const prior = asMostLikelyBallot(existing[0].value);
+      if (prior.finished) {
+        return {
+          ok: false,
+          error: "Your “most likely” answers are locked and cannot be changed.",
+          status: 409,
+        };
+      }
+    }
+
+    // Scores: keep personal best only (memory = fewer moves, guess = higher score).
+    let toStore = normalized.value;
+    if (game === "memory-match" || game === "guess-elf") {
+      const incoming = asScore(normalized.value);
+      if (!incoming) return { ok: false, error: "Please send a valid score.", status: 400 };
+      const prior = existing.length > 0 ? asScore(existing[0].value) : null;
+      if (game === "memory-match" && prior && prior.best <= incoming.best) {
+        return { ok: true };
+      }
+      if (game === "guess-elf" && prior && prior.best >= incoming.best) {
+        return { ok: true };
+      }
+      toStore = incoming;
+    }
+
     await db
       .insert(funLabEntries)
       .values({
         game,
         voterName: voter,
-        value: normalized.value,
+        value: toStore,
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
         target: [funLabEntries.game, funLabEntries.voterName],
-        set: { value: normalized.value, updatedAt: new Date() },
+        set: { value: toStore, updatedAt: new Date() },
       });
   } catch (error) {
     console.error("Fun Lab vote save failed:", error);
@@ -170,18 +231,54 @@ function normalizeValue(
   game: FunLabGame,
   value: unknown,
 ): { ok: true; value: unknown } | { ok: false; error: string; status: number } {
-  if (game === "poll" || game === "elf-vote") {
+  if (game === "poll") {
     const v = asString(value);
-    if (!v) return { ok: false, error: "Please send a valid choice.", status: 400 };
+    if (!v || !POLL_OPTIONS.some((o) => o.id === v)) {
+      return { ok: false, error: "Please send a valid choice.", status: 400 };
+    }
+    return { ok: true, value: v };
+  }
+
+  if (game === "elf-vote") {
+    const v = asString(value);
+    if (!v || !isFunLabName(v)) {
+      return { ok: false, error: "Please send a valid choice.", status: 400 };
+    }
     return { ok: true, value: v };
   }
 
   if (game === "most-likely") {
-    const record = asStringRecord(value);
-    if (Object.keys(record).length === 0) {
+    const ballot = asMostLikelyBallot(value);
+    if (Object.keys(ballot.picks).length === 0) {
       return { ok: false, error: "Please pick a colleague for at least one question.", status: 400 };
     }
-    return { ok: true, value: record };
+    if (ballot.finished) {
+      const complete = MOST_LIKELY_QUESTIONS.every((q) => Boolean(ballot.picks[q.id]));
+      if (!complete) {
+        return {
+          ok: false,
+          error: "Answer every question before finishing.",
+          status: 400,
+        };
+      }
+    }
+    return { ok: true, value: ballot };
+  }
+
+  if (game === "memory-match") {
+    const score = asScore(value);
+    if (!score || score.best < 1) {
+      return { ok: false, error: "Please send a valid score.", status: 400 };
+    }
+    return { ok: true, value: score };
+  }
+
+  if (game === "guess-elf") {
+    const score = asScore(value);
+    if (!score || score.best > GUESS_ELF_ROUNDS) {
+      return { ok: false, error: "Please send a valid score.", status: 400 };
+    }
+    return { ok: true, value: score };
   }
 
   if (game === "challenge") {
@@ -221,8 +318,9 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
 
   const mostLikely = MOST_LIKELY_QUESTIONS.map((q) => {
     const counts = Object.fromEntries(FUN_LAB_ROSTER.map((p) => [p.name, 0])) as Record<string, number>;
-    for (const picks of Object.values(state.mostLikely)) {
-      const chosen = picks[q.id];
+    for (const ballot of Object.values(state.mostLikely)) {
+      if (!ballot.finished) continue;
+      const chosen = ballot.picks[q.id];
       if (chosen && chosen in counts) counts[chosen] += 1;
     }
     const ranked = [...FUN_LAB_ROSTER]
@@ -232,6 +330,24 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
     const leader = ranked[0] && ranked[0].count > 0 ? ranked[0] : null;
     return { id: q.id, labelKey: q.labelKey, total, leader };
   });
+
+  const memoryLeaders = Object.entries(state.memoryMatch)
+    .map(([name, score]) => ({
+      name,
+      photo: rosterPhoto(name),
+      value: score.best,
+    }))
+    .sort((a, b) => a.value - b.value)
+    .slice(0, 5);
+
+  const guessLeaders = Object.entries(state.guessElf)
+    .map(([name, score]) => ({
+      name,
+      photo: rosterPhoto(name),
+      value: score.best,
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
 
   return {
     poll: {
@@ -245,6 +361,12 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
     },
     elfVote: { total: elfTotal, podium },
     mostLikely: { questions: mostLikely },
+    memoryMatch: { total: Object.keys(state.memoryMatch).length, leaders: memoryLeaders },
+    guessElf: {
+      total: Object.keys(state.guessElf).length,
+      max: GUESS_ELF_ROUNDS,
+      leaders: guessLeaders,
+    },
   };
 }
 

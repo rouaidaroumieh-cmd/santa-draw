@@ -22,6 +22,8 @@ export default function PollDemo() {
 
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
   const myVote = state.mine.poll;
+  const locked = Boolean(myVote);
+  const myLabel = OPTIONS.find((o) => o.id === myVote)?.labelKey;
 
   return (
     <div className="paper gold-frame flex flex-col gap-5 px-6 py-7" style={{ borderRadius: 2 }}>
@@ -30,6 +32,9 @@ export default function PollDemo() {
         <h3 className="mt-2 text-[1.35rem] leading-snug text-[#173D32]">
           {t("What should we bring to the office Christmas break?")}
         </h3>
+        <p className="mt-2 text-[0.85rem] text-[#6E6A5E]">
+          {locked ? t("Your vote is locked.") : t("One vote only — choose carefully, then it locks.")}
+        </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -37,16 +42,18 @@ export default function PollDemo() {
           const selected = myVote === opt.id;
           const count = counts[opt.id];
           const pct = total === 0 ? 0 : Math.round((count / total) * 100);
+          const className = selected
+            ? "relative overflow-hidden border border-[#173D32] bg-[rgba(23,61,50,0.1)] px-4 py-3 text-left"
+            : locked
+              ? "relative overflow-hidden border border-[rgba(23,61,50,0.15)] px-4 py-3 text-left opacity-55"
+              : "relative overflow-hidden border border-[rgba(23,61,50,0.25)] px-4 py-3 text-left transition-colors hover:border-[#B08F4C]";
           return (
             <button
               key={opt.id}
               type="button"
+              disabled={locked}
               onClick={() => void vote("poll", opt.id)}
-              className={`relative overflow-hidden border px-4 py-3 text-left transition-colors ${
-                selected
-                  ? "border-[#173D32] bg-[rgba(23,61,50,0.1)]"
-                  : "border-[rgba(23,61,50,0.25)] hover:border-[#B08F4C]"
-              }`}
+              className={className}
               style={{ borderRadius: 2 }}
             >
               <span
@@ -65,13 +72,13 @@ export default function PollDemo() {
         })}
       </div>
 
-      {myVote ? (
+      {myVote && myLabel ? (
         <p
           role="status"
           className="border border-[rgba(36,92,70,0.35)] bg-[rgba(36,92,70,0.12)] px-4 py-3 text-[0.9rem] text-[#173D32]"
           style={{ borderRadius: 2 }}
         >
-          {t("Vote recorded — results update live below. You can still change your mind.")}
+          {t("Vote locked for {name}. Results update live below.", { name: t(myLabel) })}
         </p>
       ) : null}
 

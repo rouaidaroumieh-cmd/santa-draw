@@ -1,7 +1,6 @@
 "use client";
 
 import { Overline, PageShell } from "@/components/Chrome";
-import MemoryMatch from "@/components/fun/MemoryMatch";
 import Quiz from "@/components/fun/Quiz";
 import WishWall from "@/components/fun/WishWall";
 import { useT } from "@/lib/language";
@@ -26,15 +25,10 @@ export default function FunPage() {
             <span className="block text-gold">{t("Fun Corner")}</span>
           </h1>
           <p className="mt-6 max-w-[560px] font-display text-[1.15rem] italic leading-relaxed text-ivory/80">
-            {t("Match the office photos, test your Christmas knowledge, or leave a wish for the whole office.")}
+            {t(
+              "Test your Christmas knowledge or leave a wish for the whole office. Memory match and blurred elves live in the Fun Lab (PIN).",
+            )}
           </p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-[1240px] px-5 pt-16 sm:pt-20">
-        <Overline>{t("Memory match")}</Overline>
-        <div className="mt-7">
-          <MemoryMatch />
         </div>
       </section>
 

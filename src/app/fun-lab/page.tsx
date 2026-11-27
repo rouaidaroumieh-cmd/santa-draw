@@ -5,6 +5,7 @@ import ElfVoteDemo from "@/components/fun-lab/ElfVoteDemo";
 import { FunLabProvider, useFunLab } from "@/components/fun-lab/FunLabContext";
 import FunLabLogin from "@/components/fun-lab/FunLabLogin";
 import GuessElfDemo from "@/components/fun-lab/GuessElfDemo";
+import MemoryMatchDemo from "@/components/fun-lab/MemoryMatchDemo";
 import MostLikelyDemo from "@/components/fun-lab/MostLikelyDemo";
 import PollDemo from "@/components/fun-lab/PollDemo";
 import { useT } from "@/lib/language";
@@ -72,7 +73,7 @@ function FunLabBody() {
         <LabSection
           title={t("1 · Poll of the day")}
           how={t(
-            "One office question. Each person votes once with their first name. After voting, the bars update live — you stay on this block and can still change your vote.",
+            "One office question. Each person votes once. After voting, the bars update live — your choice is locked.",
           )}
         >
           <PollDemo />
@@ -88,18 +89,27 @@ function FunLabBody() {
         </LabSection>
 
         <LabSection
-          title={t("3 · Who is this elf?")}
+          title={t("3 · Memory match")}
           how={t(
-            "Ten blurred elves. Guess each colleague among 4 names. Instant feedback each round — a perfect 10/10 gets a tada celebration.",
+            "Find matching elf photo pairs. Fewer moves is better — your personal best is saved on the shared leaderboard.",
+          )}
+        >
+          <MemoryMatchDemo />
+        </LabSection>
+
+        <LabSection
+          title={t("4 · Who is this elf?")}
+          how={t(
+            "Ten blurred elves. Guess each colleague among 4 names. Your best score is saved on the shared leaderboard — a perfect 10/10 gets a tada celebration.",
           )}
         >
           <GuessElfDemo />
         </LabSection>
 
         <LabSection
-          title={t("4 · Most likely to…")}
+          title={t("5 · Most likely to…")}
           how={t(
-            "Four fun questions. For each one, vote for the colleague who fits best. Results are shared live — then go to the next question.",
+            "Ten fun questions. Vote for the colleague who fits best on each one. On the last question, tap Finish to lock your answers — leaders appear on the home page.",
           )}
         >
           <MostLikelyDemo />
@@ -141,7 +151,7 @@ export default function FunLabPage() {
           </h1>
           <p className="mt-5 max-w-[640px] font-display text-[1.1rem] italic leading-relaxed text-ivory/80">
             {t(
-              "Playable prototypes: polls, elf votes, guess-who and “most likely to…”. Votes are shared for everyone — unlock with your personal PIN.",
+              "Playable prototypes: polls, elf votes, memory match, guess-who and “most likely to…”. Scores and votes are shared — unlock with your personal PIN.",
             )}
           </p>
           <p className="mt-4 max-w-[640px] text-[0.9rem] leading-relaxed text-ivory/55">

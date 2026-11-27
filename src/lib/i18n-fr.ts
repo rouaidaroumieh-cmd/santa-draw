@@ -150,11 +150,42 @@ export const FR: Record<string, string> = {
   "Just for fun": "Juste pour s'amuser",
   "Christmas": "Noël",
   "Fun Corner": "Coin détente",
-  "Match the office photos, test your Christmas knowledge, or leave a wish for the whole office.":
-    "Retrouvez les photos des collègues, testez vos connaissances de Noël ou laissez un vœu pour tout le bureau.",
+  "Match the office photos, guess the blurred elves, test your Christmas knowledge, or leave a wish for the whole office.":
+    "Retrouvez les photos des collègues, devinez les elfes floutés, testez vos connaissances de Noël ou laissez un vœu pour tout le bureau.",
+  "Test your Christmas knowledge or leave a wish for the whole office. Memory match and blurred elves live in the Fun Lab (PIN).":
+    "Testez vos connaissances de Noël ou laissez un vœu pour tout le bureau. Memory match et elfes floutés sont dans le Fun Lab (PIN).",
   "Memory match": "Memory des photos",
   "Christmas quiz": "Quiz de Noël",
   "Wish wall": "Mur des vœux",
+  "3 · Memory match": "3 · Memory des photos",
+  "4 · Who is this elf?": "4 · Qui est cet elfe ?",
+  "5 · Most likely to…": "5 · Le plus susceptible de…",
+  "Find matching elf photo pairs. Fewer moves is better — your personal best is saved on the shared leaderboard.":
+    "Retrouvez les paires de photos d’elfes. Moins de coups = mieux — votre meilleur score est enregistré sur le classement partagé.",
+  "Ten blurred elves. Guess each colleague among 4 names. Your best score is saved on the shared leaderboard — a perfect 10/10 gets a tada celebration.":
+    "Dix elfes floutés. Devinez chaque collègue parmi 4 prénoms. Votre meilleur score est enregistré sur le classement — un 10/10 parfait déclenche un tada.",
+  "Playable prototypes: polls, elf votes, memory match, guess-who and “most likely to…”. Scores and votes are shared — unlock with your personal PIN.":
+    "Prototypes jouables : polls, votes elfes, memory match, qui-est-ce et « le plus susceptible de… ». Scores et votes partagés — déverrouillez avec votre PIN.",
+  "Flip two cards at a time. The fewer moves, the better. Your best score joins the leaderboard.":
+    "Retournez deux cartes à la fois. Moins de coups = mieux. Votre meilleur score rejoint le classement.",
+  "Your best: {count} moves": "Votre record : {count} coups",
+  "Your best: {score}/{total}": "Votre record : {score}/{total}",
+  "{count} moves": "{count} coups",
+  "Leaderboard": "Classement",
+  "Leaderboard — best scores": "Classement — meilleurs scores",
+  "Best score saved to the leaderboard.": "Meilleur score enregistré sur le classement.",
+  "Only your best score is kept on the leaderboard.":
+    "Seul votre meilleur score est gardé sur le classement.",
+  "No scores yet — finish a run to appear here.":
+    "Pas encore de scores — terminez une partie pour apparaître ici.",
+  "you": "vous",
+  "Fewest moves": "Moins de coups",
+  "Best blur scores": "Meilleurs scores flou",
+  "No scores yet.": "Pas encore de scores.",
+  "{count} players": "{count} joueurs",
+  "Please send a valid score.": "Envoyez un score valide.",
+  "Add participant photos to play this game.":
+    "Ajoutez des photos de participants pour jouer à ce jeu.",
   "Fun Lab results": "Résultats Fun Lab",
   "Live tallies from the Fun Lab votes — unlock with your PIN to take part.":
     "Compteurs en direct des votes Fun Lab — déverrouillez avec votre PIN pour participer.",
@@ -174,8 +205,29 @@ export const FR: Record<string, string> = {
     "Prototypes jouables : polls, votes elfes, qui-est-ce et « le plus susceptible de… ». Les votes sont partagés — déverrouillez avec votre PIN personnel.",
   "4 · Most likely to…": "4 · Le plus susceptible de…",
   "5 · Challenge of the day": "5 · Challenge du jour",
-  "Four fun questions. For each one, vote for the colleague who fits best. Results are shared live — then go to the next question.":
-    "Quatre questions fun. Pour chacune, votez pour le collègue qui correspond le mieux. Résultats partagés en direct — puis passez à la question suivante.",
+  "Ten fun questions. Vote for the colleague who fits best on each one. On the last question, tap Finish to lock your answers — leaders appear on the home page.":
+    "Dix questions fun. Votez pour le collègue qui correspond le mieux à chacune. Sur la dernière, appuyez sur Terminer pour verrouiller — les leaders apparaissent sur la page d’accueil.",
+  "Answer all 10 questions, then Finish on the last one to lock.":
+    "Répondez aux 10 questions, puis Terminer sur la dernière pour verrouiller.",
+  "Last question — answer everyone, then tap Finish to lock.":
+    "Dernière question — répondez à toutes, puis appuyez sur Terminer pour verrouiller.",
+  "Your answers are locked.": "Vos réponses sont verrouillées.",
+  "All answers locked. Browse questions below — results appear on the home page.":
+    "Toutes les réponses sont verrouillées. Parcourez les questions — les résultats apparaissent sur la page d’accueil.",
+  "You picked {name}. You can still change answers until you Finish.":
+    "Vous avez choisi {name}. Vous pouvez encore changer jusqu’à Terminer.",
+  "Your “most likely” answers are locked and cannot be changed.":
+    "Vos réponses « le plus susceptible de… » sont verrouillées et ne peuvent plus être modifiées.",
+  "Answer every question before tapping Finish.":
+    "Répondez à toutes les questions avant d’appuyer sur Terminer.",
+  "Answer every question before finishing.":
+    "Répondez à toutes les questions avant de terminer.",
+  "Finish": "Terminer",
+  "Finished ✓": "Terminé ✓",
+  "Saving…": "Enregistrement…",
+  "Leaders for each question": "Leaders par question",
+  "Only finished ballots count on the home page.":
+    "Seuls les bulletins terminés comptent sur la page d’accueil.",
   "Most likely to…": "Le plus susceptible de…",
   "Who is most likely to blast Christmas music at 8am?":
     "Qui est le plus susceptible de mettre la musique de Noël à 8h ?",
@@ -183,6 +235,18 @@ export const FR: Record<string, string> = {
     "Qui est le plus susceptible de manger le dernier chocolat de l’Avent ?",
   "Who is most likely to keep the elf hat on all day?":
     "Qui est le plus susceptible de garder le bonnet d’elfe toute la journée ?",
+  "Who is most likely to over-decorate their desk?":
+    "Qui est le plus susceptible de trop décorer son bureau ?",
+  "Who is most likely to spoil the Secret Santa surprise?":
+    "Qui est le plus susceptible de spoiler le Secret Santa ?",
+  "Who is most likely to bake (or buy) treats for everyone?":
+    "Qui est le plus susceptible de préparer (ou acheter) des douceurs pour tous ?",
+  "Who is most likely to start a Christmas karaoke?":
+    "Qui est le plus susceptible de lancer un karaoké de Noël ?",
+  "Who is most likely to be a secret Grinch?":
+    "Qui est le plus susceptible d’être un Grinch secret ?",
+  "Who is most likely to wrap a gift with too much tape?":
+    "Qui est le plus susceptible d’emballer un cadeau avec trop de scotch ?",
   "Who is most likely to fall asleep in a long meeting?":
     "Qui est le plus susceptible de s’endormir en longue réunion ?",
   "You picked {name}. Results update for everyone.":
@@ -214,8 +278,12 @@ export const FR: Record<string, string> = {
     "L’auth PIN du Fun Lab n’est pas configurée (définir ADMIN_PASSWORD ou FUN_LAB_PIN_SECRET).",
   "Fun Lab database is unavailable. Start Postgres (`docker-compose up -d db`) then run `npm run db:push`.":
     "La base Fun Lab est indisponible. Démarrez Postgres (`docker-compose up -d db`) puis `npm run db:push`.",
-  "One office question. Each person votes once with their first name. After voting, the bars update live — you stay on this block and can still change your vote.":
-    "Une question pour le bureau. Chacun vote une fois avec son prénom. Après le vote, les barres se mettent à jour en direct — vous restez sur ce bloc et pouvez encore changer d’avis.",
+  "One office question. Each person votes once. After voting, the bars update live — your choice is locked.":
+    "Une question pour le bureau. Chacun vote une fois. Après le vote, les barres se mettent à jour en direct — votre choix est verrouillé.",
+  "Your poll vote is locked and cannot be changed.":
+    "Votre vote au poll est verrouillé et ne peut plus être modifié.",
+  "Vote locked for {name}. Results update live below.":
+    "Vote verrouillé pour {name}. Les résultats se mettent à jour en dessous.",
   "Vote for your favourite elf look among the 20 colleagues. One vote only — once cast, it is locked. The podium (top 3) updates live below.":
     "Votez pour votre look d’elfe préféré parmi les 20 collègues. Un seul vote — une fois fait, c’est verrouillé. Le podium (top 3) se met à jour en dessous.",
   "One vote only — choose carefully, then it locks.":
@@ -251,6 +319,7 @@ export const FR: Record<string, string> = {
   "Mulled wine": "Vin chaud",
   "Christmas cookies": "Biscuits de Noël",
   "Clémentines": "Clémentines",
+  "Protein bar": "Barre protéinée",
   "I am…": "Je suis…",
   "First choose who you are — this is not your vote, only your identity.":
     "Choisissez d’abord qui vous êtes — ce n’est pas votre vote, seulement votre identité.",

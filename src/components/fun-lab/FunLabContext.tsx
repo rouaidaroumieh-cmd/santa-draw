@@ -9,17 +9,22 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { FunLabScore, MostLikelyBallot } from "@/lib/fun-lab-games";
 import type { FunLabName } from "@/lib/fun-lab-roster";
 
 export type FunLabState = {
   poll: Record<string, string>;
   elfVote: Record<string, string>;
-  mostLikely: Record<string, Record<string, string>>;
+  mostLikely: Record<string, MostLikelyBallot>;
+  memoryMatch: Record<string, FunLabScore>;
+  guessElf: Record<string, FunLabScore>;
   challenge: { id: string; joined: string[]; done: string[] };
   mine: {
     poll?: string;
     elfVote?: string;
-    mostLikely?: Record<string, string>;
+    mostLikely?: MostLikelyBallot;
+    memoryMatch?: FunLabScore;
+    guessElf?: FunLabScore;
     challenge?: { id: string; joined: boolean; done: boolean };
   };
 };
@@ -39,6 +44,8 @@ const EMPTY_STATE: FunLabState = {
   poll: {},
   elfVote: {},
   mostLikely: {},
+  memoryMatch: {},
+  guessElf: {},
   challenge: { id: "", joined: [], done: [] },
   mine: {},
 };
