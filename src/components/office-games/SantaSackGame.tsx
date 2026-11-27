@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { fireConfetti } from "@/lib/confetti";
 import { rankingMessage } from "@/lib/office-games/catalog";
-import { maxSackScore, SANTA_SACK_QUESTIONS } from "@/lib/office-games/santa-sack";
+import { pickSackRound, roundMaxScore, type SackQuestion } from "@/lib/office-games/santa-sack";
+import { useFunLab } from "@/components/fun-lab/FunLabContext";
 import { useT } from "@/lib/language";
 import { GameIntro, GameProgress, GameResult, OptionButton } from "./GameChrome";
 
@@ -11,19 +12,22 @@ type Phase = "intro" | "play" | "result";
 
 export default function SantaSackGame() {
   const t = useT();
+  const { vote } = useFunLab();
   const [phase, setPhase] = useState<Phase>("intro");
+  const [deck, setDeck] = useState<SackQuestion[]>([]);
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [hintUsed, setHintUsed] = useState(false);
   const [score, setScore] = useState(0);
   const [reveal, setReveal] = useState(false);
 
-  const total = SANTA_SACK_QUESTIONS.length;
-  const q = SANTA_SACK_QUESTIONS[index]!;
+  const total = deck.length;
+  const q = deck[index];
   const revealed = picked !== null;
-  const max = maxSackScore();
+  const roundMax = roundMaxScore(deck);
 
   const start = () => {
+    setDeck(pickSackRound());
     setPhase("play");
     setIndex(0);
     setPicked(null);
@@ -33,7 +37,7 @@ export default function SantaSackGame() {
   };
 
   const choose = (i: number) => {
-    if (revealed) return;
+    if (!q || revealed) return;
     setPicked(i);
     setReveal(true);
     if (i === q.answer) {
@@ -45,8 +49,9 @@ export default function SantaSackGame() {
 
   const next = () => {
     if (index + 1 >= total) {
+      void vote("og-sack", { best: score });
       setPhase("result");
-      if (score >= max * 0.7) fireConfetti(0.95);
+      if (score >= roundMax * 0.7) fireConfetti(0.95);
       return;
     }
     setIndex((i) => i + 1);
@@ -60,7 +65,7 @@ export default function SantaSackGame() {
       <GameIntro
         title={t("Guess what's in Santa's sack")}
         blurb={t("Identify the hidden festive object — hints cost points.")}
-        meta={`${t("7 objects")} · ${t("~2 min")}`}
+        meta={`${t("7 random objects")} · ${t("~2 min")} · ${t("Play as often as you like")}`}
         onStart={start}
       />
     );
@@ -69,24 +74,25 @@ export default function SantaSackGame() {
   if (phase === "result") {
     return (
       <GameResult
-        title={t("You scored {score} out of {total}!", { score, total: max })}
-        message={rankingMessage(score, max)}
+        title={t("You scored {score} out of {total}!", { score, total: roundMax })}
+        message={rankingMessage(score, roundMax)}
         onAgain={start}
       />
     );
   }
 
-  const blur = revealed || reveal ? 0 : q.difficulty === "easy" ? 6 : q.difficulty === "medium" ? 12 : 18;
+  if (!q) {
+    return null;
+  }
+
+  const blur = revealed ? 0 : q.difficulty === "easy" ? 6 : q.difficulty === "medium" ? 12 : 18;
   const scale = revealed ? 1 : 1.08;
-  const emojiClass = reveal
-    ? "fun-lab-tada-pop text-[4.5rem] leading-none transition-[filter,transform] duration-500"
-    : "text-[4.5rem] leading-none transition-[filter,transform] duration-500";
 
   return (
     <div className="paper gold-frame flex flex-col gap-5 px-6 py-7" style={{ borderRadius: 2 }}>
       <GameProgress current={index + 1} total={total} showScore={false} />
       <p className="text-right text-[0.85rem] text-[#6E6A5E]">
-        {t("Live score")}: {score}/{max}
+        {t("Live score")}: {score}/{roundMax}
       </p>
 
       <div className="relative mx-auto w-full max-w-[320px]">
@@ -96,11 +102,18 @@ export default function SantaSackGame() {
           aria-hidden
         >
           <p className="label mb-2 text-[#F8F3E9]">{t("Santa's sack")}</p>
+          {/* key remounts each object already blurred — no filter transition from 0 */}
           <span
-            className={emojiClass}
+            key={q.id}
+            className={
+              reveal
+                ? "fun-lab-tada-pop text-[4.5rem] leading-none"
+                : "text-[4.5rem] leading-none"
+            }
             style={{
               filter: `blur(${blur}px)`,
               transform: `scale(${scale})`,
+              transition: reveal ? "filter 500ms ease, transform 500ms ease" : "none",
             }}
           >
             {q.emoji}
@@ -147,7 +160,7 @@ export default function SantaSackGame() {
             else if (i === picked) state = "wrong";
           }
           return (
-            <OptionButton key={label} disabled={revealed} state={state} onClick={() => choose(i)}>
+            <OptionButton key={`${q.id}-${label}`} disabled={revealed} state={state} onClick={() => choose(i)}>
               {label}
             </OptionButton>
           );

@@ -1,6 +1,7 @@
 "use client";
 
 import { Overline, PageShell } from "@/components/Chrome";
+import ChristmasFactsDemo from "@/components/fun-lab/ChristmasFactsDemo";
 import ElfVoteDemo from "@/components/fun-lab/ElfVoteDemo";
 import { FunLabProvider, useFunLab } from "@/components/fun-lab/FunLabContext";
 import FunLabLogin from "@/components/fun-lab/FunLabLogin";
@@ -115,6 +116,15 @@ function FunLabBody() {
         >
           <MostLikelyDemo />
         </LabSection>
+
+        <LabSection
+          title={t("6 · Who’s behind the Christmas fact?")}
+          how={t(
+            "Anonymous festive facts. Vote who you think each one belongs to. Finish locks your ballot — tallies appear on the home page.",
+          )}
+        >
+          <ChristmasFactsDemo />
+        </LabSection>
       </div>
     </>
   );
@@ -152,7 +162,7 @@ export default function FunLabPage() {
           </h1>
           <p className="mt-5 max-w-[640px] font-display text-[1.1rem] italic leading-relaxed text-ivory/80">
             {t(
-              "Playable prototypes: polls, elf votes, memory match, guess-who and “most likely to…”. Scores and votes are shared — unlock with your personal PIN.",
+              "Playable prototypes: polls, elf votes, memory match, guess-who, “most likely to…” and Christmas facts. Scores and votes are shared — unlock with your personal PIN.",
             )}
           </p>
           <p className="mt-4 max-w-[640px] text-[0.9rem] leading-relaxed text-ivory/55">

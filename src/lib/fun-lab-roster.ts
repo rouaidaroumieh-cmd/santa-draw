@@ -38,6 +38,11 @@ export const FUN_LAB_GAMES = [
   "challenge",
   "memory-match",
   "guess-elf",
+  "og-facts",
+  "og-movie",
+  "og-sack",
+  "og-wheel",
+  "og-horoscope",
 ] as const;
 export type FunLabGame = (typeof FUN_LAB_GAMES)[number];
 

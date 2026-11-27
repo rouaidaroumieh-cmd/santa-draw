@@ -4,6 +4,7 @@ import { useState } from "react";
 import { fireConfetti } from "@/lib/confetti";
 import { rankingMessage } from "@/lib/office-games/catalog";
 import { GUESS_MOVIE_QUESTIONS } from "@/lib/office-games/guess-movie";
+import { useFunLab } from "@/components/fun-lab/FunLabContext";
 import { useT } from "@/lib/language";
 import { GameIntro, GameProgress, GameResult, OptionButton } from "./GameChrome";
 
@@ -11,6 +12,7 @@ type Phase = "intro" | "play" | "result";
 
 export default function GuessMovieGame() {
   const t = useT();
+  const { vote } = useFunLab();
   const [phase, setPhase] = useState<Phase>("intro");
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
@@ -42,6 +44,7 @@ export default function GuessMovieGame() {
 
   const next = () => {
     if (index + 1 >= total) {
+      void vote("og-movie", { best: score });
       setPhase("result");
       if (score >= total - 1) fireConfetti(1);
       return;

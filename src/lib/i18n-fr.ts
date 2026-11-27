@@ -150,11 +150,49 @@ export const FR: Record<string, string> = {
 
   // Christmas Office Games (/games)
   "Christmas Office Games": "Jeux de Noël du bureau",
+  "Unlock with your PIN to play — scores join the shared leaderboards.":
+    "Déverrouillez avec votre PIN pour jouer — les scores rejoignent les classements partagés.",
+  "PIN required — your best scores appear on the home leaderboards.":
+    "PIN requis — vos meilleurs scores apparaissent sur les classements de l’accueil.",
+  "Best fact scores": "Meilleurs scores faits",
+  "Top guesses for each fact": "Meilleurs votes pour chaque fait",
+  "Full fact votes": "Tous les votes faits",
+  "Vote who you think each anonymous fact belongs to.":
+    "Votez pour la personne à qui vous pensez que chaque fait anonyme appartient.",
+  "8 facts · one ballot": "8 faits · un seul bulletin",
+  "Finish to lock": "Terminez pour verrouiller",
+  "Votes locked": "Votes verrouillés",
+  "Thanks — your Christmas fact ballot is in.":
+    "Merci — votre bulletin sur les faits de Noël est enregistré.",
+  "Tallies appear on the home page once ballots are finished.":
+    "Les totaux apparaissent sur la page d’accueil une fois les bulletins terminés.",
+  "Last fact — vote on everyone, then tap Finish to lock.":
+    "Dernier fait — votez pour tous, puis appuyez sur Terminer pour verrouiller.",
+  "Vote on all facts, then Finish to lock. One ballot only.":
+    "Votez sur tous les faits, puis Terminer pour verrouiller. Un seul bulletin.",
+  "Fact {number} of {total}": "Fait {number} sur {total}",
+  "Fact {n}": "Fait {n}",
+  "Next fact": "Fait suivant",
+  "{count} ballots": "{count} bulletins",
+  "Best movie scores": "Meilleurs scores films",
+  "Best sack scores": "Meilleurs scores sac",
+  "Most challenges cleared": "Plus de défis réussis",
+  "Office personality mix": "Mix de personnalités du bureau",
+  "{count} challenges": "{count} défis",
   "Welcome to": "Bienvenue dans",
   "Ready for some festive fun? Take a break, challenge your colleagues and discover who’s the real Christmas star of the office!":
     "Prêt·e pour un peu de fun festif ? Faites une pause, défiez vos collègues et découvrez qui est la vraie star de Noël du bureau !",
   "5 Mini Games • Quick rounds • Endless Christmas Fun!":
     "5 mini-jeux • Parties rapides • Fun de Noël sans fin !",
+  "4 Mini Games • Quick rounds • Endless Christmas Fun!":
+    "4 mini-jeux • Parties rapides • Fun de Noël sans fin !",
+  "6 · Who’s behind the Christmas fact?": "6 · Qui se cache derrière ce fait de Noël ?",
+  "Anonymous festive facts. Vote who you think each one belongs to. Finish locks your ballot — tallies appear on the home page.":
+    "Faits festifs anonymes. Votez pour la personne à qui vous pensez que chacun appartient. Terminer verrouille votre bulletin — les totaux apparaissent sur la page d’accueil.",
+  "Playable prototypes: polls, elf votes, memory match, guess-who, “most likely to…” and Christmas facts. Scores and votes are shared — unlock with your personal PIN.":
+    "Prototypes jouables : sondages, votes elfes, memory, guess-who, « most likely to… » et faits de Noël. Scores et votes sont partagés — déverrouillez avec votre PIN.",
+  "Memory Match, Who is this elf?, Most likely, and Who’s behind the Christmas fact? live in Fun Lab (PIN).":
+    "Memory Match, Qui est cet elfe ?, Most likely et Qui se cache derrière ce fait de Noël ? sont dans le Fun Lab (PIN).",
   "Pick a game": "Choisissez un jeu",
   "Play now": "Jouer",
   "Start game": "Lancer le jeu",
@@ -184,7 +222,27 @@ export const FR: Record<string, string> = {
   "Answer five questions and meet your Christmas personality.":
     "Répondez à cinq questions et découvrez votre personnalité de Noël.",
   "5 questions": "5 questions",
+  "One reveal only": "Une seule révélation",
   "Your Christmas character": "Votre personnage de Noël",
+  "Your Christmas characters": "Vos personnages de Noël",
+  "Locked — one reveal only. Your character is on the home page.":
+    "Verrouillé — une seule révélation. Votre personnage est sur la page d’accueil.",
+  "See home results": "Voir les résultats à l’accueil",
+  "The Christmas Grinch": "Le Grinch de Noël",
+  "The Christmas Elf": "L’elfe de Noël",
+  "Santa Claus": "Le Père Noël",
+  Rudolph: "Rudolph",
+  "The Christmas Star": "L’étoile de Noël",
+  "You pretend you don’t care about Christmas, but secretly enjoy all the festive chaos.":
+    "Vous prétendez ne pas aimer Noël, mais vous savourez secrètement tout le chaos festif.",
+  "Always energetic, helpful and ready to spread Christmas cheer.":
+    "Toujours énergique, serviable et prêt·e à répandre la joie de Noël.",
+  "The generous one who makes sure everyone has a present.":
+    "La personne généreuse qui s’assure que tout le monde ait un cadeau.",
+  "The life of the party. You bring the energy wherever you go.":
+    "L’âme de la fête. Vous apportez l’énergie partout où vous allez.",
+  "You love the spotlight, the decorations and all the attention.":
+    "Vous aimez les projecteurs, les décorations et toute l’attention.",
   "Share result": "Partager le résultat",
   "Copied!": "Copié !",
   "Guess the Christmas movie": "Devinez le film de Noël",
@@ -196,10 +254,12 @@ export const FR: Record<string, string> = {
   "Identify the hidden festive object — hints cost points.":
     "Identifiez l'objet festif caché — les indices coûtent des points.",
   "7 objects": "7 objets",
-  "Difficulty": "Difficulté",
-  "easy": "facile",
-  "medium": "moyen",
-  "hard": "difficile",
+  "7 random objects": "7 objets aléatoires",
+  "Play as often as you like": "Jouez autant que vous voulez",
+  Difficulty: "Difficulté",
+  easy: "facile",
+  medium: "moyen",
+  hard: "difficile",
   "Hint used (-points)": "Indice utilisé (-points)",
   "Show hint": "Voir un indice",
   "Santa's sack": "Sac du Père Noël",

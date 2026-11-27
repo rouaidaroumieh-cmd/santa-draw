@@ -32,8 +32,49 @@ export default function FunLabResultsPreview() {
   const elfPodium = results?.elfVote.ranked.slice(0, 3) ?? [];
   const memoryTop = results?.memoryMatch.leaders.slice(0, 5) ?? [];
   const guessTop = results?.guessElf.leaders.slice(0, 5) ?? [];
+  const movieTop = results?.officeMovie.leaders.slice(0, 5) ?? [];
+  const sackTop = results?.officeSack.leaders.slice(0, 5) ?? [];
+  const wheelTop = results?.officeWheel.leaders.slice(0, 5) ?? [];
+  const horoscopeRoster = results?.officeHoroscope.roster.slice(0, 8) ?? [];
+  const factsReady =
+    results && results.officeFacts.facts.some((q) => q.ranked.length > 0);
   const mostLikelyReady =
     results && results.mostLikely.questions.some((q) => q.ranked.length > 0);
+
+  const scoreBoard = (
+    title: string,
+    subtitle: string,
+    leaders: { name: string; photo: string; value: number }[],
+    formatValue: (v: number) => string,
+    players: number,
+  ) => (
+    <article className="paper gold-frame flex flex-col gap-4 px-5 py-6" style={{ borderRadius: 2 }}>
+      <div>
+        <p className="label text-[#B08F4C]">{title}</p>
+        <h3 className="mt-2 text-[1.4rem] leading-snug text-[#173D32]" style={{ fontWeight: 600 }}>
+          {subtitle}
+        </h3>
+      </div>
+      {leaders.length === 0 ? (
+        <p className="text-[0.9rem] text-[#6E6A5E]">{t("No scores yet.")}</p>
+      ) : (
+        <ol className="flex flex-col gap-3">
+          {leaders.map((row, i) => (
+            <li key={row.name} className="flex items-center gap-3 text-[#173D32]">
+              <span className="label w-7 text-[#B08F4C]">#{i + 1}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={row.photo} alt="" className="h-11 w-11 rounded-full object-cover" />
+              <span className="capitalize">{row.name}</span>
+              <span className="ml-auto text-[0.85rem] text-[#6E6A5E]">{formatValue(row.value)}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+      <p className="mt-auto pt-2 text-[0.78rem] text-[#6E6A5E]">
+        {t("{count} players", { count: players })}
+      </p>
+    </article>
+  );
 
   return (
     <section id="fun-lab-results" className="px-5 pt-20 sm:pt-24">
@@ -46,6 +87,9 @@ export default function FunLabResultsPreview() {
           <div className="flex flex-wrap gap-3">
             <Link href="/fun-lab/results" className="btn btn-ghost">
               {t("See all results")}
+            </Link>
+            <Link href="/games" className="btn btn-ghost">
+              {t("Games")}
             </Link>
             <Link href="/fun-lab" className="btn btn-gold">
               {t("Open Fun Lab")}
@@ -119,64 +163,140 @@ export default function FunLabResultsPreview() {
         </div>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-2">
-          <article className="paper gold-frame flex flex-col gap-4 px-5 py-6" style={{ borderRadius: 2 }}>
-            <div>
-              <p className="label text-[#B08F4C]">{t("Memory match")}</p>
-              <h3 className="mt-2 text-[1.4rem] leading-snug text-[#173D32]" style={{ fontWeight: 600 }}>
-                {t("Fewest moves")}
-              </h3>
-            </div>
-            {memoryTop.length === 0 ? (
-              <p className="text-[0.9rem] text-[#6E6A5E]">{t("No scores yet.")}</p>
-            ) : (
-              <ol className="flex flex-col gap-3">
-                {memoryTop.map((row, i) => (
-                  <li key={row.name} className="flex items-center gap-3 text-[#173D32]">
-                    <span className="label w-7 text-[#B08F4C]">#{i + 1}</span>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={row.photo} alt="" className="h-11 w-11 rounded-full object-cover" />
-                    <span className="capitalize">{row.name}</span>
-                    <span className="ml-auto text-[0.85rem] text-[#6E6A5E]">
-                      {t("{count} moves", { count: row.value })}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            )}
-            <p className="mt-auto pt-2 text-[0.78rem] text-[#6E6A5E]">
-              {t("{count} players", { count: results?.memoryMatch.total ?? 0 })}
-            </p>
-          </article>
+          {scoreBoard(
+            t("Memory match"),
+            t("Fewest moves"),
+            memoryTop,
+            (v) => t("{count} moves", { count: v }),
+            results?.memoryMatch.total ?? 0,
+          )}
+          {scoreBoard(
+            t("Who is this elf?"),
+            t("Best blur scores"),
+            guessTop,
+            (v) => `${v}/${results?.guessElf.max ?? 10}`,
+            results?.guessElf.total ?? 0,
+          )}
+        </div>
 
+        <div className="mt-5 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+          {scoreBoard(
+            t("Guess the Christmas movie"),
+            t("Best movie scores"),
+            movieTop,
+            (v) => `${v}/${results?.officeMovie.max ?? 7}`,
+            results?.officeMovie.total ?? 0,
+          )}
+          {scoreBoard(
+            t("Guess what's in Santa's sack"),
+            t("Best sack scores"),
+            sackTop,
+            (v) => `${v}/${results?.officeSack.max ?? 20}`,
+            results?.officeSack.total ?? 0,
+          )}
+          {scoreBoard(
+            t("Spin the Christmas wheel"),
+            t("Most challenges cleared"),
+            wheelTop,
+            (v) => t("{count} challenges", { count: v }),
+            results?.officeWheel.total ?? 0,
+          )}
           <article className="paper gold-frame flex flex-col gap-4 px-5 py-6" style={{ borderRadius: 2 }}>
             <div>
-              <p className="label text-[#B08F4C]">{t("Who is this elf?")}</p>
+              <p className="label text-[#B08F4C]">{t("Christmas horoscope")}</p>
               <h3 className="mt-2 text-[1.4rem] leading-snug text-[#173D32]" style={{ fontWeight: 600 }}>
-                {t("Best blur scores")}
+                {t("Your Christmas characters")}
               </h3>
             </div>
-            {guessTop.length === 0 ? (
+            {horoscopeRoster.length === 0 ? (
               <p className="text-[0.9rem] text-[#6E6A5E]">{t("No scores yet.")}</p>
             ) : (
-              <ol className="flex flex-col gap-3">
-                {guessTop.map((row, i) => (
+              <ul className="flex flex-col gap-3">
+                {horoscopeRoster.map((row) => (
                   <li key={row.name} className="flex items-center gap-3 text-[#173D32]">
-                    <span className="label w-7 text-[#B08F4C]">#{i + 1}</span>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={row.photo} alt="" className="h-11 w-11 rounded-full object-cover" />
-                    <span className="capitalize">{row.name}</span>
-                    <span className="ml-auto text-[0.85rem] text-[#6E6A5E]">
-                      {row.value}/{results!.guessElf.max}
+                    <span className="min-w-0 flex-1 capitalize" style={{ fontWeight: 500 }}>
+                      {row.name}
+                    </span>
+                    <span className="ml-auto text-right text-[0.85rem] text-[#6E6A5E]">
+                      {t(row.titleKey)}
                     </span>
                   </li>
                 ))}
-              </ol>
+              </ul>
             )}
             <p className="mt-auto pt-2 text-[0.78rem] text-[#6E6A5E]">
-              {t("{count} players", { count: results?.guessElf.total ?? 0 })}
+              {t("{count} players", { count: results?.officeHoroscope.total ?? 0 })}
             </p>
           </article>
         </div>
+
+        <article className="paper gold-frame mt-5 px-5 py-6" style={{ borderRadius: 2 }}>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="label text-[#B08F4C]">{t("Who’s behind the Christmas fact?")}</p>
+              <h3 className="mt-2 text-[1.45rem] leading-snug text-[#173D32]" style={{ fontWeight: 600 }}>
+                {t("Top guesses for each fact")}
+              </h3>
+              <p className="mt-2 text-[0.95rem] leading-relaxed text-[#4A463C]">
+                {t("Only finished ballots count on the home page.")}
+              </p>
+            </div>
+            <p className="text-[0.85rem] text-[#6E6A5E]">
+              {t("{count} ballots", { count: results?.officeFacts.total ?? 0 })}
+            </p>
+          </div>
+
+          {!factsReady ? (
+            <p className="mt-5 text-[0.95rem] text-[#4A463C]">{t("No votes yet.")}</p>
+          ) : (
+            <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {results!.officeFacts.facts.map((q) => {
+                const podium = q.ranked.slice(0, 3);
+                return (
+                  <li
+                    key={q.id}
+                    className="flex flex-col border border-[rgba(23,61,50,0.12)] px-3.5 py-3.5"
+                    style={{ borderRadius: 2 }}
+                  >
+                    <p
+                      className="min-h-[3.2rem] text-[0.92rem] leading-snug text-[#173D32]"
+                      style={{ fontWeight: 500 }}
+                    >
+                      “{q.fact}”
+                    </p>
+                    {podium.length > 0 ? (
+                      <ol className="mt-3 flex flex-col gap-2">
+                        {podium.map((person, i) => (
+                          <li key={person.name} className="flex items-center gap-2 text-[#173D32]">
+                            <span className="label w-5 shrink-0 text-[#B08F4C]">#{i + 1}</span>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={person.photo}
+                              alt=""
+                              className="h-8 w-8 shrink-0 rounded-full object-cover"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate capitalize text-[0.88rem]" style={{ fontWeight: 600 }}>
+                                {person.name}
+                              </p>
+                              <p className="text-[0.78rem] text-[#4A463C]">
+                                {t("{count} votes", { count: person.count })}
+                              </p>
+                            </div>
+                          </li>
+                        ))}
+                      </ol>
+                    ) : (
+                      <p className="mt-3 text-[0.9rem] text-[#4A463C]">{t("No votes yet.")}</p>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </article>
 
         <article className="paper gold-frame mt-5 px-5 py-6" style={{ borderRadius: 2 }}>
           <div className="flex flex-wrap items-end justify-between gap-3">

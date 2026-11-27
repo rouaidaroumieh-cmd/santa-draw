@@ -3,8 +3,41 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { Overline, PageShell } from "@/components/Chrome";
-import type { FunLabPublicResults, VoteTally } from "@/lib/fun-lab-games";
+import type { FunLabPublicResults, LeaderboardEntry, VoteTally } from "@/lib/fun-lab-games";
 import { useT } from "@/lib/language";
+
+function ScoreLeaders({
+  rows,
+  empty,
+  formatValue,
+}: {
+  rows: LeaderboardEntry[];
+  empty: string;
+  formatValue: (value: number) => string;
+}) {
+  if (rows.length === 0) {
+    return <p className="mt-5 text-[0.95rem] text-ivory/55">{empty}</p>;
+  }
+  return (
+    <ol className="mt-5 flex flex-col gap-3">
+      {rows.map((row, i) => (
+        <li
+          key={row.name}
+          className="paper gold-frame flex items-center gap-4 px-5 py-4"
+          style={{ borderRadius: 2 }}
+        >
+          <span className="label w-8 shrink-0 text-[#B08F4C]">#{i + 1}</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={row.photo} alt="" className="h-12 w-12 shrink-0 rounded-full object-cover" />
+          <span className="min-w-0 flex-1 capitalize text-[1.1rem] text-[#173D32]" style={{ fontWeight: 600 }}>
+            {row.name}
+          </span>
+          <span className="text-[0.9rem] text-[#4A463C]">{formatValue(row.value)}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 function RankedPeople({
   rows,
@@ -225,32 +258,120 @@ export default function FunLabResultsPage() {
                 title={t("Best blur scores")}
                 meta={t("{count} players", { count: results.guessElf.total })}
               >
-                {results.guessElf.leaders.length === 0 ? (
+                <ScoreLeaders
+                  rows={results.guessElf.leaders}
+                  empty={t("No scores yet.")}
+                  formatValue={(v) => `${v}/${results.guessElf.max}`}
+                />
+              </ResultBlock>
+
+              <div id="og-facts" className="scroll-mt-28">
+                <Overline>{t("Who’s behind the Christmas fact?")}</Overline>
+                <h2 className="mt-3 text-[1.55rem] leading-snug text-ivory" style={{ fontWeight: 600 }}>
+                  {t("Full fact votes")}
+                </h2>
+                <p className="mt-2 text-[0.95rem] text-ivory/60">
+                  {t("Only finished ballots count on the home page.")}{" "}
+                  {t("{count} ballots", { count: results.officeFacts.total })}
+                </p>
+                <div className="mt-8 flex flex-col gap-12">
+                  {results.officeFacts.facts.map((q, qi) => (
+                    <article key={q.id} id={`og-facts-${q.id}`} className="scroll-mt-28">
+                      <div className="flex flex-wrap items-end justify-between gap-3">
+                        <div>
+                          <p className="label text-gold">{t("Fact {n}", { n: qi + 1 })}</p>
+                          <h3
+                            className="mt-2 text-[1.25rem] leading-snug text-ivory"
+                            style={{ fontWeight: 600 }}
+                          >
+                            “{q.fact}”
+                          </h3>
+                        </div>
+                        <p className="text-[0.85rem] text-ivory/60">
+                          {t("{count} votes so far", { count: q.total })}
+                        </p>
+                      </div>
+                      <RankedPeople
+                        rows={q.ranked}
+                        total={q.total}
+                        empty={t("No votes yet.")}
+                      />
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <ResultBlock
+                id="og-movie"
+                overline={t("Guess the Christmas movie")}
+                title={t("Best movie scores")}
+                meta={t("{count} players", { count: results.officeMovie.total })}
+              >
+                <ScoreLeaders
+                  rows={results.officeMovie.leaders}
+                  empty={t("No scores yet.")}
+                  formatValue={(v) => `${v}/${results.officeMovie.max}`}
+                />
+              </ResultBlock>
+
+              <ResultBlock
+                id="og-sack"
+                overline={t("Guess what's in Santa's sack")}
+                title={t("Best sack scores")}
+                meta={t("{count} players", { count: results.officeSack.total })}
+              >
+                <ScoreLeaders
+                  rows={results.officeSack.leaders}
+                  empty={t("No scores yet.")}
+                  formatValue={(v) => `${v}/${results.officeSack.max}`}
+                />
+              </ResultBlock>
+
+              <ResultBlock
+                id="og-wheel"
+                overline={t("Spin the Christmas wheel")}
+                title={t("Most challenges cleared")}
+                meta={t("{count} players", { count: results.officeWheel.total })}
+              >
+                <ScoreLeaders
+                  rows={results.officeWheel.leaders}
+                  empty={t("No scores yet.")}
+                  formatValue={(v) => t("{count} challenges", { count: v })}
+                />
+              </ResultBlock>
+
+              <ResultBlock
+                id="og-horoscope"
+                overline={t("Christmas horoscope")}
+                title={t("Your Christmas characters")}
+                meta={t("{count} players", { count: results.officeHoroscope.total })}
+              >
+                {results.officeHoroscope.roster.length === 0 ? (
                   <p className="mt-5 text-[0.95rem] text-ivory/55">{t("No scores yet.")}</p>
                 ) : (
-                  <ol className="mt-5 flex flex-col gap-3">
-                    {results.guessElf.leaders.map((row, i) => (
+                  <ul className="mt-5 flex flex-col gap-3">
+                    {results.officeHoroscope.roster.map((row) => (
                       <li
                         key={row.name}
                         className="paper gold-frame flex items-center gap-4 px-5 py-4"
                         style={{ borderRadius: 2 }}
                       >
-                        <span className="label w-8 shrink-0 text-[#B08F4C]">#{i + 1}</span>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={row.photo}
                           alt=""
                           className="h-12 w-12 shrink-0 rounded-full object-cover"
                         />
-                        <span className="min-w-0 flex-1 capitalize text-[1.1rem] text-[#173D32]" style={{ fontWeight: 600 }}>
+                        <span
+                          className="min-w-0 flex-1 capitalize text-[1.1rem] text-[#173D32]"
+                          style={{ fontWeight: 600 }}
+                        >
                           {row.name}
                         </span>
-                        <span className="text-[0.9rem] text-[#4A463C]">
-                          {row.value}/{results.guessElf.max}
-                        </span>
+                        <span className="text-[0.95rem] text-[#4A463C]">{t(row.titleKey)}</span>
                       </li>
                     ))}
-                  </ol>
+                  </ul>
                 )}
               </ResultBlock>
 

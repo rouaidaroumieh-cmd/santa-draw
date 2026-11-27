@@ -1,14 +1,21 @@
 /** Hub catalog for Christmas Office Games. */
 
 export type OfficeGameSlug =
-  | "christmas-facts"
   | "horoscope"
   | "guess-movie"
   | "santa-sack"
   | "spin-wheel";
 
+/** Fun Lab server game ids for personal-best / personality storage. */
+export type OfficeGameScoreId =
+  | "og-movie"
+  | "og-sack"
+  | "og-wheel"
+  | "og-horoscope";
+
 export type OfficeGameMeta = {
   slug: OfficeGameSlug;
+  scoreGame: OfficeGameScoreId;
   titleKey: string;
   blurbKey: string;
   questionsLabelKey: string;
@@ -18,23 +25,17 @@ export type OfficeGameMeta = {
 
 export const OFFICE_GAMES: readonly OfficeGameMeta[] = [
   {
-    slug: "christmas-facts",
-    titleKey: "Who’s behind the Christmas fact?",
-    blurbKey: "Guess which colleague matches a fun festive fact.",
-    questionsLabelKey: "8 facts",
-    durationKey: "~2 min",
-    accent: "#7A1F2B",
-  },
-  {
     slug: "horoscope",
+    scoreGame: "og-horoscope",
     titleKey: "Christmas horoscope",
     blurbKey: "Answer five questions and meet your Christmas personality.",
-    questionsLabelKey: "5 questions",
+    questionsLabelKey: "One reveal only",
     durationKey: "~2 min",
     accent: "#B08F4C",
   },
   {
     slug: "guess-movie",
+    scoreGame: "og-movie",
     titleKey: "Guess the Christmas movie",
     blurbKey: "Decode emoji clues into classic Christmas films.",
     questionsLabelKey: "7 movies",
@@ -43,14 +44,16 @@ export const OFFICE_GAMES: readonly OfficeGameMeta[] = [
   },
   {
     slug: "santa-sack",
+    scoreGame: "og-sack",
     titleKey: "Guess what's in Santa's sack",
     blurbKey: "Identify the hidden festive object — hints cost points.",
-    questionsLabelKey: "7 objects",
+    questionsLabelKey: "7 random objects",
     durationKey: "~2 min",
     accent: "#A33444",
   },
   {
     slug: "spin-wheel",
+    scoreGame: "og-wheel",
     titleKey: "Spin the Christmas wheel",
     blurbKey: "Land on a random office Christmas challenge.",
     questionsLabelKey: "Endless spins",
@@ -58,6 +61,8 @@ export const OFFICE_GAMES: readonly OfficeGameMeta[] = [
     accent: "#173D32",
   },
 ] as const;
+
+export const OFFICE_MOVIE_MAX = 7;
 
 export function isOfficeGameSlug(value: string): value is OfficeGameSlug {
   return OFFICE_GAMES.some((g) => g.slug === value);

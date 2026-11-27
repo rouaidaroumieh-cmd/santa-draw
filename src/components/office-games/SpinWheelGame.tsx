@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import Dialog from "@/components/Dialog";
 import { fireConfetti } from "@/lib/confetti";
 import { WHEEL_CHALLENGES, type WheelChallenge } from "@/lib/office-games/spin-wheel";
+import { useFunLab } from "@/components/fun-lab/FunLabContext";
 import { useT } from "@/lib/language";
 import { GameIntro, GameResult } from "./GameChrome";
 
@@ -11,6 +12,7 @@ type Phase = "intro" | "play" | "done";
 
 export default function SpinWheelGame() {
   const t = useT();
+  const { vote } = useFunLab();
   const [phase, setPhase] = useState<Phase>("intro");
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -67,11 +69,16 @@ export default function SpinWheelGame() {
 
   const markDone = () => {
     if (!current) return;
-    setCompleted((list) => (list.includes(current.id) ? list : [...list, current.id]));
+    setCompleted((list) => {
+      const next = list.includes(current.id) ? list : [...list, current.id];
+      void vote("og-wheel", { best: next.length });
+      return next;
+    });
     setModalOpen(false);
   };
 
   const finishSession = () => {
+    if (completed.length > 0) void vote("og-wheel", { best: completed.length });
     setPhase("done");
     fireConfetti(0.6);
   };

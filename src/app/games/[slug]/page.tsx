@@ -3,7 +3,7 @@
 import { use } from "react";
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/Chrome";
-import ChristmasFactsGame from "@/components/office-games/ChristmasFactsGame";
+import GamesAuthGate from "@/components/office-games/GamesAuthGate";
 import GuessMovieGame from "@/components/office-games/GuessMovieGame";
 import HoroscopeGame from "@/components/office-games/HoroscopeGame";
 import SantaSackGame from "@/components/office-games/SantaSackGame";
@@ -16,13 +16,14 @@ export default function OfficeGamePage({ params }: { params: Promise<{ slug: str
 
   return (
     <PageShell current="games">
-      <section className="mx-auto max-w-[860px] px-5 py-12 sm:py-16">
-        {slug === "christmas-facts" ? <ChristmasFactsGame /> : null}
-        {slug === "horoscope" ? <HoroscopeGame /> : null}
-        {slug === "guess-movie" ? <GuessMovieGame /> : null}
-        {slug === "santa-sack" ? <SantaSackGame /> : null}
-        {slug === "spin-wheel" ? <SpinWheelGame /> : null}
-      </section>
+      <GamesAuthGate>
+        <section className="mx-auto max-w-[860px] px-5 py-12 sm:py-16">
+          {slug === "horoscope" ? <HoroscopeGame /> : null}
+          {slug === "guess-movie" ? <GuessMovieGame /> : null}
+          {slug === "santa-sack" ? <SantaSackGame /> : null}
+          {slug === "spin-wheel" ? <SpinWheelGame /> : null}
+        </section>
+      </GamesAuthGate>
     </PageShell>
   );
 }

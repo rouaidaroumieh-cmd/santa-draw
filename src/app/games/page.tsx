@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { Overline, PageShell } from "@/components/Chrome";
+import GamesAuthGate from "@/components/office-games/GamesAuthGate";
 import { OFFICE_GAMES } from "@/lib/office-games/catalog";
 import { useT } from "@/lib/language";
 
-/** Public Christmas Office Games arcade hub. */
-export default function GamesHubPage() {
+function GamesHubBody() {
   const t = useT();
 
   return (
-    <PageShell current="games">
+    <>
       <section className="relative isolate overflow-hidden border-b border-[rgba(214,181,109,0.22)]">
         <div
           className="absolute inset-0"
@@ -31,7 +31,10 @@ export default function GamesHubPage() {
             )}
           </p>
           <p className="mt-5 inline-block border border-[rgba(214,181,109,0.45)] bg-[rgba(214,181,109,0.12)] px-4 py-2 label text-gold">
-            {t("5 Mini Games • Quick rounds • Endless Christmas Fun!")}
+            {t("4 Mini Games • Quick rounds • Endless Christmas Fun!")}
+          </p>
+          <p className="mt-4 max-w-[560px] text-[0.9rem] text-ivory/60">
+            {t("PIN required — your best scores appear on the home leaderboards.")}
           </p>
         </div>
       </section>
@@ -45,11 +48,7 @@ export default function GamesHubPage() {
               className="paper gold-frame flex flex-col gap-4 px-5 py-6"
               style={{ borderRadius: 2 }}
             >
-              <div
-                className="h-1.5 w-16"
-                style={{ background: game.accent }}
-                aria-hidden
-              />
+              <div className="h-1.5 w-16" style={{ background: game.accent }} aria-hidden />
               <h2 className="text-[1.35rem] leading-snug text-[#173D32]" style={{ fontWeight: 600 }}>
                 {t(game.titleKey)}
               </h2>
@@ -69,10 +68,10 @@ export default function GamesHubPage() {
         <Overline>{t("Also in Fun Lab")}</Overline>
         <p className="mt-4 max-w-[640px] text-[0.95rem] leading-relaxed text-ivory/70">
           {t(
-            "Memory Match and Who is this elf? stay in Fun Lab (PIN). They are unchanged — open Fun Lab to play them.",
+            "Memory Match, Who is this elf?, Most likely, and Who’s behind the Christmas fact? live in Fun Lab (PIN).",
           )}
         </p>
-        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <div className="paper gold-frame flex flex-col gap-3 px-5 py-6" style={{ borderRadius: 2 }}>
             <h3 className="text-[1.25rem] text-[#173D32]" style={{ fontWeight: 600 }}>
               {t("Memory match")}
@@ -95,8 +94,30 @@ export default function GamesHubPage() {
               {t("Open Fun Lab")}
             </Link>
           </div>
+          <div className="paper gold-frame flex flex-col gap-3 px-5 py-6" style={{ borderRadius: 2 }}>
+            <h3 className="text-[1.25rem] text-[#173D32]" style={{ fontWeight: 600 }}>
+              {t("Who’s behind the Christmas fact?")}
+            </h3>
+            <p className="text-[0.95rem] text-[#3D3A30]">
+              {t("Vote who you think each anonymous fact belongs to.")}
+            </p>
+            <Link href="/fun-lab" className="btn btn-dark self-start">
+              {t("Open Fun Lab")}
+            </Link>
+          </div>
         </div>
       </section>
+    </>
+  );
+}
+
+/** Christmas Office Games hub — same PIN session as Fun Lab. */
+export default function GamesHubPage() {
+  return (
+    <PageShell current="games">
+      <GamesAuthGate>
+        <GamesHubBody />
+      </GamesAuthGate>
     </PageShell>
   );
 }

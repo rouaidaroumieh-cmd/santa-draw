@@ -83,12 +83,15 @@ export function GameResult({
   detail,
   children,
   onAgain,
+  locked = false,
 }: {
   title: string;
   message: string;
   detail?: string;
   children?: ReactNode;
-  onAgain: () => void;
+  onAgain?: () => void;
+  /** When true, hide Play again — one-shot games. */
+  locked?: boolean;
 }) {
   const t = useT();
   return (
@@ -99,14 +102,24 @@ export function GameResult({
       </h2>
       <p className="font-display text-[1.35rem] italic text-[#245C46]">{message}</p>
       {detail ? <p className="max-w-[480px] text-[1rem] leading-relaxed text-[#3D3A30]">{detail}</p> : null}
+      {locked ? (
+        <p className="text-[0.9rem] text-[#6E6A5E]">{t("Locked — one reveal only. Your character is on the home page.")}</p>
+      ) : null}
       {children}
       <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
-        <button type="button" className="btn btn-dark" onClick={onAgain}>
-          {t("Play again")}
-        </button>
+        {!locked && onAgain ? (
+          <button type="button" className="btn btn-dark" onClick={onAgain}>
+            {t("Play again")}
+          </button>
+        ) : null}
         <Link href="/games" className="btn btn-ghost !text-[#173D32] !border-[rgba(23,61,50,0.35)]">
           {t("Back to games")}
         </Link>
+        {locked ? (
+          <Link href="/#fun-lab-results" className="btn btn-dark">
+            {t("See home results")}
+          </Link>
+        ) : null}
       </div>
     </div>
   );

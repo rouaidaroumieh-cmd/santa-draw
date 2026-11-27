@@ -1,80 +1,113 @@
 /**
- * Editable Christmas facts quiz.
- * Replace SAMPLE_* colleague names and facts with real office data later.
- * Do not invent real employee names here.
+ * “Who’s behind the Christmas fact?” — voting ballot (not a scored quiz).
+ *
+ * How to configure:
+ * 1. Write the anonymous `fact` text.
+ * 2. Set `options` to 4 roster names players can vote for.
+ * 3. Optionally set `answer` to the real person (organiser reference only — not shown while voting).
+ *
+ * Roster names: `src/lib/fun-lab-roster.ts` (exact spelling).
  */
+
+import { FUN_LAB_ROSTER, type FunLabName, isFunLabName } from "@/lib/fun-lab-roster";
+import type { MostLikelyBallot } from "@/lib/fun-lab-games";
 
 export type ChristmasFact = {
   id: string;
   /** Fact shown anonymously */
   fact: string;
-  /** Correct colleague id from COLLEAGUE_SAMPLES */
-  answerId: string;
-  /** 3–4 option ids including the answer */
-  optionIds: string[];
+  /**
+   * Real person behind the fact (organiser note only — not revealed in the vote UI).
+   * Keep aligned with one of `options`.
+   */
+  answer: FunLabName;
+  /** Names shown as vote choices (include the real person). Prefer 4. */
+  options: FunLabName[];
 };
 
-/** Placeholder colleagues — rename / replace when you have real data. */
-export const COLLEAGUE_SAMPLES = [
-  { id: "sample-a", name: "SAMPLE Colleague A" },
-  { id: "sample-b", name: "SAMPLE Colleague B" },
-  { id: "sample-c", name: "SAMPLE Colleague C" },
-  { id: "sample-d", name: "SAMPLE Colleague D" },
-  { id: "sample-e", name: "SAMPLE Colleague E" },
-  { id: "sample-f", name: "SAMPLE Colleague F" },
-] as const;
+/** Same ballot shape as Most Likely: picks + finish lock. */
+export type FactsBallot = MostLikelyBallot;
+
+export const FACT_COLLEAGUES = FUN_LAB_ROSTER.map((p) => ({
+  id: p.name,
+  name: p.name,
+  photo: p.photo,
+}));
 
 export const CHRISTMAS_FACTS: ChristmasFact[] = [
   {
     id: "f1",
     fact: "I have watched Home Alone more than 20 times.",
-    answerId: "sample-a",
-    optionIds: ["sample-a", "sample-b", "sample-c", "sample-d"],
+    answer: "yann",
+    options: ["yann", "samer", "eliane", "maroun"],
   },
   {
     id: "f2",
     fact: "I secretly listen to Christmas music in November.",
-    answerId: "sample-b",
-    optionIds: ["sample-a", "sample-b", "sample-e", "sample-f"],
+    answer: "sarah",
+    options: ["sarah", "maria", "cynthia", "karen"],
   },
   {
     id: "f3",
     fact: "I once bought all my Christmas presents on December 24.",
-    answerId: "sample-c",
-    optionIds: ["sample-b", "sample-c", "sample-d", "sample-e"],
+    answer: "joseph",
+    options: ["joseph", "georges", "elia", "rida"],
   },
   {
     id: "f4",
     fact: "I absolutely hate Christmas pudding.",
-    answerId: "sample-d",
-    optionIds: ["sample-a", "sample-c", "sample-d", "sample-f"],
+    answer: "pia",
+    options: ["pia", "carole", "lara", "rouaida"],
   },
   {
     id: "f5",
     fact: "I have never watched The Grinch.",
-    answerId: "sample-e",
-    optionIds: ["sample-b", "sample-d", "sample-e", "sample-f"],
+    answer: "christina",
+    options: ["christina", "yara mezher", "yara kh", "marie-ange"],
   },
   {
     id: "f6",
     fact: "I start decorating my Christmas tree in November.",
-    answerId: "sample-f",
-    optionIds: ["sample-a", "sample-c", "sample-e", "sample-f"],
+    answer: "eliane",
+    options: ["eliane", "maria", "karen", "lara"],
   },
   {
     id: "f7",
     fact: "I once pretended to like a Christmas gift.",
-    answerId: "sample-a",
-    optionIds: ["sample-a", "sample-b", "sample-d", "sample-e"],
+    answer: "samer",
+    options: ["samer", "maroun", "georges", "joseph"],
   },
   {
     id: "f8",
     fact: "I could eat gingerbread cookies every single day.",
-    answerId: "sample-c",
-    optionIds: ["sample-b", "sample-c", "sample-d", "sample-f"],
+    answer: "rouaida",
+    options: ["rouaida", "cynthia", "pia", "sarah"],
   },
 ];
 
-export function colleagueName(id: string): string {
-  return COLLEAGUE_SAMPLES.find((c) => c.id === id)?.name ?? id;
+export const OFFICE_FACTS_COUNT = CHRISTMAS_FACTS.length;
+
+export function colleagueName(name: string): string {
+  return isFunLabName(name) ? name : name;
+}
+
+export function colleaguePhoto(name: string): string {
+  return FUN_LAB_ROSTER.find((p) => p.name === name)?.photo ?? "/elfs/yann.jpeg";
+}
+
+export function isFactsBallotComplete(picks: Record<string, string> | undefined): boolean {
+  if (!picks) return false;
+  return CHRISTMAS_FACTS.every((q) => Boolean(picks[q.id]));
+}
+
+/** Validate picks against each fact’s option list. */
+export function sanitizeFactsPicks(picks: Record<string, string>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const fact of CHRISTMAS_FACTS) {
+    const chosen = picks[fact.id];
+    if (chosen && fact.options.includes(chosen as FunLabName) && isFunLabName(chosen)) {
+      out[fact.id] = chosen;
+    }
+  }
+  return out;
 }

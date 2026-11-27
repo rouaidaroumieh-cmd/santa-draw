@@ -11,6 +11,7 @@ import {
 } from "react";
 import type { FunLabScore, MostLikelyBallot } from "@/lib/fun-lab-games";
 import type { FunLabName } from "@/lib/fun-lab-roster";
+import type { PersonalityId } from "@/lib/office-games/horoscope";
 
 export type FunLabState = {
   poll: Record<string, string>;
@@ -18,6 +19,11 @@ export type FunLabState = {
   mostLikely: Record<string, MostLikelyBallot>;
   memoryMatch: Record<string, FunLabScore>;
   guessElf: Record<string, FunLabScore>;
+  officeFacts: Record<string, MostLikelyBallot>;
+  officeMovie: Record<string, FunLabScore>;
+  officeSack: Record<string, FunLabScore>;
+  officeWheel: Record<string, FunLabScore>;
+  officeHoroscope: Record<string, { personality: PersonalityId }>;
   challenge: { id: string; joined: string[]; done: string[] };
   mine: {
     poll?: string;
@@ -25,6 +31,11 @@ export type FunLabState = {
     mostLikely?: MostLikelyBallot;
     memoryMatch?: FunLabScore;
     guessElf?: FunLabScore;
+    officeFacts?: MostLikelyBallot;
+    officeMovie?: FunLabScore;
+    officeSack?: FunLabScore;
+    officeWheel?: FunLabScore;
+    officeHoroscope?: { personality: PersonalityId };
     challenge?: { id: string; joined: boolean; done: boolean };
   };
 };
@@ -46,6 +57,11 @@ const EMPTY_STATE: FunLabState = {
   mostLikely: {},
   memoryMatch: {},
   guessElf: {},
+  officeFacts: {},
+  officeMovie: {},
+  officeSack: {},
+  officeWheel: {},
+  officeHoroscope: {},
   challenge: { id: "", joined: [], done: [] },
   mine: {},
 };

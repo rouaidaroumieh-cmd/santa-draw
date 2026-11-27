@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { fireConfetti } from "@/lib/confetti";
 import {
   HOROSCOPE_QUESTIONS,
+  PERSONALITIES,
   resolvePersonality,
   type PersonalityResult,
 } from "@/lib/office-games/horoscope";
+import { useFunLab } from "@/components/fun-lab/FunLabContext";
 import { useT } from "@/lib/language";
 import { GameIntro, GameProgress, GameResult, OptionButton } from "./GameChrome";
 
@@ -14,16 +16,28 @@ type Phase = "intro" | "play" | "result";
 
 export default function HoroscopeGame() {
   const t = useT();
-  const [phase, setPhase] = useState<Phase>("intro");
+  const { vote, state } = useFunLab();
+  const lockedPersonality = state.mine.officeHoroscope?.personality;
+  const [phase, setPhase] = useState<Phase>(lockedPersonality ? "result" : "intro");
   const [index, setIndex] = useState(0);
   const [picks, setPicks] = useState<string[]>([]);
-  const [result, setResult] = useState<PersonalityResult | null>(null);
+  const [result, setResult] = useState<PersonalityResult | null>(
+    lockedPersonality ? PERSONALITIES[lockedPersonality] : null,
+  );
   const [copied, setCopied] = useState(false);
 
   const total = HOROSCOPE_QUESTIONS.length;
   const q = HOROSCOPE_QUESTIONS[index]!;
+  const locked = Boolean(lockedPersonality);
+
+  useEffect(() => {
+    if (!lockedPersonality) return;
+    setResult(PERSONALITIES[lockedPersonality]);
+    setPhase("result");
+  }, [lockedPersonality]);
 
   const start = () => {
+    if (locked) return;
     setPhase("play");
     setIndex(0);
     setPicks([]);
@@ -32,11 +46,13 @@ export default function HoroscopeGame() {
   };
 
   const choose = (optionId: string) => {
+    if (locked) return;
     const next = [...picks.slice(0, index), optionId];
     setPicks(next);
     if (index + 1 >= total) {
       const personality = resolvePersonality(next);
       setResult(personality);
+      void vote("og-horoscope", { personality: personality.id });
       setPhase("result");
       fireConfetti(0.9);
       return;
@@ -46,7 +62,7 @@ export default function HoroscopeGame() {
 
   const share = async () => {
     if (!result) return;
-    const text = `${result.title} — ${result.description}`;
+    const text = `${t(result.title)} — ${t(result.description)}`;
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -56,24 +72,13 @@ export default function HoroscopeGame() {
     }
   };
 
-  if (phase === "intro") {
-    return (
-      <GameIntro
-        title={t("Christmas horoscope")}
-        blurb={t("Answer five questions and meet your Christmas personality.")}
-        meta={`${t("5 questions")} · ${t("~2 min")}`}
-        onStart={start}
-      />
-    );
-  }
-
   if (phase === "result" && result) {
     return (
       <GameResult
-        title={result.title}
+        title={t(result.title)}
         message={t("Your Christmas character")}
-        detail={result.description}
-        onAgain={start}
+        detail={t(result.description)}
+        locked
       >
         <div
           className="flex h-28 w-28 items-center justify-center border border-[rgba(176,143,76,0.45)] bg-[rgba(176,143,76,0.15)] text-[2.8rem] text-[#173D32]"
@@ -86,6 +91,17 @@ export default function HoroscopeGame() {
           {copied ? t("Copied!") : t("Share result")}
         </button>
       </GameResult>
+    );
+  }
+
+  if (phase === "intro") {
+    return (
+      <GameIntro
+        title={t("Christmas horoscope")}
+        blurb={t("Answer five questions and meet your Christmas personality.")}
+        meta={`${t("5 questions")} · ${t("~2 min")} · ${t("One reveal only")}`}
+        onStart={start}
+      />
     );
   }
 

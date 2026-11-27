@@ -39,6 +39,26 @@ export type FunLabPublicResults = {
   /** Full scoreboard — home shows a short top list. */
   memoryMatch: { total: number; leaders: LeaderboardEntry[] };
   guessElf: { total: number; max: number; leaders: LeaderboardEntry[] };
+  /** Christmas facts — vote tallies per fact (finished ballots only). */
+  officeFacts: {
+    total: number;
+    facts: {
+      id: string;
+      fact: string;
+      total: number;
+      ranked: VoteTally[];
+    }[];
+  };
+  /** Office arcade games (PIN Fun Lab scores). */
+  officeMovie: { total: number; max: number; leaders: LeaderboardEntry[] };
+  officeSack: { total: number; max: number; leaders: LeaderboardEntry[] };
+  officeWheel: { total: number; leaders: LeaderboardEntry[] };
+  officeHoroscope: {
+    total: number;
+    personalities: { id: string; titleKey: string; count: number }[];
+    /** One locked result per player — shown on home. */
+    roster: { name: string; photo: string; personalityId: string; titleKey: string }[];
+  };
 };
 
 export const GUESS_ELF_ROUNDS = 10;

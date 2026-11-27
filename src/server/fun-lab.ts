@@ -14,6 +14,14 @@ import {
   type FunLabScore,
   type MostLikelyBallot,
 } from "@/lib/fun-lab-games";
+import { OFFICE_MOVIE_MAX } from "@/lib/office-games/catalog";
+import {
+  CHRISTMAS_FACTS,
+  isFactsBallotComplete,
+  sanitizeFactsPicks,
+} from "@/lib/office-games/christmas-facts";
+import { PERSONALITIES, type PersonalityId } from "@/lib/office-games/horoscope";
+import { maxSackScore } from "@/lib/office-games/santa-sack";
 import {
   FUN_LAB_ROSTER,
   isFunLabGame,
@@ -22,12 +30,32 @@ import {
   type FunLabName,
 } from "@/lib/fun-lab-roster";
 
+const HIGHER_SCORE_GAMES = [
+  "guess-elf",
+  "og-movie",
+  "og-sack",
+  "og-wheel",
+] as const;
+
+type HigherScoreGame = (typeof HIGHER_SCORE_GAMES)[number];
+
+function isHigherScoreGame(game: string): game is HigherScoreGame {
+  return (HIGHER_SCORE_GAMES as readonly string[]).includes(game);
+}
+
+export type HoroscopeBallot = { personality: PersonalityId };
+
 export type FunLabPublicState = {
   poll: Record<string, string>;
   elfVote: Record<string, string>;
   mostLikely: Record<string, MostLikelyBallot>;
   memoryMatch: Record<string, FunLabScore>;
   guessElf: Record<string, FunLabScore>;
+  officeFacts: Record<string, MostLikelyBallot>;
+  officeMovie: Record<string, FunLabScore>;
+  officeSack: Record<string, FunLabScore>;
+  officeWheel: Record<string, FunLabScore>;
+  officeHoroscope: Record<string, HoroscopeBallot>;
   challenge: { id: FunLabChallengeId; joined: string[]; done: string[] };
   mine: {
     poll?: string;
@@ -35,6 +63,11 @@ export type FunLabPublicState = {
     mostLikely?: MostLikelyBallot;
     memoryMatch?: FunLabScore;
     guessElf?: FunLabScore;
+    officeFacts?: MostLikelyBallot;
+    officeMovie?: FunLabScore;
+    officeSack?: FunLabScore;
+    officeWheel?: FunLabScore;
+    officeHoroscope?: HoroscopeBallot;
     challenge?: { id: FunLabChallengeId; joined: boolean; done: boolean };
   };
 };
@@ -75,6 +108,26 @@ function asScore(value: unknown): FunLabScore | null {
   return { best: Math.floor(best) };
 }
 
+function asHoroscopeBallot(value: unknown): HoroscopeBallot | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const personality = (value as { personality?: unknown }).personality;
+  if (typeof personality !== "string" || !(personality in PERSONALITIES)) return null;
+  return { personality: personality as PersonalityId };
+}
+
+function leadersFromScores(
+  scores: Record<string, FunLabScore>,
+  higherIsBetter: boolean,
+): { name: string; photo: string; value: number }[] {
+  return Object.entries(scores)
+    .map(([name, score]) => ({
+      name,
+      photo: rosterPhoto(name),
+      value: score.best,
+    }))
+    .sort((a, b) => (higherIsBetter ? b.value - a.value : a.value - b.value));
+}
+
 function asChallengeProgress(
   value: unknown,
 ): { id: FunLabChallengeId; joined: boolean; done: boolean } | null {
@@ -108,6 +161,11 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
   const mostLikely: Record<string, MostLikelyBallot> = {};
   const memoryMatch: Record<string, FunLabScore> = {};
   const guessElf: Record<string, FunLabScore> = {};
+  const officeFacts: Record<string, MostLikelyBallot> = {};
+  const officeMovie: Record<string, FunLabScore> = {};
+  const officeSack: Record<string, FunLabScore> = {};
+  const officeWheel: Record<string, FunLabScore> = {};
+  const officeHoroscope: Record<string, HoroscopeBallot> = {};
   const joined: string[] = [];
   const done: string[] = [];
   let mineChallenge: FunLabPublicState["mine"]["challenge"];
@@ -127,6 +185,25 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
     } else if (row.game === "guess-elf") {
       const score = asScore(row.value);
       if (score) guessElf[row.voterName] = score;
+    } else if (row.game === "og-facts") {
+      // Ignore legacy score payloads — ballot votes only.
+      const raw = row.value;
+      if (raw && typeof raw === "object" && !Array.isArray(raw) && "best" in (raw as object)) {
+        continue;
+      }
+      officeFacts[row.voterName] = asMostLikelyBallot(raw);
+    } else if (row.game === "og-movie") {
+      const score = asScore(row.value);
+      if (score) officeMovie[row.voterName] = score;
+    } else if (row.game === "og-sack") {
+      const score = asScore(row.value);
+      if (score) officeSack[row.voterName] = score;
+    } else if (row.game === "og-wheel") {
+      const score = asScore(row.value);
+      if (score) officeWheel[row.voterName] = score;
+    } else if (row.game === "og-horoscope") {
+      const ballot = asHoroscopeBallot(row.value);
+      if (ballot) officeHoroscope[row.voterName] = ballot;
     } else if (row.game === "challenge") {
       const progress = asChallengeProgress(row.value);
       if (!progress) continue;
@@ -144,6 +221,11 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
     mine.mostLikely = mostLikely[voter] ?? { picks: {}, finished: false };
     if (memoryMatch[voter]) mine.memoryMatch = memoryMatch[voter];
     if (guessElf[voter]) mine.guessElf = guessElf[voter];
+    mine.officeFacts = officeFacts[voter] ?? { picks: {}, finished: false };
+    if (officeMovie[voter]) mine.officeMovie = officeMovie[voter];
+    if (officeSack[voter]) mine.officeSack = officeSack[voter];
+    if (officeWheel[voter]) mine.officeWheel = officeWheel[voter];
+    if (officeHoroscope[voter]) mine.officeHoroscope = officeHoroscope[voter];
     if (mineChallenge) mine.challenge = mineChallenge;
   }
 
@@ -153,6 +235,11 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
     mostLikely,
     memoryMatch,
     guessElf,
+    officeFacts,
+    officeMovie,
+    officeSack,
+    officeWheel,
+    officeHoroscope,
     challenge: { id: todayId, joined, done },
     mine,
   };
@@ -183,6 +270,13 @@ export async function saveFunLabVote(
     if (game === "elf-vote" && existing.length > 0) {
       return { ok: false, error: "Your elf vote is locked and cannot be changed.", status: 409 };
     }
+    if (game === "og-horoscope" && existing.length > 0) {
+      return {
+        ok: false,
+        error: "Your Christmas character is locked — one reveal only.",
+        status: 409,
+      };
+    }
     if (game === "most-likely" && existing.length > 0) {
       const prior = asMostLikelyBallot(existing[0].value);
       if (prior.finished) {
@@ -193,20 +287,36 @@ export async function saveFunLabVote(
         };
       }
     }
+    if (game === "og-facts" && existing.length > 0) {
+      const prior = asMostLikelyBallot(existing[0].value);
+      if (prior.finished) {
+        return {
+          ok: false,
+          error: "Your Christmas fact votes are locked and cannot be changed.",
+          status: 409,
+        };
+      }
+    }
 
-    // Scores: keep personal best only (memory = fewer moves, guess = higher score).
+    // Scores: keep personal best only (memory = fewer moves; others = higher score).
     let toStore = normalized.value;
-    if (game === "memory-match" || game === "guess-elf") {
+    if (game === "memory-match" || isHigherScoreGame(game)) {
       const incoming = asScore(normalized.value);
       if (!incoming) return { ok: false, error: "Please send a valid score.", status: 400 };
       const prior = existing.length > 0 ? asScore(existing[0].value) : null;
       if (game === "memory-match" && prior && prior.best <= incoming.best) {
         return { ok: true };
       }
-      if (game === "guess-elf" && prior && prior.best >= incoming.best) {
+      if (isHigherScoreGame(game) && prior && prior.best >= incoming.best) {
         return { ok: true };
       }
       toStore = incoming;
+    }
+    // Horoscope: first reveal only (lock enforced above).
+    if (game === "og-horoscope") {
+      const ballot = asHoroscopeBallot(normalized.value);
+      if (!ballot) return { ok: false, error: "Please send a valid personality.", status: 400 };
+      toStore = ballot;
     }
 
     await db
@@ -291,6 +401,55 @@ function normalizeValue(
     return { ok: true, value: score };
   }
 
+  if (game === "og-facts") {
+    const ballot = asMostLikelyBallot(value);
+    const picks = sanitizeFactsPicks(ballot.picks);
+    if (Object.keys(picks).length === 0) {
+      return { ok: false, error: "Please vote on at least one fact.", status: 400 };
+    }
+    if (ballot.finished) {
+      if (!isFactsBallotComplete(picks)) {
+        return {
+          ok: false,
+          error: "Vote on every fact before finishing.",
+          status: 400,
+        };
+      }
+      return { ok: true, value: { picks, finished: true as const } };
+    }
+    return { ok: true, value: { picks, finished: false as const } };
+  }
+
+  if (game === "og-movie") {
+    const score = asScore(value);
+    if (!score || score.best > OFFICE_MOVIE_MAX) {
+      return { ok: false, error: "Please send a valid score.", status: 400 };
+    }
+    return { ok: true, value: score };
+  }
+
+  if (game === "og-sack") {
+    const score = asScore(value);
+    if (!score || score.best > maxSackScore()) {
+      return { ok: false, error: "Please send a valid score.", status: 400 };
+    }
+    return { ok: true, value: score };
+  }
+
+  if (game === "og-wheel") {
+    const score = asScore(value);
+    if (!score || score.best < 1) {
+      return { ok: false, error: "Please send a valid score.", status: 400 };
+    }
+    return { ok: true, value: score };
+  }
+
+  if (game === "og-horoscope") {
+    const ballot = asHoroscopeBallot(value);
+    if (!ballot) return { ok: false, error: "Please send a valid personality.", status: 400 };
+    return { ok: true, value: ballot };
+  }
+
   if (game === "challenge") {
     const progress = asChallengeProgress(value);
     if (!progress) {
@@ -340,21 +499,54 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
     return { id: q.id, labelKey: q.labelKey, total, ranked };
   });
 
-  const memoryLeaders = Object.entries(state.memoryMatch)
-    .map(([name, score]) => ({
-      name,
-      photo: rosterPhoto(name),
-      value: score.best,
-    }))
-    .sort((a, b) => a.value - b.value);
+  const memoryLeaders = leadersFromScores(state.memoryMatch, false);
+  const guessLeaders = leadersFromScores(state.guessElf, true);
+  const factsFinished = Object.values(state.officeFacts).filter((b) => b.finished).length;
+  const officeFacts = CHRISTMAS_FACTS.map((fact) => {
+    const counts = Object.fromEntries(fact.options.map((n) => [n, 0])) as Record<string, number>;
+    for (const ballot of Object.values(state.officeFacts)) {
+      if (!ballot.finished) continue;
+      const chosen = ballot.picks[fact.id];
+      if (chosen && chosen in counts) counts[chosen] += 1;
+    }
+    const ranked = fact.options
+      .map((name) => ({
+        name,
+        photo: FUN_LAB_ROSTER.find((p) => p.name === name)?.photo ?? "",
+        count: counts[name] ?? 0,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .filter((p) => p.count > 0);
+    const total = ranked.reduce((sum, row) => sum + row.count, 0);
+    return { id: fact.id, fact: fact.fact, total, ranked };
+  });
+  const movieLeaders = leadersFromScores(state.officeMovie, true);
+  const sackLeaders = leadersFromScores(state.officeSack, true);
+  const wheelLeaders = leadersFromScores(state.officeWheel, true);
 
-  const guessLeaders = Object.entries(state.guessElf)
-    .map(([name, score]) => ({
+  const horoscopeCounts = Object.fromEntries(
+    Object.keys(PERSONALITIES).map((id) => [id, 0]),
+  ) as Record<PersonalityId, number>;
+  for (const ballot of Object.values(state.officeHoroscope)) {
+    horoscopeCounts[ballot.personality] += 1;
+  }
+  const horoscopePersonalities = (Object.keys(PERSONALITIES) as PersonalityId[])
+    .map((id) => ({
+      id,
+      titleKey: PERSONALITIES[id].title,
+      count: horoscopeCounts[id],
+    }))
+    .filter((row) => row.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  const horoscopeRoster = Object.entries(state.officeHoroscope)
+    .map(([name, ballot]) => ({
       name,
       photo: rosterPhoto(name),
-      value: score.best,
+      personalityId: ballot.personality,
+      titleKey: PERSONALITIES[ballot.personality].title,
     }))
-    .sort((a, b) => b.value - a.value);
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return {
     poll: {
@@ -373,6 +565,29 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
       total: Object.keys(state.guessElf).length,
       max: GUESS_ELF_ROUNDS,
       leaders: guessLeaders,
+    },
+    officeFacts: {
+      total: factsFinished,
+      facts: officeFacts,
+    },
+    officeMovie: {
+      total: Object.keys(state.officeMovie).length,
+      max: OFFICE_MOVIE_MAX,
+      leaders: movieLeaders,
+    },
+    officeSack: {
+      total: Object.keys(state.officeSack).length,
+      max: maxSackScore(),
+      leaders: sackLeaders,
+    },
+    officeWheel: {
+      total: Object.keys(state.officeWheel).length,
+      leaders: wheelLeaders,
+    },
+    officeHoroscope: {
+      total: Object.keys(state.officeHoroscope).length,
+      personalities: horoscopePersonalities,
+      roster: horoscopeRoster,
     },
   };
 }
