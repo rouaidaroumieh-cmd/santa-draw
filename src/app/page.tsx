@@ -290,11 +290,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <ParticipantGallery state={state} />
-
       <FunLabResultsPreview />
 
       <WishPreview />
+
+      <ParticipantGallery state={state} />
     </PageShell>
   );
 }

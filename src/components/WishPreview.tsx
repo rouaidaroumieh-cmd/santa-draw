@@ -61,10 +61,10 @@ export default function WishPreview() {
                 {t("Leave a Christmas wish")}
               </h3>
               <p className="mt-3 text-[0.9rem] leading-relaxed text-[#4A463C]">
-                {t("Read every wish — and add your own — in the Fun corner.")}
+                {t("Read every wish — and add your own — in the Wishes section.")}
               </p>
             </div>
-            <Link href="/fun#wish-wall" className="btn btn-dark self-start">
+            <Link href="/wishes#wish-wall" className="btn btn-dark self-start">
               {t("See the wish wall")}
             </Link>
           </aside>

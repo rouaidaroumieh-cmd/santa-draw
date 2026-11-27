@@ -8,6 +8,7 @@ export const FR: Record<string, string> = {
   "Calendar": "Calendrier",
   "Participants": "Participants",
   "Fun": "Fun",
+  "Wishes": "Vœux",
   "Admin": "Admin",
   "Language": "Langue",
   "Main navigation": "Navigation principale",
@@ -146,10 +147,12 @@ export const FR: Record<string, string> = {
   "Weekend – no draw": "Week-end – pas de tirage",
   "Santa is taking a little Christmas break.": "Le Père Noël prend une petite pause de Noël.",
 
-  // Fun corner
+  // Wishes section (/wishes) — Fun Lab games come later for signed-in users
   "Just for fun": "Juste pour s'amuser",
   "Christmas": "Noël",
   "Fun Corner": "Coin détente",
+  "Leave a wish for the whole office — and read what everyone else wrote.":
+    "Laissez un vœu pour tout le bureau — et lisez ceux des autres.",
   "Match the office photos, guess the blurred elves, test your Christmas knowledge, or leave a wish for the whole office.":
     "Retrouvez les photos des collègues, devinez les elfes floutés, testez vos connaissances de Noël ou laissez un vœu pour tout le bureau.",
   "Test your Christmas knowledge or leave a wish for the whole office. Memory match and blurred elves live in the Fun Lab (PIN).":
@@ -207,13 +210,15 @@ export const FR: Record<string, string> = {
   "5 · Challenge of the day": "5 · Challenge du jour",
   "Ten fun questions. Vote for the colleague who fits best on each one. On the last question, tap Finish to lock your answers — leaders appear on the home page.":
     "Dix questions fun. Votez pour le collègue qui correspond le mieux à chacune. Sur la dernière, appuyez sur Terminer pour verrouiller — les leaders apparaissent sur la page d’accueil.",
-  "Answer all 10 questions, then Finish on the last one to lock.":
-    "Répondez aux 10 questions, puis Terminer sur la dernière pour verrouiller.",
+  "Answer all 10 questions, then Finish to lock. One vote only.":
+    "Répondez aux 10 questions, puis Terminer pour verrouiller. Un seul vote.",
+  "All answered — tap Finish to lock your one vote.":
+    "Tout est répondu — appuyez sur Terminer pour verrouiller votre unique vote.",
   "Last question — answer everyone, then tap Finish to lock.":
     "Dernière question — répondez à toutes, puis appuyez sur Terminer pour verrouiller.",
   "Your answers are locked.": "Vos réponses sont verrouillées.",
-  "All answers locked. Browse questions below — results appear on the home page.":
-    "Toutes les réponses sont verrouillées. Parcourez les questions — les résultats apparaissent sur la page d’accueil.",
+  "Vote locked — one ballot only. Browse questions below — results appear on the home page.":
+    "Vote verrouillé — un seul bulletin. Parcourez les questions — les résultats apparaissent sur la page d’accueil.",
   "You picked {name}. You can still change answers until you Finish.":
     "Vous avez choisi {name}. Vous pouvez encore changer jusqu’à Terminer.",
   "Your “most likely” answers are locked and cannot be changed.":
@@ -384,6 +389,8 @@ export const FR: Record<string, string> = {
   "Leave a Christmas wish": "Laissez un vœu de Noël",
   "Read every wish — and add your own — in the Fun corner.":
     "Lisez tous les vœux — et ajoutez le vôtre — dans le coin Fun.",
+  "Read every wish — and add your own — in the Wishes section.":
+    "Lisez tous les vœux — et ajoutez le vôtre — dans la section Vœux.",
   "See the wish wall": "Voir le mur des vœux",
   "Loading the photos…": "Chargement des photos…",
   "Find every matching pair of photos.": "Retrouvez toutes les paires de photos identiques.",

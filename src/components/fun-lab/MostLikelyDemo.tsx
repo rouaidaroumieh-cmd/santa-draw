@@ -9,26 +9,31 @@ import {
 import { FUN_LAB_ROSTER, isFunLabName } from "@/lib/fun-lab-roster";
 import { useFunLab } from "./FunLabContext";
 
-/** “Who is most likely to…” — 10 questions; Finish on the last one locks answers. */
+/** “Who is most likely to…” — one ballot; Finish locks forever. */
 export default function MostLikelyDemo() {
   const t = useT();
   const { name, state, vote } = useFunLab();
   const [index, setIndex] = useState(0);
   const [finishing, setFinishing] = useState(false);
+  /** Optimistic lock so the UI freezes the moment Finish succeeds. */
+  const [lockedLocal, setLockedLocal] = useState(false);
 
   const question = MOST_LIKELY_QUESTIONS[index]!;
   const ballot = state.mine.mostLikely ?? { picks: {}, finished: false };
   const myPicks = ballot.picks;
   const myPick = myPicks[question.id];
-  const locked = ballot.finished;
+  const locked = lockedLocal || Boolean(ballot.finished);
   const allAnswered = isMostLikelyComplete(myPicks);
   const isLast = index >= MOST_LIKELY_QUESTIONS.length - 1;
+  const canFinish = !locked && allAnswered;
 
   const tallies = useMemo(() => {
     const counts: Record<string, number> = Object.fromEntries(
       FUN_LAB_ROSTER.map((p) => [p.name, 0]),
     );
     for (const entry of Object.values(state.mostLikely)) {
+      // Live lab tallies: only count finished ballots (one vote per person).
+      if (!entry.finished) continue;
       const chosen = entry.picks[question.id];
       if (chosen && chosen in counts) counts[chosen] += 1;
     }
@@ -41,7 +46,7 @@ export default function MostLikelyDemo() {
   const leaders = tallies.filter((row) => row.count > 0).slice(0, 3);
 
   const pick = (nominee: string) => {
-    if (!name || locked || !isFunLabName(nominee)) return;
+    if (!name || locked || finishing || !isFunLabName(nominee)) return;
     void vote("most-likely", {
       picks: { ...myPicks, [question.id]: nominee },
       finished: false,
@@ -52,7 +57,8 @@ export default function MostLikelyDemo() {
     if (!name || locked || !allAnswered || finishing) return;
     setFinishing(true);
     try {
-      await vote("most-likely", { picks: myPicks, finished: true });
+      const ok = await vote("most-likely", { picks: myPicks, finished: true });
+      if (ok) setLockedLocal(true);
     } finally {
       setFinishing(false);
     }
@@ -69,9 +75,11 @@ export default function MostLikelyDemo() {
           <p className="mt-2 text-[0.85rem] text-[#6E6A5E]">
             {locked
               ? t("Your answers are locked.")
-              : isLast
-                ? t("Last question — answer everyone, then tap Finish to lock.")
-                : t("Answer all 10 questions, then Finish on the last one to lock.")}
+              : canFinish
+                ? t("All answered — tap Finish to lock your one vote.")
+                : isLast
+                  ? t("Last question — answer everyone, then tap Finish to lock.")
+                  : t("Answer all 10 questions, then Finish to lock. One vote only.")}
           </p>
         </div>
         <p className="label text-[#6E6A5E]">
@@ -95,7 +103,7 @@ export default function MostLikelyDemo() {
             <button
               key={p.name}
               type="button"
-              disabled={locked}
+              disabled={locked || finishing}
               onClick={() => pick(p.name)}
               className={className}
               style={{ borderRadius: 2 }}
@@ -117,7 +125,7 @@ export default function MostLikelyDemo() {
           className="border border-[rgba(36,92,70,0.35)] bg-[rgba(36,92,70,0.12)] px-4 py-3 text-[0.9rem] text-[#173D32]"
           style={{ borderRadius: 2 }}
         >
-          {t("All answers locked. Browse questions below — results appear on the home page.")}
+          {t("Vote locked — one ballot only. Browse questions below — results appear on the home page.")}
         </p>
       ) : myPick ? (
         <p
@@ -165,12 +173,13 @@ export default function MostLikelyDemo() {
           {!isLast ? (
             <button
               type="button"
-              className="btn btn-dark"
+              className="btn btn-ghost"
               onClick={() => setIndex((i) => Math.min(MOST_LIKELY_QUESTIONS.length - 1, i + 1))}
             >
               {t("Next question")}
             </button>
-          ) : locked ? (
+          ) : null}
+          {locked ? (
             <button type="button" className="btn btn-dark" disabled>
               {t("Finished ✓")}
             </button>
@@ -178,7 +187,7 @@ export default function MostLikelyDemo() {
             <button
               type="button"
               className="btn btn-dark"
-              disabled={!allAnswered || finishing}
+              disabled={!canFinish || finishing}
               onClick={() => void finish()}
             >
               {finishing ? t("Saving…") : t("Finish")}
@@ -187,7 +196,7 @@ export default function MostLikelyDemo() {
         </div>
       </div>
 
-      {isLast && !locked && !allAnswered ? (
+      {!locked && isLast && !allAnswered ? (
         <p className="text-[0.8rem] text-[#6E6A5E]">
           {t("Answer every question before tapping Finish.")}
         </p>

@@ -52,6 +52,10 @@ function asStringRecord(value: unknown): Record<string, string> {
   return out;
 }
 
+function isFinishedFlag(value: unknown): boolean {
+  return value === true || value === 1 || value === "true" || value === "1";
+}
+
 /** Accepts `{ picks, finished }` or legacy flat name maps. */
 function asMostLikelyBallot(value: unknown): MostLikelyBallot {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -59,9 +63,9 @@ function asMostLikelyBallot(value: unknown): MostLikelyBallot {
   }
   const obj = value as Record<string, unknown>;
   if (obj.picks && typeof obj.picks === "object" && !Array.isArray(obj.picks)) {
-    return { picks: asStringRecord(obj.picks), finished: Boolean(obj.finished) };
+    return { picks: asStringRecord(obj.picks), finished: isFinishedFlag(obj.finished) };
   }
-  return { picks: asStringRecord(value), finished: Boolean(obj.finished) };
+  return { picks: asStringRecord(value), finished: isFinishedFlag(obj.finished) };
 }
 
 function asScore(value: unknown): FunLabScore | null {
@@ -252,6 +256,7 @@ function normalizeValue(
     if (Object.keys(ballot.picks).length === 0) {
       return { ok: false, error: "Please pick a colleague for at least one question.", status: 400 };
     }
+    // Once finished, never accept another payload for this voter (lock is enforced above too).
     if (ballot.finished) {
       const complete = MOST_LIKELY_QUESTIONS.every((q) => Boolean(ballot.picks[q.id]));
       if (!complete) {
@@ -261,8 +266,13 @@ function normalizeValue(
           status: 400,
         };
       }
+      // Normalize to a strict locked ballot.
+      return {
+        ok: true,
+        value: { picks: ballot.picks, finished: true as const },
+      };
     }
-    return { ok: true, value: ballot };
+    return { ok: true, value: { picks: ballot.picks, finished: false as const } };
   }
 
   if (game === "memory-match") {

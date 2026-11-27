@@ -8,13 +8,14 @@ import { type Lang } from "@/lib/i18n";
 import { setLang, useLang, useT } from "@/lib/language";
 import { useSyncError } from "@/lib/store";
 
-export type SectionKey = "home" | "calendar" | "participants" | "fun" | "fun-lab" | "admin";
+export type SectionKey = "home" | "calendar" | "participants" | "wishes" | "fun" | "fun-lab" | "admin";
 
 const NAV: { key: SectionKey; href: string; label: string }[] = [
   { key: "home", href: "/", label: "Home" },
   { key: "calendar", href: "/calendar", label: "Calendar" },
   { key: "participants", href: "/participants", label: "Participants" },
-  { key: "fun", href: "/fun", label: "Fun" },
+  { key: "wishes", href: "/wishes", label: "Wishes" },
+  // Fun (signed-in Fun Lab) will be added to the nav later.
 ];
 
 const LANGUAGES: { code: Lang; label: string }[] = [
