@@ -15,7 +15,11 @@ export function handle<Args extends unknown[]>(fn: (...args: Args) => Promise<Re
       return await fn(...args);
     } catch (error) {
       console.error(error);
-      return errorResponse("Something went wrong on the server.", 500);
+      const message =
+        error instanceof Error && error.message.startsWith("Fun Lab database")
+          ? error.message
+          : "Something went wrong on the server.";
+      return errorResponse(message, 500);
     }
   };
 }

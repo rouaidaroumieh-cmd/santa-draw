@@ -29,8 +29,16 @@ function asStringArray(value: unknown): string[] {
 }
 
 export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabPublicState> {
-  const db = getDb();
-  const rows = await db.select().from(funLabEntries);
+  let rows: (typeof funLabEntries.$inferSelect)[];
+  try {
+    const db = getDb();
+    rows = await db.select().from(funLabEntries);
+  } catch (error) {
+    console.error("Fun Lab state load failed:", error);
+    throw new Error(
+      "Fun Lab database is unavailable. Start Postgres (`docker-compose up -d db`) then run `npm run db:push`.",
+    );
+  }
 
   const poll: Record<string, string> = {};
   const elfVote: Record<string, string> = {};
@@ -81,19 +89,26 @@ export async function saveFunLabVote(
   const normalized = normalizeValue(game, value);
   if (!normalized.ok) return normalized;
 
-  const db = getDb();
-  await db
-    .insert(funLabEntries)
-    .values({
-      game,
-      voterName: voter,
-      value: normalized.value,
-      updatedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: [funLabEntries.game, funLabEntries.voterName],
-      set: { value: normalized.value, updatedAt: new Date() },
-    });
+  try {
+    const db = getDb();
+    await db
+      .insert(funLabEntries)
+      .values({
+        game,
+        voterName: voter,
+        value: normalized.value,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: [funLabEntries.game, funLabEntries.voterName],
+        set: { value: normalized.value, updatedAt: new Date() },
+      });
+  } catch (error) {
+    console.error("Fun Lab vote save failed:", error);
+    throw new Error(
+      "Fun Lab database is unavailable. Start Postgres (`docker-compose up -d db`) then run `npm run db:push`.",
+    );
+  }
 
   return { ok: true };
 }

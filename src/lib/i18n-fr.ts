@@ -182,6 +182,8 @@ export const FR: Record<string, string> = {
     "Déverrouillez d’abord le Fun Lab avec votre prénom et votre PIN.",
   "Fun Lab PIN auth is not configured (set ADMIN_PASSWORD or FUN_LAB_PIN_SECRET).":
     "L’auth PIN du Fun Lab n’est pas configurée (définir ADMIN_PASSWORD ou FUN_LAB_PIN_SECRET).",
+  "Fun Lab database is unavailable. Start Postgres (`docker-compose up -d db`) then run `npm run db:push`.":
+    "La base Fun Lab est indisponible. Démarrez Postgres (`docker-compose up -d db`) puis `npm run db:push`.",
   "One office question. Each person votes once with their first name. After voting, the bars update live — you stay on this block and can still change your vote.":
     "Une question pour le bureau. Chacun vote une fois avec son prénom. Après le vote, les barres se mettent à jour en direct — vous restez sur ce bloc et pouvez encore changer d’avis.",
   "Vote for your favourite elf look among the 20 colleagues. After you vote, the podium (top 3) appears below. One vote per name; you can change it.":
