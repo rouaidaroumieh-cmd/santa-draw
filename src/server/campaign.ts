@@ -403,6 +403,9 @@ async function replaceCampaign(
 
 export async function resetCampaign(): Promise<Outcome<{ state: CampaignState }>> {
   await replaceCampaign(createInitialConfig(), {}, {});
+  // Also wipe Fun Lab votes + Office Games scores so everyone can restart together.
+  const { clearAllFunLabEntries } = await import("@/server/fun-lab");
+  await clearAllFunLabEntries();
   return stateOutcome(getDb());
 }
 

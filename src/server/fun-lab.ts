@@ -595,8 +595,37 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
   };
 }
 
-/** Dev helper — clear one voter's rows (unused in UI for now). */
-export async function clearFunLabVoter(voter: FunLabName): Promise<void> {
+/**
+ * Clear one voter's Fun Lab / Games rows.
+ * Pass `game` to wipe a single activity; omit it to wipe everything for that person.
+ */
+export async function clearFunLabVoter(
+  voter: FunLabName,
+  game?: FunLabGame,
+): Promise<{ ok: true; deleted: number }> {
   const db = getDb();
-  await db.delete(funLabEntries).where(eq(funLabEntries.voterName, voter));
+  const removed = game
+    ? await db
+        .delete(funLabEntries)
+        .where(and(eq(funLabEntries.voterName, voter), eq(funLabEntries.game, game)))
+        .returning({ game: funLabEntries.game })
+    : await db
+        .delete(funLabEntries)
+        .where(eq(funLabEntries.voterName, voter))
+        .returning({ game: funLabEntries.game });
+  return { ok: true, deleted: removed.length };
+}
+
+/**
+ * Wipe every Fun Lab vote and Games score:
+ * poll, elf-vote, most-likely, christmas facts, memory, guess-elf,
+ * og-movie / sack / wheel / horoscope, challenge progress.
+ */
+export async function clearAllFunLabEntries(): Promise<{ ok: true; deleted: number }> {
+  const db = getDb();
+  const removed = await db.delete(funLabEntries).returning({
+    game: funLabEntries.game,
+    voterName: funLabEntries.voterName,
+  });
+  return { ok: true, deleted: removed.length };
 }

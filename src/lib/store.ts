@@ -247,6 +247,24 @@ export async function resetCampaign(): Promise<void> {
   await adminCall({ action: "reset" });
 }
 
+/** Wipe Fun Lab votes + Office Games scores (keeps the campaign draw intact). */
+export async function resetFunLabAndGames(): Promise<{ ok: boolean; deleted?: number; error?: string }> {
+  const res = await adminCall<{ deleted?: number }>({ action: "resetFunLab" });
+  return res.ok ? { ok: true, deleted: res.deleted } : { ok: false, error: res.error };
+}
+
+/**
+ * Wipe one person's Fun Lab / Games data.
+ * Pass `game` for a single activity, or omit / `"all"` for everything.
+ */
+export async function resetFunLabVoter(
+  name: string,
+  game: string = "all",
+): Promise<{ ok: boolean; deleted?: number; error?: string }> {
+  const res = await adminCall<{ deleted?: number }>({ action: "resetFunLabVoter", name, game });
+  return res.ok ? { ok: true, deleted: res.deleted } : { ok: false, error: res.error };
+}
+
 export async function applyBackup(raw: string): Promise<{ ok: boolean; error?: string }> {
   const res = await adminCall({ action: "importBackup", raw });
   return res.ok ? { ok: true } : { ok: false, error: res.error };

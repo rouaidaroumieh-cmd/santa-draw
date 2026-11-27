@@ -739,6 +739,32 @@ export const FR: Record<string, string> = {
     "Les fichiers importés sont entièrement validés avant de remplacer la campagne actuelle : type de fichier incorrect, planning invalide, gagnants en double ou budget de sélections dépassé sont refusés avec un message clair, et rien n'est écrasé.",
   "Danger zone": "Zone sensible",
   "Full campaign reset": "Réinitialisation complète de la campagne",
+  "Reset Fun Lab & Games": "Réinitialiser Fun Lab & Jeux",
+  "Reset one person / one game": "Réinitialiser une personne / un jeu",
+  "Pick a person and optionally one activity. “All activities” clears every Fun Lab vote and Games score for that person. They can play again after a refresh.":
+    "Choisissez une personne et éventuellement une activité. « Toutes les activités » efface tous ses votes Fun Lab et scores Jeux. Elle pourra rejouer après un rafraîchissement.",
+  Person: "Personne",
+  Activity: "Activité",
+  "All activities": "Toutes les activités",
+  "Reset {game} for {name}? This cannot be undone.":
+    "Réinitialiser {game} pour {name} ? Action irréversible.",
+  "Reset done for {name} · {game} ({count} entries). Ask them to refresh.":
+    "Réinitialisation faite pour {name} · {game} ({count} entrées). Demandez-lui de rafraîchir.",
+  "Reset selection": "Réinitialiser la sélection",
+  "Games · Guess the Christmas movie": "Jeux · Devinez le film de Noël",
+  "Games · Santa’s sack": "Jeux · Sac du Père Noël",
+  "Games · Spin the Christmas wheel": "Jeux · Roue de Noël",
+  "Games · Christmas horoscope": "Jeux · Horoscope de Noël",
+  "Clears every Fun Lab vote and every Office Games score (poll, elf vote, most likely, Christmas facts, memory, guess-elf, movie, sack, wheel, horoscope). The daily draw campaign is not touched. Everyone can start fresh together.":
+    "Efface tous les votes Fun Lab et tous les scores des Office Games (sondage, vote elfe, most likely, faits de Noël, memory, guess-elf, film, sac, roue, horoscope). Le tirage quotidien n’est pas touché. Tout le monde peut repartir à zéro ensemble.",
+  "Reset all Fun Lab votes and Games scores? This cannot be undone.":
+    "Réinitialiser tous les votes Fun Lab et les scores des jeux ? Action irréversible.",
+  "Fun Lab & Games reset. Ask everyone to refresh.":
+    "Fun Lab & Jeux réinitialisés. Demandez à tout le monde de rafraîchir.",
+  "Reset Fun Lab & Games now": "Réinitialiser Fun Lab & Jeux maintenant",
+  "Reset failed.": "Échec de la réinitialisation.",
+  "This erases every result, lock, name, photograph and the current schedule — and also clears Fun Lab votes and Games scores. The campaign returns to its initial placeholder state with a brand new randomised schedule. There is no ordinary undo for a daily draw — this is the only way to start again, and it requires two separate confirmations.":
+    "Ceci efface tous les résultats, verrous, noms, photos et le planning actuel — ainsi que les votes Fun Lab et les scores des jeux. La campagne revient à son état initial avec un nouveau planning aléatoire. Il n’y a pas d’annulation ordinaire d’un tirage — c’est la seule façon de recommencer, et cela demande deux confirmations.",
   "This erases every result, lock, name, photograph and the current schedule. The campaign returns to its initial placeholder state with a brand new randomised schedule. There is no ordinary undo for a daily draw — this is the only way to start again, and it requires two separate confirmations.":
     "Cela efface chaque résultat, verrou, nom, photo et le planning actuel. La campagne revient à son état initial avec un nouveau planning aléatoire. Un tirage quotidien ne peut pas être annulé simplement — c'est la seule façon de recommencer, et deux confirmations séparées sont requises.",
   "Reset the entire campaign": "Réinitialiser toute la campagne",

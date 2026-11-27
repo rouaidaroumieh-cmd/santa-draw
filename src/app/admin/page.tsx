@@ -18,6 +18,8 @@ import {
   logout,
   regenerateSchedule,
   resetCampaign,
+  resetFunLabAndGames,
+  resetFunLabVoter,
   setParticipantPhoto,
   setSettings,
   startCampaign,
@@ -26,6 +28,21 @@ import {
   useIsAdmin,
   validateCurrentSchedule,
 } from "@/lib/store";
+import { FUN_LAB_GAMES, FUN_LAB_NAMES } from "@/lib/fun-lab-roster";
+
+const FUN_LAB_GAME_LABELS: Record<(typeof FUN_LAB_GAMES)[number], string> = {
+  poll: "1 · Poll of the day",
+  "elf-vote": "2 · Elf costume vote",
+  "memory-match": "3 · Memory match",
+  "guess-elf": "4 · Who is this elf?",
+  "most-likely": "5 · Most likely to…",
+  "og-facts": "6 · Who’s behind the Christmas fact?",
+  challenge: "Challenge of the day",
+  "og-movie": "Games · Guess the Christmas movie",
+  "og-sack": "Games · Santa’s sack",
+  "og-wheel": "Games · Spin the Christmas wheel",
+  "og-horoscope": "Games · Christmas horoscope",
+};
 
 type ResetStep = "closed" | "warning" | "confirm";
 
@@ -38,6 +55,8 @@ export default function AdminPage() {
   const [validation, setValidation] = useState<{ ok: boolean; errors: string[] } | null>(null);
   const [resetStep, setResetStep] = useState<ResetStep>("closed");
   const [resetWord, setResetWord] = useState("");
+  const [funLabPerson, setFunLabPerson] = useState<string>(FUN_LAB_NAMES[0] ?? "");
+  const [funLabGame, setFunLabGame] = useState<string>("all");
   const importRef = useRef<HTMLInputElement | null>(null);
   const photoInputRef = useRef<HTMLInputElement | null>(null);
   const photoTargetRef = useRef<string | null>(null);
@@ -609,23 +628,145 @@ export default function AdminPage() {
           {/* ---- Reset ----------------------------------------------- */}
           <div>
             <Overline>{t("Danger zone")}</Overline>
-            <div
-              className="mt-6 border border-[rgba(163,52,68,0.45)] px-6 py-7 sm:px-8"
-              style={{ borderRadius: 2, background: "rgba(122,31,43,0.12)" }}
-            >
-              <p className="label text-[#F0C9CE]">{t("Full campaign reset")}</p>
-              <p className="mt-3 max-w-[640px] text-[0.92rem] leading-relaxed text-ivory/80">
-                {t(
-                  "This erases every result, lock, name, photograph and the current schedule. The campaign returns to its initial placeholder state with a brand new randomised schedule. There is no ordinary undo for a daily draw — this is the only way to start again, and it requires two separate confirmations.",
-                )}
-              </p>
-              <button
-                type="button"
-                className="btn btn-danger mt-6"
-                onClick={() => setResetStep("warning")}
+            <div className="mt-6 flex flex-col gap-5">
+              <div
+                className="border border-[rgba(163,52,68,0.45)] px-6 py-7 sm:px-8"
+                style={{ borderRadius: 2, background: "rgba(122,31,43,0.12)" }}
               >
-                {t("Reset the entire campaign")}
-              </button>
+                <p className="label text-[#F0C9CE]">{t("Reset one person / one game")}</p>
+                <p className="mt-3 max-w-[640px] text-[0.92rem] leading-relaxed text-ivory/80">
+                  {t(
+                    "Pick a person and optionally one activity. “All activities” clears every Fun Lab vote and Games score for that person. They can play again after a refresh.",
+                  )}
+                </p>
+                <div className="mt-5 flex flex-wrap items-end gap-3">
+                  <label className="flex min-w-[180px] flex-col gap-1.5 text-[0.85rem] text-ivory/80">
+                    {t("Person")}
+                    <select
+                      className="field capitalize"
+                      value={funLabPerson}
+                      onChange={(e) => setFunLabPerson(e.target.value)}
+                    >
+                      {FUN_LAB_NAMES.map((name) => (
+                        <option key={name} value={name}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="flex min-w-[240px] flex-1 flex-col gap-1.5 text-[0.85rem] text-ivory/80">
+                    {t("Activity")}
+                    <select
+                      className="field"
+                      value={funLabGame}
+                      onChange={(e) => setFunLabGame(e.target.value)}
+                    >
+                      <option value="all">{t("All activities")}</option>
+                      {FUN_LAB_GAMES.map((game) => (
+                        <option key={game} value={game}>
+                          {t(FUN_LAB_GAME_LABELS[game])}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => {
+                      if (!funLabPerson) return;
+                      const gameLabel =
+                        funLabGame === "all"
+                          ? t("All activities")
+                          : t(FUN_LAB_GAME_LABELS[funLabGame as (typeof FUN_LAB_GAMES)[number]]);
+                      if (
+                        !window.confirm(
+                          t("Reset {game} for {name}? This cannot be undone.", {
+                            name: funLabPerson,
+                            game: gameLabel,
+                          }),
+                        )
+                      ) {
+                        return;
+                      }
+                      void (async () => {
+                        const res = await resetFunLabVoter(funLabPerson, funLabGame);
+                        if (!res.ok) {
+                          setNotice({ tone: "error", text: res.error ?? t("Reset failed.") });
+                          return;
+                        }
+                        setNotice({
+                          tone: "ok",
+                          text: t(
+                            "Reset done for {name} · {game} ({count} entries). Ask them to refresh.",
+                            {
+                              name: funLabPerson,
+                              game: gameLabel,
+                              count: res.deleted ?? 0,
+                            },
+                          ),
+                        });
+                      })();
+                    }}
+                  >
+                    {t("Reset selection")}
+                  </button>
+                </div>
+              </div>
+              <div
+                className="border border-[rgba(163,52,68,0.45)] px-6 py-7 sm:px-8"
+                style={{ borderRadius: 2, background: "rgba(122,31,43,0.12)" }}
+              >
+                <p className="label text-[#F0C9CE]">{t("Reset Fun Lab & Games")}</p>
+                <p className="mt-3 max-w-[640px] text-[0.92rem] leading-relaxed text-ivory/80">
+                  {t(
+                    "Clears every Fun Lab vote and every Office Games score (poll, elf vote, most likely, Christmas facts, memory, guess-elf, movie, sack, wheel, horoscope). The daily draw campaign is not touched. Everyone can start fresh together.",
+                  )}
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-danger mt-6"
+                  onClick={() => {
+                    if (
+                      !window.confirm(
+                        t("Reset all Fun Lab votes and Games scores? This cannot be undone."),
+                      )
+                    ) {
+                      return;
+                    }
+                    void (async () => {
+                      const res = await resetFunLabAndGames();
+                      if (!res.ok) {
+                        setNotice({ tone: "error", text: res.error ?? t("Reset failed.") });
+                        return;
+                      }
+                      setNotice({
+                        tone: "ok",
+                        text: t("Fun Lab & Games reset. Ask everyone to refresh."),
+                      });
+                    })();
+                  }}
+                >
+                  {t("Reset Fun Lab & Games now")}
+                </button>
+              </div>
+              <div
+                className="border border-[rgba(163,52,68,0.45)] px-6 py-7 sm:px-8"
+                style={{ borderRadius: 2, background: "rgba(122,31,43,0.12)" }}
+              >
+                <p className="label text-[#F0C9CE]">{t("Full campaign reset")}</p>
+                <p className="mt-3 max-w-[640px] text-[0.92rem] leading-relaxed text-ivory/80">
+                  {t(
+                    "This erases every result, lock, name, photograph and the current schedule — and also clears Fun Lab votes and Games scores. The campaign returns to its initial placeholder state with a brand new randomised schedule. There is no ordinary undo for a daily draw — this is the only way to start again, and it requires two separate confirmations.",
+                  )}
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-danger mt-6"
+                  onClick={() => setResetStep("warning")}
+                >
+                  {t("Reset the entire campaign")}
+                </button>
+              </div>
             </div>
           </div>
 
