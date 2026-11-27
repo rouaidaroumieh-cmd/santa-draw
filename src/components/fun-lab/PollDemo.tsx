@@ -98,6 +98,16 @@ export default function PollDemo() {
         </div>
       )}
 
+      {myVote ? (
+        <p
+          role="status"
+          className="border border-[rgba(36,92,70,0.35)] bg-[rgba(36,92,70,0.12)] px-4 py-3 text-[0.9rem] text-[#173D32]"
+          style={{ borderRadius: 2 }}
+        >
+          {t("Vote recorded — results update live below. You can still change your mind.")}
+        </p>
+      ) : null}
+
       <p className="text-[0.8rem] text-[#6E6A5E]">
         {t("{count} votes so far", { count: total })}
         {myVote ? ` — ${t("You voted.")}` : ""}

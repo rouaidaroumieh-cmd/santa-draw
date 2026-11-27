@@ -6,7 +6,7 @@ import NamePicker from "./NamePicker";
 import { DEMO_PARTICIPANTS, readJson, writeJson } from "./demoData";
 
 const STORAGE_KEY = "fun-lab-elf-vote-v1";
-const CANDIDATES = DEMO_PARTICIPANTS.slice(0, 6);
+const CANDIDATES = DEMO_PARTICIPANTS;
 
 type VoteState = {
   votes: Record<string, string>;
@@ -61,7 +61,7 @@ export default function ElfVoteDemo() {
       {!voter ? (
         <p className="text-[0.85rem] text-[#6E6A5E]">{t("Pick your name to vote.")}</p>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
           {CANDIDATES.map((c) => {
             const selected = myVote === c.name;
             const count = ranking.find((r) => r.name === c.name)?.count ?? 0;
@@ -87,6 +87,18 @@ export default function ElfVoteDemo() {
           })}
         </div>
       )}
+
+      {myVote ? (
+        <p
+          role="status"
+          className="border border-[rgba(36,92,70,0.35)] bg-[rgba(36,92,70,0.12)] px-4 py-3 text-[0.9rem] text-[#173D32]"
+          style={{ borderRadius: 2 }}
+        >
+          {t("Vote recorded for {name}. See the podium below — scroll when you want the next game.", {
+            name: myVote,
+          })}
+        </p>
+      ) : null}
 
       {total > 0 ? (
         <div className="border-t border-[rgba(23,61,50,0.15)] pt-4">

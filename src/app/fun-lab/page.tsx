@@ -7,6 +7,25 @@ import GuessElfDemo from "@/components/fun-lab/GuessElfDemo";
 import PollDemo from "@/components/fun-lab/PollDemo";
 import WishLikeDemo from "@/components/fun-lab/WishLikeDemo";
 import { useT } from "@/lib/language";
+import type { ReactNode } from "react";
+
+function LabSection({
+  title,
+  how,
+  children,
+}: {
+  title: string;
+  how: string;
+  children: ReactNode;
+}) {
+  return (
+    <section>
+      <Overline>{title}</Overline>
+      <p className="mt-3 max-w-[720px] text-[0.95rem] leading-relaxed text-ivory/70">{how}</p>
+      <div className="mt-6">{children}</div>
+    </section>
+  );
+}
 
 /**
  * Internal demo lab for validating interactive games with the team.
@@ -42,44 +61,59 @@ export default function FunLabPage() {
               "Playable prototypes: polls, elf votes, guess-who, daily challenges and wish likes. Local demo only — nothing is saved on the server.",
             )}
           </p>
+          <p className="mt-4 max-w-[640px] text-[0.9rem] leading-relaxed text-ivory/55">
+            {t(
+              "How to test: pick your name, play once, then look at the live result. Nothing jumps to the next game — scroll when you are ready.",
+            )}
+          </p>
         </div>
       </section>
 
       <div className="mx-auto flex max-w-[860px] flex-col gap-14 px-5 py-14 sm:py-16">
-        <section>
-          <Overline>{t("1 · Poll of the day")}</Overline>
-          <div className="mt-6">
-            <PollDemo />
-          </div>
-        </section>
+        <LabSection
+          title={t("1 · Poll of the day")}
+          how={t(
+            "One office question. Each person votes once with their first name. After voting, the bars update live — you stay on this block and can still change your vote.",
+          )}
+        >
+          <PollDemo />
+        </LabSection>
 
-        <section>
-          <Overline>{t("2 · Elf costume vote")}</Overline>
-          <div className="mt-6">
-            <ElfVoteDemo />
-          </div>
-        </section>
+        <LabSection
+          title={t("2 · Elf costume vote")}
+          how={t(
+            "Vote for your favourite elf look among the 20 colleagues. After you vote, the podium (top 3) appears below. One vote per name; you can change it.",
+          )}
+        >
+          <ElfVoteDemo />
+        </LabSection>
 
-        <section>
-          <Overline>{t("3 · Who is this elf?")}</Overline>
-          <div className="mt-6">
-            <GuessElfDemo />
-          </div>
-        </section>
+        <LabSection
+          title={t("3 · Who is this elf?")}
+          how={t(
+            "A blurred elf photo. Guess who it is among 4 names. You get instant feedback, then “Next elf”. Score is for this session only.",
+          )}
+        >
+          <GuessElfDemo />
+        </LabSection>
 
-        <section>
-          <Overline>{t("4 · Challenge of the day")}</Overline>
-          <div className="mt-6">
-            <ChallengeDemo />
-          </div>
-        </section>
+        <LabSection
+          title={t("4 · Challenge of the day")}
+          how={t(
+            "A daily mission for the team. Tap “I’m in”, then “Mark as done” when finished. Counters show who joined and who completed.",
+          )}
+        >
+          <ChallengeDemo />
+        </LabSection>
 
-        <section>
-          <Overline>{t("5 · Wish likes")}</Overline>
-          <div className="mt-6">
-            <WishLikeDemo />
-          </div>
-        </section>
+        <LabSection
+          title={t("5 · Wish likes")}
+          how={t(
+            "Heart the wishes you like. The list reorders by likes. One like per wish per name — tap again to remove it.",
+          )}
+        >
+          <WishLikeDemo />
+        </LabSection>
       </div>
     </PageShell>
   );

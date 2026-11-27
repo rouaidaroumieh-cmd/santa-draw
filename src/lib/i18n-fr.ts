@@ -164,6 +164,22 @@ export const FR: Record<string, string> = {
   "Pick what we keep": "Choisissez ce qu’on garde",
   "Playable prototypes: polls, elf votes, guess-who, daily challenges and wish likes. Local demo only — nothing is saved on the server.":
     "Prototypes jouables : polls, votes elfes, qui-est-ce, challenges du jour et likes sur vœux. Démo locale seulement — rien n’est enregistré sur le serveur.",
+  "How to test: pick your name, play once, then look at the live result. Nothing jumps to the next game — scroll when you are ready.":
+    "Comment tester : choisissez votre prénom, jouez une fois, puis regardez le résultat en direct. Rien ne passe au jeu suivant tout seul — scrollez quand vous voulez.",
+  "One office question. Each person votes once with their first name. After voting, the bars update live — you stay on this block and can still change your vote.":
+    "Une question pour le bureau. Chacun vote une fois avec son prénom. Après le vote, les barres se mettent à jour en direct — vous restez sur ce bloc et pouvez encore changer d’avis.",
+  "Vote for your favourite elf look among the 20 colleagues. After you vote, the podium (top 3) appears below. One vote per name; you can change it.":
+    "Votez pour votre look d’elfe préféré parmi les 20 collègues. Après le vote, le podium (top 3) apparaît en dessous. Un vote par prénom ; vous pouvez le changer.",
+  "A blurred elf photo. Guess who it is among 4 names. You get instant feedback, then “Next elf”. Score is for this session only.":
+    "Une photo d’elfe floutée. Devinez qui c’est parmi 4 prénoms. Feedback immédiat, puis « Elfe suivant ». Le score est pour cette session seulement.",
+  "A daily mission for the team. Tap “I’m in”, then “Mark as done” when finished. Counters show who joined and who completed.":
+    "Une mission du jour pour l’équipe. Cliquez « Je suis partant·e », puis « Marquer comme fait » une fois terminé. Les compteurs montrent qui s’est inscrit et qui a fini.",
+  "Heart the wishes you like. The list reorders by likes. One like per wish per name — tap again to remove it.":
+    "Likez les vœux qui vous plaisent. La liste se réordonne. Un like par vœu et par prénom — recliquez pour l’enlever.",
+  "Vote recorded — results update live below. You can still change your mind.":
+    "Vote enregistré — les résultats se mettent à jour juste en dessous. Vous pouvez encore changer d’avis.",
+  "Vote recorded for {name}. See the podium below — scroll when you want the next game.":
+    "Vote enregistré pour {name}. Voyez le podium en dessous — scrollez quand vous voulez passer au jeu suivant.",
   "1 · Poll of the day": "1 · Poll du jour",
   "2 · Elf costume vote": "2 · Vote costume elfe",
   "3 · Who is this elf?": "3 · Qui est cet elfe ?",
