@@ -38,7 +38,7 @@ export default function ElfVoteDemo() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+      <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-5">
         {candidates.map((c) => {
           const selected = myVote === c.name;
           const count = ranking.find((r) => r.name === c.name)?.count ?? 0;
@@ -58,9 +58,9 @@ export default function ElfVoteDemo() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={c.photo} alt={c.name} className="aspect-square w-full object-cover" />
-              <div className="flex items-center justify-between gap-2 px-2.5 py-2">
-                <span className="truncate text-[0.85rem] capitalize text-[#173D32]">{c.name}</span>
-                <span className="label text-[#B08F4C]">{count}</span>
+              <div className="flex items-center justify-between gap-1 px-2 py-1.5">
+                <span className="truncate text-[0.78rem] capitalize text-[#173D32]">{c.name}</span>
+                <span className="label shrink-0 text-[0.65rem] text-[#B08F4C]">{count}</span>
               </div>
             </button>
           );

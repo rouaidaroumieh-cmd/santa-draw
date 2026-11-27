@@ -90,7 +90,7 @@ export default function MostLikelyDemo() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-5">
+      <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-5">
         {FUN_LAB_ROSTER.map((p) => {
           const selected = myPick === p.name;
           const count = tallies.find((row) => row.name === p.name)?.count ?? 0;
@@ -111,8 +111,8 @@ export default function MostLikelyDemo() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={p.photo} alt={p.name} className="aspect-square w-full object-cover" />
               <div className="flex items-center justify-between gap-1 px-2 py-1.5">
-                <span className="truncate text-[0.75rem] capitalize text-[#173D32]">{p.name}</span>
-                <span className="label text-[0.65rem] text-[#B08F4C]">{count}</span>
+                <span className="truncate text-[0.78rem] capitalize text-[#173D32]">{p.name}</span>
+                <span className="label shrink-0 text-[0.65rem] text-[#B08F4C]">{count}</span>
               </div>
             </button>
           );

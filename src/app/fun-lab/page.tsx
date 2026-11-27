@@ -130,22 +130,12 @@ function FunLabBody() {
   );
 }
 
-/**
- * Internal demo lab for validating interactive games with the team.
- * Not linked from the main navigation — open `/fun-lab` directly.
- * Protected by a stable per-person PIN; votes are shared on the server.
- */
+/** Fun Lab — PIN-gated polls, votes and mini-games. Shared results on home. */
 export default function FunLabPage() {
   const t = useT();
 
   return (
     <PageShell current="fun">
-      <div className="relative z-20 border-b border-[rgba(214,181,109,0.35)] bg-[rgba(122,31,43,0.85)] px-5 py-3 text-center">
-        <p className="label text-ivory">
-          {t("LAB DEMO — not official")} · {t("For team validation only")} · /fun-lab
-        </p>
-      </div>
-
       <section className="relative isolate overflow-hidden border-b border-[rgba(214,181,109,0.22)]">
         <div
           className="absolute inset-0"
