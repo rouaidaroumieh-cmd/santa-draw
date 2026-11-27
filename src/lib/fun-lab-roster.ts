@@ -31,7 +31,7 @@ export function isFunLabName(value: string): value is FunLabName {
   return (FUN_LAB_NAMES as readonly string[]).includes(value);
 }
 
-export const FUN_LAB_GAMES = ["poll", "elf-vote", "challenge", "wish-likes"] as const;
+export const FUN_LAB_GAMES = ["poll", "elf-vote", "most-likely"] as const;
 export type FunLabGame = (typeof FUN_LAB_GAMES)[number];
 
 export function isFunLabGame(value: string): value is FunLabGame {

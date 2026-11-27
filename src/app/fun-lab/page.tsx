@@ -1,13 +1,12 @@
 "use client";
 
 import { Overline, PageShell } from "@/components/Chrome";
-import ChallengeDemo from "@/components/fun-lab/ChallengeDemo";
 import ElfVoteDemo from "@/components/fun-lab/ElfVoteDemo";
 import { FunLabProvider, useFunLab } from "@/components/fun-lab/FunLabContext";
 import FunLabLogin from "@/components/fun-lab/FunLabLogin";
 import GuessElfDemo from "@/components/fun-lab/GuessElfDemo";
+import MostLikelyDemo from "@/components/fun-lab/MostLikelyDemo";
 import PollDemo from "@/components/fun-lab/PollDemo";
-import WishLikeDemo from "@/components/fun-lab/WishLikeDemo";
 import { useT } from "@/lib/language";
 import type { ReactNode } from "react";
 
@@ -91,28 +90,19 @@ function FunLabBody() {
         <LabSection
           title={t("3 · Who is this elf?")}
           how={t(
-            "A blurred elf photo. Guess who it is among 4 names. You get instant feedback, then “Next elf”. Score is for this session only.",
+            "Ten blurred elves. Guess each colleague among 4 names. Instant feedback each round — a perfect 10/10 gets a tada celebration.",
           )}
         >
           <GuessElfDemo />
         </LabSection>
 
         <LabSection
-          title={t("4 · Challenge of the day")}
+          title={t("4 · Most likely to…")}
           how={t(
-            "A daily mission for the team. Tap “I’m in”, then “Mark as done” when finished. Counters show who joined and who completed.",
+            "Four fun questions. For each one, vote for the colleague who fits best. Results are shared live — then go to the next question.",
           )}
         >
-          <ChallengeDemo />
-        </LabSection>
-
-        <LabSection
-          title={t("5 · Wish likes")}
-          how={t(
-            "Heart the wishes you like. The list reorders by likes. One like per wish per name — tap again to remove it.",
-          )}
-        >
-          <WishLikeDemo />
+          <MostLikelyDemo />
         </LabSection>
       </div>
     </>
@@ -151,7 +141,7 @@ export default function FunLabPage() {
           </h1>
           <p className="mt-5 max-w-[640px] font-display text-[1.1rem] italic leading-relaxed text-ivory/80">
             {t(
-              "Playable prototypes: polls, elf votes, guess-who, daily challenges and wish likes. Votes are shared for everyone — unlock with your personal PIN.",
+              "Playable prototypes: polls, elf votes, guess-who and “most likely to…”. Votes are shared for everyone — unlock with your personal PIN.",
             )}
           </p>
           <p className="mt-4 max-w-[640px] text-[0.9rem] leading-relaxed text-ivory/55">

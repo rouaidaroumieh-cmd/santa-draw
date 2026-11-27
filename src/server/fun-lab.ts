@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { funLabEntries } from "@/db/schema";
 import {
   isFunLabGame,
+  isFunLabName,
   type FunLabGame,
   type FunLabName,
 } from "@/lib/fun-lab-roster";
@@ -10,13 +11,11 @@ import {
 export type FunLabPublicState = {
   poll: Record<string, string>;
   elfVote: Record<string, string>;
-  challenge: { joined: string[]; done: string[] };
-  wishLikes: Record<string, string[]>;
+  mostLikely: Record<string, Record<string, string>>;
   mine: {
     poll?: string;
     elfVote?: string;
-    challenge?: { joined: boolean; done: boolean };
-    wishLikes?: string[];
+    mostLikely?: Record<string, string>;
   };
 };
 
@@ -24,8 +23,13 @@ function asString(value: unknown): string | null {
   return typeof value === "string" ? value : null;
 }
 
-function asStringArray(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+function asStringRecord(value: unknown): Record<string, string> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const out: Record<string, string> = {};
+  for (const [key, raw] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof raw === "string" && isFunLabName(raw)) out[key] = raw;
+  }
+  return out;
 }
 
 export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabPublicState> {
@@ -42,9 +46,7 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
 
   const poll: Record<string, string> = {};
   const elfVote: Record<string, string> = {};
-  const joined: string[] = [];
-  const done: string[] = [];
-  const wishLikes: Record<string, string[]> = {};
+  const mostLikely: Record<string, Record<string, string>> = {};
 
   for (const row of rows) {
     if (row.game === "poll") {
@@ -53,12 +55,8 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
     } else if (row.game === "elf-vote") {
       const v = asString(row.value);
       if (v) elfVote[row.voterName] = v;
-    } else if (row.game === "challenge") {
-      const obj = row.value && typeof row.value === "object" ? (row.value as Record<string, unknown>) : {};
-      if (obj.joined) joined.push(row.voterName);
-      if (obj.done) done.push(row.voterName);
-    } else if (row.game === "wish-likes") {
-      wishLikes[row.voterName] = asStringArray(row.value);
+    } else if (row.game === "most-likely") {
+      mostLikely[row.voterName] = asStringRecord(row.value);
     }
   }
 
@@ -66,17 +64,10 @@ export async function loadFunLabState(voter: FunLabName | null): Promise<FunLabP
   if (voter) {
     if (poll[voter]) mine.poll = poll[voter];
     if (elfVote[voter]) mine.elfVote = elfVote[voter];
-    mine.challenge = { joined: joined.includes(voter), done: done.includes(voter) };
-    mine.wishLikes = wishLikes[voter] ?? [];
+    mine.mostLikely = mostLikely[voter] ?? {};
   }
 
-  return {
-    poll,
-    elfVote,
-    challenge: { joined, done },
-    wishLikes,
-    mine,
-  };
+  return { poll, elfVote, mostLikely, mine };
 }
 
 export async function saveFunLabVote(
@@ -123,18 +114,12 @@ function normalizeValue(
     return { ok: true, value: v };
   }
 
-  if (game === "challenge") {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-      return { ok: false, error: "Please send challenge progress as JSON.", status: 400 };
+  if (game === "most-likely") {
+    const record = asStringRecord(value);
+    if (Object.keys(record).length === 0) {
+      return { ok: false, error: "Please pick a colleague for at least one question.", status: 400 };
     }
-    const obj = value as Record<string, unknown>;
-    const joined = Boolean(obj.joined);
-    const done = Boolean(obj.done);
-    return { ok: true, value: { joined: joined || done, done } };
-  }
-
-  if (game === "wish-likes") {
-    return { ok: true, value: asStringArray(value) };
+    return { ok: true, value: record };
   }
 
   return { ok: false, error: "Unknown Fun Lab game.", status: 400 };

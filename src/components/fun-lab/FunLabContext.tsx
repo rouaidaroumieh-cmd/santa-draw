@@ -14,13 +14,11 @@ import type { FunLabName } from "@/lib/fun-lab-roster";
 export type FunLabState = {
   poll: Record<string, string>;
   elfVote: Record<string, string>;
-  challenge: { joined: string[]; done: string[] };
-  wishLikes: Record<string, string[]>;
+  mostLikely: Record<string, Record<string, string>>;
   mine: {
     poll?: string;
     elfVote?: string;
-    challenge?: { joined: boolean; done: boolean };
-    wishLikes?: string[];
+    mostLikely?: Record<string, string>;
   };
 };
 
@@ -38,8 +36,7 @@ type FunLabContextValue = {
 const EMPTY_STATE: FunLabState = {
   poll: {},
   elfVote: {},
-  challenge: { joined: [], done: [] },
-  wishLikes: {},
+  mostLikely: {},
   mine: {},
 };
 

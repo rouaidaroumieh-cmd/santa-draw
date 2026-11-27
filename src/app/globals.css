@@ -294,6 +294,49 @@
   .wish-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(214, 181, 109, 0.8);
   }
+
+  /* ---- Fun Lab perfect-score tada ---------------------------------- */
+  .fun-lab-tada {
+    animation: fun-lab-tada-glow 1.2s ease-out;
+  }
+
+  .fun-lab-tada-pop {
+    animation: fun-lab-tada-pop 700ms cubic-bezier(0.12, 0.85, 0.2, 1);
+  }
+
+  @keyframes fun-lab-tada-glow {
+    0% {
+      box-shadow: 0 0 0 0 rgba(214, 181, 109, 0);
+    }
+    40% {
+      box-shadow: 0 0 0 8px rgba(214, 181, 109, 0.35), 0 22px 50px -30px rgba(0, 0, 0, 0.8);
+    }
+    100% {
+      box-shadow: 0 22px 50px -30px rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  @keyframes fun-lab-tada-pop {
+    0% {
+      transform: scale(0.4) rotate(-8deg);
+      opacity: 0;
+    }
+    55% {
+      transform: scale(1.18) rotate(3deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fun-lab-tada,
+    .fun-lab-tada-pop {
+      animation: none;
+    }
+  }
 }
 
 @layer utilities {

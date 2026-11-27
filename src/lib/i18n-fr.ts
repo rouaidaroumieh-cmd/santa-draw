@@ -162,8 +162,29 @@ export const FR: Record<string, string> = {
   "Fun Lab": "Fun Lab",
   "Try the ideas": "Testez les idées",
   "Pick what we keep": "Choisissez ce qu’on garde",
-  "Playable prototypes: polls, elf votes, guess-who, daily challenges and wish likes. Votes are shared for everyone — unlock with your personal PIN.":
-    "Prototypes jouables : polls, votes elfes, qui-est-ce, challenges du jour et likes sur vœux. Les votes sont partagés — déverrouillez avec votre PIN personnel.",
+  "Playable prototypes: polls, elf votes, guess-who and “most likely to…”. Votes are shared for everyone — unlock with your personal PIN.":
+    "Prototypes jouables : polls, votes elfes, qui-est-ce et « le plus susceptible de… ». Les votes sont partagés — déverrouillez avec votre PIN personnel.",
+  "4 · Most likely to…": "4 · Le plus susceptible de…",
+  "Four fun questions. For each one, vote for the colleague who fits best. Results are shared live — then go to the next question.":
+    "Quatre questions fun. Pour chacune, votez pour le collègue qui correspond le mieux. Résultats partagés en direct — puis passez à la question suivante.",
+  "Most likely to…": "Le plus susceptible de…",
+  "Who is most likely to blast Christmas music at 8am?":
+    "Qui est le plus susceptible de mettre la musique de Noël à 8h ?",
+  "Who is most likely to eat the last Advent chocolate?":
+    "Qui est le plus susceptible de manger le dernier chocolat de l’Avent ?",
+  "Who is most likely to keep the elf hat on all day?":
+    "Qui est le plus susceptible de garder le bonnet d’elfe toute la journée ?",
+  "Who is most likely to fall asleep in a long meeting?":
+    "Qui est le plus susceptible de s’endormir en longue réunion ?",
+  "You picked {name}. Results update for everyone.":
+    "Vous avez choisi {name}. Les résultats se mettent à jour pour tout le monde.",
+  "Tap a colleague to vote on this question.":
+    "Touchez un collègue pour voter sur cette question.",
+  "Top picks": "Top votes",
+  "Previous": "Précédente",
+  "Next question": "Question suivante",
+  "Please pick a colleague for at least one question.":
+    "Choisissez un collègue pour au moins une question.",
   "How to test: unlock with your name + PIN, play once, then look at the live result. Nothing jumps to the next game — scroll when you are ready.":
     "Comment tester : déverrouillez avec prénom + PIN, jouez une fois, puis regardez le résultat en direct. Rien ne passe au jeu suivant tout seul — scrollez quand vous voulez.",
   "Unlock Fun Lab": "Déverrouiller le Fun Lab",
@@ -188,8 +209,14 @@ export const FR: Record<string, string> = {
     "Une question pour le bureau. Chacun vote une fois avec son prénom. Après le vote, les barres se mettent à jour en direct — vous restez sur ce bloc et pouvez encore changer d’avis.",
   "Vote for your favourite elf look among the 20 colleagues. After you vote, the podium (top 3) appears below. One vote per name; you can change it.":
     "Votez pour votre look d’elfe préféré parmi les 20 collègues. Après le vote, le podium (top 3) apparaît en dessous. Un vote par prénom ; vous pouvez le changer.",
-  "A blurred elf photo. Guess who it is among 4 names. You get instant feedback, then “Next elf”. Score is for this session only.":
-    "Une photo d’elfe floutée. Devinez qui c’est parmi 4 prénoms. Feedback immédiat, puis « Elfe suivant ». Le score est pour cette session seulement.",
+  "Ten blurred elves. Guess each colleague among 4 names. Instant feedback each round — a perfect 10/10 gets a tada celebration.":
+    "Dix elfes floutés. Devinez chaque collègue parmi 4 prénoms. Feedback immédiat à chaque manche — un 10/10 parfait déclenche un tada.",
+  "Round {number} of {total}": "Manche {number} sur {total}",
+  "Perfect score!": "Score parfait !",
+  "Tada!": "Tada !",
+  "Elf master — every face unmasked.": "Maître des elfes — tous les visages démasqués.",
+  "Strong elf vision.": "Bonne vue d’elfe.",
+  "Try again — the hats are tricky.": "Réessayez — les bonnets trompent.",
   "A daily mission for the team. Tap “I’m in”, then “Mark as done” when finished. Counters show who joined and who completed.":
     "Une mission du jour pour l’équipe. Cliquez « Je suis partant·e », puis « Marquer comme fait » une fois terminé. Les compteurs montrent qui s’est inscrit et qui a fini.",
   "Heart the wishes you like. The list reorders by likes. One like per wish per name — tap again to remove it.":
