@@ -15,10 +15,12 @@ export type FunLabState = {
   poll: Record<string, string>;
   elfVote: Record<string, string>;
   mostLikely: Record<string, Record<string, string>>;
+  challenge: { id: string; joined: string[]; done: string[] };
   mine: {
     poll?: string;
     elfVote?: string;
     mostLikely?: Record<string, string>;
+    challenge?: { id: string; joined: boolean; done: boolean };
   };
 };
 
@@ -37,6 +39,7 @@ const EMPTY_STATE: FunLabState = {
   poll: {},
   elfVote: {},
   mostLikely: {},
+  challenge: { id: "", joined: [], done: [] },
   mine: {},
 };
 

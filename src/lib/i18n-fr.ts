@@ -155,6 +155,12 @@ export const FR: Record<string, string> = {
   "Memory match": "Memory des photos",
   "Christmas quiz": "Quiz de Noël",
   "Wish wall": "Mur des vœux",
+  "Fun Lab results": "Résultats Fun Lab",
+  "Live tallies from the Fun Lab votes — unlock with your PIN to take part.":
+    "Compteurs en direct des votes Fun Lab — déverrouillez avec votre PIN pour participer.",
+  "Open Fun Lab": "Ouvrir le Fun Lab",
+  "No votes yet.": "Pas encore de votes.",
+  "Current leaders": "Leaders du moment",
 
   // Fun Lab demo (/fun-lab)
   "LAB DEMO — not official": "LAB DÉMO — non officiel",
@@ -162,9 +168,12 @@ export const FR: Record<string, string> = {
   "Fun Lab": "Fun Lab",
   "Try the ideas": "Testez les idées",
   "Pick what we keep": "Choisissez ce qu’on garde",
+  "Playable prototypes: polls, elf votes, guess-who, “most likely to…”, and a daily challenge. Votes are shared for everyone — unlock with your personal PIN.":
+    "Prototypes jouables : polls, votes elfes, qui-est-ce, « le plus susceptible de… », et un challenge du jour. Les votes sont partagés — déverrouillez avec votre PIN personnel.",
   "Playable prototypes: polls, elf votes, guess-who and “most likely to…”. Votes are shared for everyone — unlock with your personal PIN.":
     "Prototypes jouables : polls, votes elfes, qui-est-ce et « le plus susceptible de… ». Les votes sont partagés — déverrouillez avec votre PIN personnel.",
   "4 · Most likely to…": "4 · Le plus susceptible de…",
+  "5 · Challenge of the day": "5 · Challenge du jour",
   "Four fun questions. For each one, vote for the colleague who fits best. Results are shared live — then go to the next question.":
     "Quatre questions fun. Pour chacune, votez pour le collègue qui correspond le mieux. Résultats partagés en direct — puis passez à la question suivante.",
   "Most likely to…": "Le plus susceptible de…",
@@ -207,8 +216,15 @@ export const FR: Record<string, string> = {
     "La base Fun Lab est indisponible. Démarrez Postgres (`docker-compose up -d db`) puis `npm run db:push`.",
   "One office question. Each person votes once with their first name. After voting, the bars update live — you stay on this block and can still change your vote.":
     "Une question pour le bureau. Chacun vote une fois avec son prénom. Après le vote, les barres se mettent à jour en direct — vous restez sur ce bloc et pouvez encore changer d’avis.",
-  "Vote for your favourite elf look among the 20 colleagues. After you vote, the podium (top 3) appears below. One vote per name; you can change it.":
-    "Votez pour votre look d’elfe préféré parmi les 20 collègues. Après le vote, le podium (top 3) apparaît en dessous. Un vote par prénom ; vous pouvez le changer.",
+  "Vote for your favourite elf look among the 20 colleagues. One vote only — once cast, it is locked. The podium (top 3) updates live below.":
+    "Votez pour votre look d’elfe préféré parmi les 20 collègues. Un seul vote — une fois fait, c’est verrouillé. Le podium (top 3) se met à jour en dessous.",
+  "One vote only — choose carefully, then it locks.":
+    "Un seul vote — choisissez bien, puis c’est verrouillé.",
+  "Your vote is locked.": "Votre vote est verrouillé.",
+  "Vote locked for {name}. See the podium below — scroll when you want the next game.":
+    "Vote verrouillé pour {name}. Voyez le podium en dessous — scrollez quand vous voulez passer au jeu suivant.",
+  "Your elf vote is locked and cannot be changed.":
+    "Votre vote elfe est verrouillé et ne peut plus être modifié.",
   "Ten blurred elves. Guess each colleague among 4 names. Instant feedback each round — a perfect 10/10 gets a tada celebration.":
     "Dix elfes floutés. Devinez chaque collègue parmi 4 prénoms. Feedback immédiat à chaque manche — un 10/10 parfait déclenche un tada.",
   "Round {number} of {total}": "Manche {number} sur {total}",
@@ -223,8 +239,6 @@ export const FR: Record<string, string> = {
     "Likez les vœux qui vous plaisent. La liste se réordonne. Un like par vœu et par prénom — recliquez pour l’enlever.",
   "Vote recorded — results update live below. You can still change your mind.":
     "Vote enregistré — les résultats se mettent à jour juste en dessous. Vous pouvez encore changer d’avis.",
-  "Vote recorded for {name}. See the podium below — scroll when you want the next game.":
-    "Vote enregistré pour {name}. Voyez le podium en dessous — scrollez quand vous voulez passer au jeu suivant.",
   "1 · Poll of the day": "1 · Poll du jour",
   "2 · Elf costume vote": "2 · Vote costume elfe",
   "3 · Who is this elf?": "3 · Qui est cet elfe ?",
@@ -259,6 +273,30 @@ export const FR: Record<string, string> = {
     "Apportez un titre de playlist de Noël à partager avec l’équipe.",
   "Join the mission, then mark it done when you have shared your track.":
     "Rejoignez la mission, puis marquez-la comme faite quand vous avez partagé votre titre.",
+  "Wear a Christmas accessory all day (hat, jumper, earrings…).":
+    "Portez un accessoire de Noël toute la journée (bonnet, pull, boucles d’oreilles…).",
+  "Join the mission, then mark it done once you have worn it for the day.":
+    "Rejoignez la mission, puis marquez-la comme faite une fois porté toute la journée.",
+  "Surprise a colleague with a coffee or tea.":
+    "Offrez un café ou un thé surprise à un collègue.",
+  "Join the mission, then mark it done when you have offered the drink.":
+    "Rejoignez la mission, puis marquez-la comme faite quand vous avez offert la boisson.",
+  "Switch your profile photo to an elf version for 24 hours.":
+    "Remplacez votre photo de profil par une version elfe pendant 24 h.",
+  "Join the mission, then mark it done when your elf photo is live.":
+    "Rejoignez la mission, puis marquez-la comme faite quand votre photo elfe est en ligne.",
+  "Bring a snack or chocolate to share with the team.":
+    "Apportez un snack ou du chocolat à partager avec l’équipe.",
+  "Join the mission, then mark it done when the treat is on the table.":
+    "Rejoignez la mission, puis marquez-la comme faite quand la douceur est sur la table.",
+  "Give a Christmas compliment to three colleagues.":
+    "Faites un compliment de Noël à trois collègues.",
+  "Join the mission, then mark it done after your three compliments.":
+    "Rejoignez la mission, puis marquez-la comme faite après vos trois compliments.",
+  "Mission {number} of {total} — rotates each day.":
+    "Mission {number} sur {total} — elle change chaque jour.",
+  "This challenge is not active today.": "Ce challenge n’est pas actif aujourd’hui.",
+  "Please send challenge progress as JSON.": "Envoyez la progression du challenge en JSON.",
   "I’m in": "Je suis partant·e",
   "Joined": "Inscrit·e",
   "Mark as done": "Marquer comme fait",

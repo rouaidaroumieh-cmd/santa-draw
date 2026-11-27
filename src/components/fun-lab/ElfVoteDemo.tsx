@@ -23,6 +23,7 @@ export default function ElfVoteDemo() {
 
   const total = Object.keys(state.elfVote).length;
   const myVote = state.mine.elfVote;
+  const locked = Boolean(myVote);
   const podium = ranking.slice(0, 3);
 
   return (
@@ -32,6 +33,9 @@ export default function ElfVoteDemo() {
         <h3 className="mt-2 text-[1.35rem] leading-snug text-[#173D32]">
           {t("Who has the best elf look?")}
         </h3>
+        <p className="mt-2 text-[0.85rem] text-[#6E6A5E]">
+          {locked ? t("Your vote is locked.") : t("One vote only — choose carefully, then it locks.")}
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
@@ -40,11 +44,14 @@ export default function ElfVoteDemo() {
           const count = ranking.find((r) => r.name === c.name)?.count ?? 0;
           const className = selected
             ? "overflow-hidden border border-[#173D32] text-left ring-2 ring-[#B08F4C] transition-colors"
-            : "overflow-hidden border border-[rgba(23,61,50,0.25)] text-left transition-colors hover:border-[#B08F4C]";
+            : locked
+              ? "overflow-hidden border border-[rgba(23,61,50,0.15)] text-left opacity-55"
+              : "overflow-hidden border border-[rgba(23,61,50,0.25)] text-left transition-colors hover:border-[#B08F4C]";
           return (
             <button
               key={c.name}
               type="button"
+              disabled={locked}
               onClick={() => void vote("elf-vote", c.name)}
               className={className}
               style={{ borderRadius: 2 }}
@@ -66,7 +73,7 @@ export default function ElfVoteDemo() {
           className="border border-[rgba(36,92,70,0.35)] bg-[rgba(36,92,70,0.12)] px-4 py-3 text-[0.9rem] text-[#173D32]"
           style={{ borderRadius: 2 }}
         >
-          {t("Vote recorded for {name}. See the podium below — scroll when you want the next game.", {
+          {t("Vote locked for {name}. See the podium below — scroll when you want the next game.", {
             name: myVote,
           })}
         </p>

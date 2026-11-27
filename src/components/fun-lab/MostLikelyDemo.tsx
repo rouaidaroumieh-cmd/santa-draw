@@ -2,27 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { useT } from "@/lib/language";
+import { MOST_LIKELY_QUESTIONS } from "@/lib/fun-lab-games";
 import { FUN_LAB_ROSTER, isFunLabName } from "@/lib/fun-lab-roster";
 import { useFunLab } from "./FunLabContext";
-
-export const MOST_LIKELY_QUESTIONS = [
-  {
-    id: "playlist",
-    labelKey: "Who is most likely to blast Christmas music at 8am?",
-  },
-  {
-    id: "chocolate",
-    labelKey: "Who is most likely to eat the last Advent chocolate?",
-  },
-  {
-    id: "costume",
-    labelKey: "Who is most likely to keep the elf hat on all day?",
-  },
-  {
-    id: "meeting",
-    labelKey: "Who is most likely to fall asleep in a long meeting?",
-  },
-] as const;
 
 /** “Who is most likely to…” — pick a colleague per question; live tallies. */
 export default function MostLikelyDemo() {

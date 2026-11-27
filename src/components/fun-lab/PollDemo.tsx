@@ -2,14 +2,10 @@
 
 import { useMemo } from "react";
 import { useT } from "@/lib/language";
+import { POLL_OPTIONS } from "@/lib/fun-lab-games";
 import { useFunLab } from "./FunLabContext";
 
-const OPTIONS = [
-  { id: "chocolat", labelKey: "Hot chocolate" },
-  { id: "vin", labelKey: "Mulled wine" },
-  { id: "cookie", labelKey: "Christmas cookies" },
-  { id: "orange", labelKey: "Clémentines" },
-] as const;
+const OPTIONS = POLL_OPTIONS;
 
 /** One-question office poll — server-backed, one vote per PIN session. */
 export default function PollDemo() {

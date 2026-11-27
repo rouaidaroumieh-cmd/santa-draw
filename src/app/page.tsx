@@ -6,6 +6,7 @@ import { Overline, PageShell } from "@/components/Chrome";
 import ParticipantGallery from "@/components/ParticipantGallery";
 import ReelMachine, { type ReelWinner } from "@/components/ReelMachine";
 import { CampaignProgress, StatCards } from "@/components/Stats";
+import FunLabResultsPreview from "@/components/FunLabResultsPreview";
 import WishPreview from "@/components/WishPreview";
 import { CAMPAIGN_END, CAMPAIGN_START, countWord, formatDateLong, winnersOn } from "@/lib/dates";
 import { DRAW_DAY_COUNT, campaignStats } from "@/lib/draw-engine";
@@ -290,6 +291,8 @@ export default function HomePage() {
       </section>
 
       <ParticipantGallery state={state} />
+
+      <FunLabResultsPreview />
 
       <WishPreview />
     </PageShell>

@@ -81,7 +81,7 @@ function FunLabBody() {
         <LabSection
           title={t("2 · Elf costume vote")}
           how={t(
-            "Vote for your favourite elf look among the 20 colleagues. After you vote, the podium (top 3) appears below. One vote per name; you can change it.",
+            "Vote for your favourite elf look among the 20 colleagues. One vote only — once cast, it is locked. The podium (top 3) updates live below.",
           )}
         >
           <ElfVoteDemo />
