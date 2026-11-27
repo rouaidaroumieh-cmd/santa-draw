@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useT } from "@/lib/language";
 import { DEMO_PARTICIPANTS } from "./demoData";
 
@@ -46,7 +46,6 @@ export default function GuessElfDemo() {
 
   const revealed = picked !== null;
   const correct = round !== null && picked === round.answer.name;
-  const blur = useMemo(() => (revealed ? 0 : 14), [revealed]);
 
   const choose = (name: string) => {
     if (!round || picked !== null) return;
@@ -59,8 +58,8 @@ export default function GuessElfDemo() {
     if (!round) return;
     const nextHistory = [...history, round.answer.name].slice(-8);
     setHistory(nextHistory);
-    setRound(makeRound(nextHistory));
     setPicked(null);
+    setRound(makeRound(nextHistory));
   };
 
   if (!round) {
@@ -88,10 +87,15 @@ export default function GuessElfDemo() {
       <div className="mx-auto w-full max-w-[280px] overflow-hidden border border-[rgba(23,61,50,0.2)]" style={{ borderRadius: 2 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          key={round.answer.name + String(played)}
           src={round.answer.photo}
           alt={revealed ? round.answer.name : t("Mystery elf")}
-          className="aspect-square w-full object-cover transition-[filter] duration-500"
-          style={{ filter: `blur(${blur}px)` }}
+          className="aspect-square w-full object-cover"
+          style={{
+            filter: revealed ? "blur(0)" : "blur(22px)",
+            transform: revealed ? "scale(1)" : "scale(1.15)",
+            transition: revealed ? "filter 400ms ease, transform 400ms ease" : "none",
+          }}
         />
       </div>
 

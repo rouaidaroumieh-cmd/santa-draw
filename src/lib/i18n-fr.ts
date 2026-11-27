@@ -162,10 +162,26 @@ export const FR: Record<string, string> = {
   "Fun Lab": "Fun Lab",
   "Try the ideas": "Testez les idées",
   "Pick what we keep": "Choisissez ce qu’on garde",
-  "Playable prototypes: polls, elf votes, guess-who, daily challenges and wish likes. Local demo only — nothing is saved on the server.":
-    "Prototypes jouables : polls, votes elfes, qui-est-ce, challenges du jour et likes sur vœux. Démo locale seulement — rien n’est enregistré sur le serveur.",
-  "How to test: pick your name, play once, then look at the live result. Nothing jumps to the next game — scroll when you are ready.":
-    "Comment tester : choisissez votre prénom, jouez une fois, puis regardez le résultat en direct. Rien ne passe au jeu suivant tout seul — scrollez quand vous voulez.",
+  "Playable prototypes: polls, elf votes, guess-who, daily challenges and wish likes. Votes are shared for everyone — unlock with your personal PIN.":
+    "Prototypes jouables : polls, votes elfes, qui-est-ce, challenges du jour et likes sur vœux. Les votes sont partagés — déverrouillez avec votre PIN personnel.",
+  "How to test: unlock with your name + PIN, play once, then look at the live result. Nothing jumps to the next game — scroll when you are ready.":
+    "Comment tester : déverrouillez avec prénom + PIN, jouez une fois, puis regardez le résultat en direct. Rien ne passe au jeu suivant tout seul — scrollez quand vous voulez.",
+  "Unlock Fun Lab": "Déverrouiller le Fun Lab",
+  "Your name + your personal PIN": "Votre prénom + votre PIN personnel",
+  "Each colleague has one fixed 4-digit PIN for the whole campaign. Ask the organiser if you do not have yours yet.":
+    "Chaque collègue a un PIN fixe à 4 chiffres pour toute la campagne. Demandez-le à l’organisateur si vous ne l’avez pas encore.",
+  "PIN (4 digits)": "PIN (4 chiffres)",
+  "PIN must be 4 digits.": "Le PIN doit contenir 4 chiffres.",
+  "Choose your name first.": "Choisissez d’abord votre prénom.",
+  "Enter Fun Lab": "Entrer dans le Fun Lab",
+  "Signed in as": "Connecté·e en tant que",
+  "Sign out": "Se déconnecter",
+  "Wrong PIN for this name.": "Mauvais PIN pour ce prénom.",
+  "Unknown participant name.": "Prénom inconnu.",
+  "Please unlock Fun Lab with your name and PIN first.":
+    "Déverrouillez d’abord le Fun Lab avec votre prénom et votre PIN.",
+  "Fun Lab PIN auth is not configured (set ADMIN_PASSWORD or FUN_LAB_PIN_SECRET).":
+    "L’auth PIN du Fun Lab n’est pas configurée (définir ADMIN_PASSWORD ou FUN_LAB_PIN_SECRET).",
   "One office question. Each person votes once with their first name. After voting, the bars update live — you stay on this block and can still change your vote.":
     "Une question pour le bureau. Chacun vote une fois avec son prénom. Après le vote, les barres se mettent à jour en direct — vous restez sur ce bloc et pouvez encore changer d’avis.",
   "Vote for your favourite elf look among the 20 colleagues. After you vote, the podium (top 3) appears below. One vote per name; you can change it.":
@@ -192,7 +208,11 @@ export const FR: Record<string, string> = {
   "Mulled wine": "Vin chaud",
   "Christmas cookies": "Biscuits de Noël",
   "Clémentines": "Clémentines",
-  "Pick your name to vote.": "Choisissez votre prénom pour voter.",
+  "I am…": "Je suis…",
+  "First choose who you are — this is not your vote, only your identity.":
+    "Choisissez d’abord qui vous êtes — ce n’est pas votre vote, seulement votre identité.",
+  "First choose who you are — this is not your like, only your identity.":
+    "Choisissez d’abord qui vous êtes — ce n’est pas votre like, seulement votre identité.",
   "{count} votes so far": "{count} votes pour l’instant",
   "You voted.": "Vous avez voté.",
   "Elf costume vote": "Vote costume elfe",
@@ -218,7 +238,6 @@ export const FR: Record<string, string> = {
   "Nobody yet": "Personne pour l’instant",
   "Wish likes": "Likes sur les vœux",
   "Heart the wishes that warm the office.": "Cœur-likez les vœux qui réchauffent le bureau.",
-  "Pick your name to like a wish.": "Choisissez votre prénom pour liker un vœu.",
 
   "Meet the participants": "Les participants",
   "Twenty colleagues,": "Vingt collègues,",

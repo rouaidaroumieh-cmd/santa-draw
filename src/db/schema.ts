@@ -40,3 +40,15 @@ export const photos = pgTable(
   },
   (table) => [primaryKey({ columns: [table.campaignId, table.participantId] })],
 );
+
+/** Fun Lab votes / progress — one row per (game, voter). */
+export const funLabEntries = pgTable(
+  "fun_lab_entries",
+  {
+    game: text("game").notNull(),
+    voterName: text("voter_name").notNull(),
+    value: jsonb("value").$type<unknown>().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.game, table.voterName] })],
+);

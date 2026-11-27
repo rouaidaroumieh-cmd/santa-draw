@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useT } from "@/lib/language";
-import NamePicker from "./NamePicker";
-import { readJson, writeJson } from "./demoData";
-
-const STORAGE_KEY = "fun-lab-poll-v1";
+import { useFunLab } from "./FunLabContext";
 
 const OPTIONS = [
   { id: "chocolat", labelKey: "Hot chocolate" },
@@ -14,41 +11,21 @@ const OPTIONS = [
   { id: "orange", labelKey: "Clémentines" },
 ] as const;
 
-type PollState = {
-  votes: Record<string, string>; // voter name -> option id
-};
-
-/** One-question daily poll with live bars (localStorage). */
+/** One-question office poll — server-backed, one vote per PIN session. */
 export default function PollDemo() {
   const t = useT();
-  const [voter, setVoter] = useState("");
-  const [state, setState] = useState<PollState>({ votes: {} });
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    setState(readJson<PollState>(STORAGE_KEY, { votes: {} }));
-    setReady(true);
-  }, []);
+  const { state, vote } = useFunLab();
 
   const counts = useMemo(() => {
     const map: Record<string, number> = Object.fromEntries(OPTIONS.map((o) => [o.id, 0]));
-    for (const optionId of Object.values(state.votes)) {
+    for (const optionId of Object.values(state.poll)) {
       if (optionId in map) map[optionId] += 1;
     }
     return map;
-  }, [state.votes]);
+  }, [state.poll]);
 
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
-  const myVote = voter ? state.votes[voter] : undefined;
-
-  const vote = (optionId: string) => {
-    if (!voter) return;
-    const next = { votes: { ...state.votes, [voter]: optionId } };
-    setState(next);
-    writeJson(STORAGE_KEY, next);
-  };
-
-  if (!ready) return null;
+  const myVote = state.mine.poll;
 
   return (
     <div className="paper gold-frame flex flex-col gap-5 px-6 py-7" style={{ borderRadius: 2 }}>
@@ -59,44 +36,38 @@ export default function PollDemo() {
         </h3>
       </div>
 
-      <NamePicker value={voter} onChange={setVoter} />
-
-      {!voter ? (
-        <p className="text-[0.85rem] text-[#6E6A5E]">{t("Pick your name to vote.")}</p>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {OPTIONS.map((opt) => {
-            const selected = myVote === opt.id;
-            const count = counts[opt.id];
-            const pct = total === 0 ? 0 : Math.round((count / total) * 100);
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => vote(opt.id)}
-                className={`relative overflow-hidden border px-4 py-3 text-left transition-colors ${
-                  selected
-                    ? "border-[#173D32] bg-[rgba(23,61,50,0.1)]"
-                    : "border-[rgba(23,61,50,0.25)] hover:border-[#B08F4C]"
-                }`}
-                style={{ borderRadius: 2 }}
-              >
-                <span
-                  aria-hidden
-                  className="absolute inset-y-0 left-0 bg-[rgba(176,143,76,0.22)]"
-                  style={{ width: `${pct}%` }}
-                />
-                <span className="relative flex items-center justify-between gap-3">
-                  <span className="font-medium text-[#173D32]">{t(opt.labelKey)}</span>
-                  <span className="label text-[#B08F4C]">
-                    {count} · {pct}%
-                  </span>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {OPTIONS.map((opt) => {
+          const selected = myVote === opt.id;
+          const count = counts[opt.id];
+          const pct = total === 0 ? 0 : Math.round((count / total) * 100);
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => void vote("poll", opt.id)}
+              className={`relative overflow-hidden border px-4 py-3 text-left transition-colors ${
+                selected
+                  ? "border-[#173D32] bg-[rgba(23,61,50,0.1)]"
+                  : "border-[rgba(23,61,50,0.25)] hover:border-[#B08F4C]"
+              }`}
+              style={{ borderRadius: 2 }}
+            >
+              <span
+                aria-hidden
+                className="absolute inset-y-0 left-0 bg-[rgba(176,143,76,0.22)]"
+                style={{ width: `${pct}%` }}
+              />
+              <span className="relative flex items-center justify-between gap-3">
+                <span className="font-medium text-[#173D32]">{t(opt.labelKey)}</span>
+                <span className="label text-[#B08F4C]">
+                  {count} · {pct}%
                 </span>
-              </button>
-            );
-          })}
-        </div>
-      )}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       {myVote ? (
         <p

@@ -1,51 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useT } from "@/lib/language";
-import NamePicker from "./NamePicker";
-import { readJson, writeJson } from "./demoData";
+import { useFunLab } from "./FunLabContext";
 
-const STORAGE_KEY = "fun-lab-challenge-v1";
-
-type ChallengeState = {
-  joined: string[];
-  done: string[];
-};
-
-/** Daily mission card with join / done counters. */
+/** Daily mission card — join / done stored on the server. */
 export default function ChallengeDemo() {
   const t = useT();
-  const [voter, setVoter] = useState("");
-  const [state, setState] = useState<ChallengeState>({ joined: [], done: [] });
-  const [ready, setReady] = useState(false);
+  const { state, vote } = useFunLab();
 
-  useEffect(() => {
-    setState(readJson<ChallengeState>(STORAGE_KEY, { joined: [], done: [] }));
-    setReady(true);
-  }, []);
-
-  const persist = (next: ChallengeState) => {
-    setState(next);
-    writeJson(STORAGE_KEY, next);
-  };
-
-  const hasJoined = voter ? state.joined.includes(voter) : false;
-  const hasDone = voter ? state.done.includes(voter) : false;
+  const hasJoined = Boolean(state.mine.challenge?.joined);
+  const hasDone = Boolean(state.mine.challenge?.done);
 
   const join = () => {
-    if (!voter || hasJoined) return;
-    persist({ ...state, joined: [...state.joined, voter] });
+    if (hasJoined) return;
+    void vote("challenge", { joined: true, done: false });
   };
 
   const markDone = () => {
-    if (!voter || !hasJoined || hasDone) return;
-    persist({
-      joined: state.joined.includes(voter) ? state.joined : [...state.joined, voter],
-      done: [...state.done, voter],
-    });
+    if (!hasJoined || hasDone) return;
+    void vote("challenge", { joined: true, done: true });
   };
-
-  if (!ready) return null;
 
   return (
     <div className="paper gold-frame flex flex-col gap-5 px-6 py-7" style={{ borderRadius: 2 }}>
@@ -59,21 +33,14 @@ export default function ChallengeDemo() {
         </p>
       </div>
 
-      <NamePicker value={voter} onChange={setVoter} />
-
       <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          className="btn btn-dark"
-          disabled={!voter || hasJoined}
-          onClick={join}
-        >
+        <button type="button" className="btn btn-dark" disabled={hasJoined} onClick={join}>
           {hasJoined ? t("Joined") : t("I’m in")}
         </button>
         <button
           type="button"
           className="btn btn-ghost"
-          disabled={!voter || !hasJoined || hasDone}
+          disabled={!hasJoined || hasDone}
           onClick={markDone}
         >
           {hasDone ? t("Done ✓") : t("Mark as done")}
@@ -83,16 +50,18 @@ export default function ChallengeDemo() {
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="border border-[rgba(23,61,50,0.15)] px-4 py-3" style={{ borderRadius: 2 }}>
           <p className="label text-[#6E6A5E]">{t("Joined")}</p>
-          <p className="mt-1 text-[1.6rem] text-[#173D32]">{state.joined.length}</p>
+          <p className="mt-1 text-[1.6rem] text-[#173D32]">{state.challenge.joined.length}</p>
           <p className="mt-1 text-[0.8rem] capitalize text-[#6E6A5E]">
-            {state.joined.length === 0 ? t("Nobody yet") : state.joined.join(", ")}
+            {state.challenge.joined.length === 0
+              ? t("Nobody yet")
+              : state.challenge.joined.join(", ")}
           </p>
         </div>
         <div className="border border-[rgba(23,61,50,0.15)] px-4 py-3" style={{ borderRadius: 2 }}>
           <p className="label text-[#6E6A5E]">{t("Completed by")}</p>
-          <p className="mt-1 text-[1.6rem] text-[#173D32]">{state.done.length}</p>
+          <p className="mt-1 text-[1.6rem] text-[#173D32]">{state.challenge.done.length}</p>
           <p className="mt-1 text-[0.8rem] capitalize text-[#6E6A5E]">
-            {state.done.length === 0 ? t("Nobody yet") : state.done.join(", ")}
+            {state.challenge.done.length === 0 ? t("Nobody yet") : state.challenge.done.join(", ")}
           </p>
         </div>
       </div>

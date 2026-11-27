@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useT } from "@/lib/language";
-import NamePicker from "./NamePicker";
-import { readJson, writeJson } from "./demoData";
-
-const STORAGE_KEY = "fun-lab-wish-likes-v1";
+import { useFunLab } from "./FunLabContext";
 
 const WISHES = [
   { id: "w1", author: "yann", message: "Que cette année se termine dans la lumière et les rires." },
@@ -15,41 +12,34 @@ const WISHES = [
   { id: "w5", author: "rouaida", message: "Moins de stress, plus de paillettes." },
 ] as const;
 
-type LikeState = {
-  /** wishId -> voter names */
-  likes: Record<string, string[]>;
-};
-
-/** Soft ranking of mock wishes by likes. */
+/** Soft ranking of wishes by likes — one like set per PIN session. */
 export default function WishLikeDemo() {
   const t = useT();
-  const [voter, setVoter] = useState("");
-  const [state, setState] = useState<LikeState>({ likes: {} });
-  const [ready, setReady] = useState(false);
+  const { state, vote } = useFunLab();
+  const myLikes = state.mine.wishLikes ?? [];
 
-  useEffect(() => {
-    setState(readJson<LikeState>(STORAGE_KEY, { likes: {} }));
-    setReady(true);
-  }, []);
+  const likeCounts = useMemo(() => {
+    const counts: Record<string, number> = Object.fromEntries(WISHES.map((w) => [w.id, 0]));
+    for (const ids of Object.values(state.wishLikes)) {
+      for (const id of ids) {
+        if (id in counts) counts[id] += 1;
+      }
+    }
+    return counts;
+  }, [state.wishLikes]);
 
   const ranked = useMemo(() => {
     return [...WISHES]
-      .map((w) => ({ ...w, count: state.likes[w.id]?.length ?? 0 }))
+      .map((w) => ({ ...w, count: likeCounts[w.id] ?? 0 }))
       .sort((a, b) => b.count - a.count);
-  }, [state.likes]);
+  }, [likeCounts]);
 
   const toggle = (wishId: string) => {
-    if (!voter) return;
-    const current = state.likes[wishId] ?? [];
-    const nextList = current.includes(voter)
-      ? current.filter((n) => n !== voter)
-      : [...current, voter];
-    const next = { likes: { ...state.likes, [wishId]: nextList } };
-    setState(next);
-    writeJson(STORAGE_KEY, next);
+    const next = myLikes.includes(wishId)
+      ? myLikes.filter((id) => id !== wishId)
+      : [...myLikes, wishId];
+    void vote("wish-likes", next);
   };
-
-  if (!ready) return null;
 
   return (
     <div className="paper gold-frame flex flex-col gap-5 px-6 py-7" style={{ borderRadius: 2 }}>
@@ -60,15 +50,9 @@ export default function WishLikeDemo() {
         </h3>
       </div>
 
-      <NamePicker value={voter} onChange={setVoter} />
-
-      {!voter ? (
-        <p className="text-[0.85rem] text-[#6E6A5E]">{t("Pick your name to like a wish.")}</p>
-      ) : null}
-
       <div className="flex flex-col gap-3">
         {ranked.map((w, i) => {
-          const liked = voter ? (state.likes[w.id] ?? []).includes(voter) : false;
+          const liked = myLikes.includes(w.id);
           return (
             <article
               key={w.id}
@@ -84,7 +68,6 @@ export default function WishLikeDemo() {
               </div>
               <button
                 type="button"
-                disabled={!voter}
                 onClick={() => toggle(w.id)}
                 aria-pressed={liked}
                 className={`shrink-0 border px-3 py-2 text-[0.85rem] transition-colors ${

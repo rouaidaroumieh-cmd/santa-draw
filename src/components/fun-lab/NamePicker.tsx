@@ -16,7 +16,7 @@ export default function NamePicker({
   const t = useT();
   return (
     <div className="flex flex-col gap-2">
-      <span className="label text-[#6E6A5E]">{label ?? t("Your first name")}</span>
+      <span className="label text-[#6E6A5E]">{label ?? t("I am…")}</span>
       <div className="flex flex-wrap gap-2">
         {DEMO_PARTICIPANTS.map((p) => {
           const selected = p.name === value;
