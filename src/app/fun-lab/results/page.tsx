@@ -122,7 +122,7 @@ export default function FunLabResultsPage() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/fun-lab/results", { cache: "no-store" })
+    fetch(`/api/fun-lab/results?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => (res.ok ? (res.json() as Promise<{ results: FunLabPublicResults }>) : null))
       .then((data) => {
         if (!cancelled && data?.results) setResults(data.results);
