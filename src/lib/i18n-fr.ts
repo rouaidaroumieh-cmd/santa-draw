@@ -9,6 +9,7 @@ export const FR: Record<string, string> = {
   "Participants": "Participants",
   "Fun": "Fun",
   "Wishes": "Vœux",
+  "Games": "Jeux",
   "Admin": "Admin",
   "Language": "Langue",
   "Main navigation": "Navigation principale",
@@ -147,6 +148,79 @@ export const FR: Record<string, string> = {
   "Weekend – no draw": "Week-end – pas de tirage",
   "Santa is taking a little Christmas break.": "Le Père Noël prend une petite pause de Noël.",
 
+  // Christmas Office Games (/games)
+  "Christmas Office Games": "Jeux de Noël du bureau",
+  "Welcome to": "Bienvenue dans",
+  "Ready for some festive fun? Take a break, challenge your colleagues and discover who’s the real Christmas star of the office!":
+    "Prêt·e pour un peu de fun festif ? Faites une pause, défiez vos collègues et découvrez qui est la vraie star de Noël du bureau !",
+  "5 Mini Games • Quick rounds • Endless Christmas Fun!":
+    "5 mini-jeux • Parties rapides • Fun de Noël sans fin !",
+  "Pick a game": "Choisissez un jeu",
+  "Play now": "Jouer",
+  "Start game": "Lancer le jeu",
+  "Back to games": "Retour aux jeux",
+  "Results": "Résultats",
+  "Progress": "Progression",
+  "Live score": "Score en direct",
+  "Also in Fun Lab": "Aussi dans le Fun Lab",
+  "Memory Match and Who is this elf? stay in Fun Lab (PIN). They are unchanged — open Fun Lab to play them.":
+    "Memory Match et Qui est cet elfe ? restent dans le Fun Lab (PIN). Ils n’ont pas changé — ouvrez le Fun Lab pour y jouer.",
+  "Find matching elf photo pairs. Best scores stay on the Fun Lab leaderboard.":
+    "Retrouvez les paires de photos d’elfes. Les meilleurs scores restent au classement Fun Lab.",
+  "Guess blurred elf photos. Perfect scores celebrate with confetti.":
+    "Devinez les photos d’elfes floutées. Un score parfait fête avec des confettis.",
+  "Who’s behind the Christmas fact?": "Qui se cache derrière ce fait de Noël ?",
+  "Guess which colleague matches a fun festive fact.":
+    "Devinez quel collègue correspond à un fait festif amusant.",
+  "8 facts": "8 faits",
+  "~2 min": "~2 min",
+  "~1 min": "~1 min",
+  "Sample placeholders — edit the data file later.":
+    "Placeholders d’exemple — modifiez le fichier de données plus tard.",
+  "Anonymous fact": "Fait anonyme",
+  "Tip: replace SAMPLE colleagues and facts in the data file when ready.":
+    "Astuce : remplacez les collègues et faits SAMPLE dans le fichier de données quand vous êtes prêt·e.",
+  "Christmas horoscope": "Horoscope de Noël",
+  "Answer five questions and meet your Christmas personality.":
+    "Répondez à cinq questions et découvrez votre personnalité de Noël.",
+  "5 questions": "5 questions",
+  "Your Christmas character": "Votre personnage de Noël",
+  "Share result": "Partager le résultat",
+  "Copied!": "Copié !",
+  "Guess the Christmas movie": "Devinez le film de Noël",
+  "Decode emoji clues into classic Christmas films.":
+    "Décodez les emojis en films de Noël classiques.",
+  "7 movies": "7 films",
+  "Emoji clue": "Indice emoji",
+  "Guess what's in Santa's sack": "Devinez ce qu'il y a dans le sac du Père Noël",
+  "Identify the hidden festive object — hints cost points.":
+    "Identifiez l'objet festif caché — les indices coûtent des points.",
+  "7 objects": "7 objets",
+  "Difficulty": "Difficulté",
+  "easy": "facile",
+  "medium": "moyen",
+  "hard": "difficile",
+  "Hint used (-points)": "Indice utilisé (-points)",
+  "Show hint": "Voir un indice",
+  "Santa's sack": "Sac du Père Noël",
+  "Spin the Christmas wheel": "Tournez la roue de Noël",
+  "Land on a random office Christmas challenge.":
+    "Atterrissez sur un défi de Noël aléatoire au bureau.",
+  "Endless spins": "Tours illimités",
+  "Challenges cleared": "Défis réussis",
+  "End session": "Terminer la session",
+  "Christmas challenge wheel": "Roue des défis de Noël",
+  "SPIN": "TOURNER",
+  "Spin": "Tourner",
+  "Spinning…": "Ça tourne…",
+  "Spin again": "Retourner",
+  "Completed challenges": "Défis terminés",
+  "Your challenge": "Votre défi",
+  "Wheel session complete": "Session de roue terminée",
+  "You completed {count} challenges!": "Vous avez terminé {count} défis !",
+  "Spin again anytime for a new office Christmas dare.":
+    "Retounez quand vous voulez pour un nouveau défi de Noël.",
+
   // Wishes section (/wishes) — Fun Lab games come later for signed-in users
   "Just for fun": "Juste pour s'amuser",
   "Christmas": "Noël",
@@ -231,6 +305,25 @@ export const FR: Record<string, string> = {
   "Finished ✓": "Terminé ✓",
   "Saving…": "Enregistrement…",
   "Leaders for each question": "Leaders par question",
+  "Top 3 for each question": "Top 3 par question",
+  "See full ranking": "Voir le classement complet",
+  "See full questionnaire": "Voir le questionnaire complet",
+  "See all results": "Voir tous les résultats",
+  "All results": "Tous les résultats",
+  "Every questionnaire": "Tous les questionnaires",
+  "Full rankings for every Fun Lab vote and scoreboard.":
+    "Classements complets pour chaque vote et scoreboard du Fun Lab.",
+  "Full questionnaire": "Questionnaire complet",
+  "Back to results": "Retour aux résultats",
+  "Full ranking": "Classement complet",
+  "Everyone who received at least one finished vote for this question.":
+    "Toutes les personnes ayant reçu au moins un vote terminé pour cette question.",
+  "Everyone who received at least one finished vote, for each question.":
+    "Toutes les personnes ayant reçu au moins un vote terminé, pour chaque question.",
+  "Question {n}": "Question {n}",
+  "Question not found": "Question introuvable",
+  "This question does not exist.": "Cette question n’existe pas.",
+  "Back to home": "Retour à l’accueil",
   "Only finished ballots count on the home page.":
     "Seuls les bulletins terminés comptent sur la page d’accueil.",
   "Most likely to…": "Le plus susceptible de…",

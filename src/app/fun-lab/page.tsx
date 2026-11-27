@@ -9,6 +9,7 @@ import MemoryMatchDemo from "@/components/fun-lab/MemoryMatchDemo";
 import MostLikelyDemo from "@/components/fun-lab/MostLikelyDemo";
 import PollDemo from "@/components/fun-lab/PollDemo";
 import { useT } from "@/lib/language";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 function LabSection({
@@ -128,7 +129,7 @@ export default function FunLabPage() {
   const t = useT();
 
   return (
-    <PageShell current="fun-lab">
+    <PageShell current="fun">
       <div className="relative z-20 border-b border-[rgba(214,181,109,0.35)] bg-[rgba(122,31,43,0.85)] px-5 py-3 text-center">
         <p className="label text-ivory">
           {t("LAB DEMO — not official")} · {t("For team validation only")} · /fun-lab
@@ -158,6 +159,11 @@ export default function FunLabPage() {
             {t(
               "How to test: unlock with your name + PIN, play once, then look at the live result. Nothing jumps to the next game — scroll when you are ready.",
             )}
+          </p>
+          <p className="mt-5">
+            <Link href="/games" className="btn btn-gold">
+              {t("Christmas Office Games")}
+            </Link>
           </p>
         </div>
       </section>

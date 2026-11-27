@@ -11,6 +11,12 @@ export type FunLabScore = {
   best: number;
 };
 
+export type VoteTally = {
+  name: string;
+  photo: string;
+  count: number;
+};
+
 export type FunLabPublicResults = {
   poll: {
     total: number;
@@ -18,16 +24,19 @@ export type FunLabPublicResults = {
   };
   elfVote: {
     total: number;
-    podium: { name: string; photo: string; count: number }[];
+    /** Everyone who received at least one vote, ranked. Home shows the first 3. */
+    ranked: VoteTally[];
   };
   mostLikely: {
     questions: {
       id: string;
       labelKey: string;
       total: number;
-      leader: { name: string; photo: string; count: number } | null;
+      /** Everyone who received at least one finished vote, ranked. Home shows the first 3. */
+      ranked: VoteTally[];
     }[];
   };
+  /** Full scoreboard — home shows a short top list. */
   memoryMatch: { total: number; leaders: LeaderboardEntry[] };
   guessElf: { total: number; max: number; leaders: LeaderboardEntry[] };
 };

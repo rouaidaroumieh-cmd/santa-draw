@@ -209,7 +209,7 @@ export default function HomePage() {
               <Overline>{t("Today at a glance")}</Overline>
               <div className="paper gold-frame mt-5 px-6 py-7" style={{ borderRadius: 2 }}>
                 <p className="label text-[#B08F4C]">{formatDateLong(today, lang)}</p>
-                <h3 className="mt-3 text-[1.55rem] leading-[1.08] text-[#173D32]" style={{ fontWeight: 400 }}>
+                <h3 className="mt-3 text-[1.55rem] leading-[1.08] text-[#173D32]" style={{ fontWeight: 600 }}>
                   {bannerTitle}
                 </h3>
                 <p className="mt-4 text-[0.92rem] leading-relaxed text-[#4A463C]">{bannerBody}</p>
@@ -294,6 +294,7 @@ export default function HomePage() {
 
       <WishPreview />
 
+      {/* Last home widget — just above the site footer */}
       <ParticipantGallery state={state} />
     </PageShell>
   );

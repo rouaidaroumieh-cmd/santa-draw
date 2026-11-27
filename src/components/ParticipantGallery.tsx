@@ -14,14 +14,14 @@ export default function ParticipantGallery({ state }: { state: CampaignState }) 
   const people = useMemo(() => participantStats(state), [state]);
 
   return (
-    <section className="px-5 pt-20 sm:pt-24">
+    <section className="px-5 pt-20 pb-20 sm:pt-24 sm:pb-24">
       <div className="mx-auto max-w-[1240px]">
         <Overline>{t("Meet the participants")}</Overline>
 
         <div className="mt-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-          <h2 className="max-w-[640px] text-[2.1rem] leading-[1.05] text-ivory sm:text-[2.6rem]" style={{ fontWeight: 300 }}>
+          <h2 className="max-w-[640px] text-[2.1rem] leading-[1.05] text-ivory sm:text-[2.6rem]" style={{ fontWeight: 500 }}>
             {t("Twenty colleagues,")}
-            <span className="block text-gold" style={{ fontWeight: 500 }}>
+            <span className="block text-gold" style={{ fontWeight: 600 }}>
               {t("three chances each")}
             </span>
           </h2>

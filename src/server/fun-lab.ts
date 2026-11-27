@@ -320,11 +320,10 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
     if (name in elfCounts) elfCounts[name] += 1;
   }
   const elfTotal = Object.keys(state.elfVote).length;
-  const podium = [...FUN_LAB_ROSTER]
+  const elfRanked = [...FUN_LAB_ROSTER]
     .map((p) => ({ name: p.name, photo: p.photo, count: elfCounts[p.name] }))
     .sort((a, b) => b.count - a.count)
-    .filter((p) => p.count > 0)
-    .slice(0, 3);
+    .filter((p) => p.count > 0);
 
   const mostLikely = MOST_LIKELY_QUESTIONS.map((q) => {
     const counts = Object.fromEntries(FUN_LAB_ROSTER.map((p) => [p.name, 0])) as Record<string, number>;
@@ -335,10 +334,10 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
     }
     const ranked = [...FUN_LAB_ROSTER]
       .map((p) => ({ name: p.name, photo: p.photo, count: counts[p.name] }))
-      .sort((a, b) => b.count - a.count);
+      .sort((a, b) => b.count - a.count)
+      .filter((p) => p.count > 0);
     const total = ranked.reduce((sum, row) => sum + row.count, 0);
-    const leader = ranked[0] && ranked[0].count > 0 ? ranked[0] : null;
-    return { id: q.id, labelKey: q.labelKey, total, leader };
+    return { id: q.id, labelKey: q.labelKey, total, ranked };
   });
 
   const memoryLeaders = Object.entries(state.memoryMatch)
@@ -347,8 +346,7 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
       photo: rosterPhoto(name),
       value: score.best,
     }))
-    .sort((a, b) => a.value - b.value)
-    .slice(0, 5);
+    .sort((a, b) => a.value - b.value);
 
   const guessLeaders = Object.entries(state.guessElf)
     .map(([name, score]) => ({
@@ -356,8 +354,7 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
       photo: rosterPhoto(name),
       value: score.best,
     }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 5);
+    .sort((a, b) => b.value - a.value);
 
   return {
     poll: {
@@ -369,7 +366,7 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
         pct: pollTotal === 0 ? 0 : Math.round((pollCounts[o.id] / pollTotal) * 100),
       })),
     },
-    elfVote: { total: elfTotal, podium },
+    elfVote: { total: elfTotal, ranked: elfRanked },
     mostLikely: { questions: mostLikely },
     memoryMatch: { total: Object.keys(state.memoryMatch).length, leaders: memoryLeaders },
     guessElf: {
