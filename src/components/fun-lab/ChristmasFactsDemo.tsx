@@ -7,7 +7,7 @@ import { FUN_LAB_ROSTER, isFunLabName } from "@/lib/fun-lab-roster";
 import { useT } from "@/lib/language";
 import { useFunLab } from "./FunLabContext";
 
-/** “Who’s behind the Christmas fact?” — vote among all 20; Finish locks forever. */
+/** “Who’s behind the Christmas fact?” — same ballot UX as Most Likely. */
 export default function ChristmasFactsDemo() {
   const t = useT();
   const { name, state, vote } = useFunLab();
@@ -15,30 +15,29 @@ export default function ChristmasFactsDemo() {
   const [finishing, setFinishing] = useState(false);
   const [lockedLocal, setLockedLocal] = useState(false);
 
+  const fact = CHRISTMAS_FACTS[index]!;
   const ballot = state.mine.officeFacts ?? { picks: {}, finished: false };
   const myPicks = ballot.picks;
+  const myPick = myPicks[fact.id];
   const locked = lockedLocal || Boolean(ballot.finished);
   const allAnswered = isFactsBallotComplete(myPicks);
-  const total = CHRISTMAS_FACTS.length;
-  const q = CHRISTMAS_FACTS[index]!;
-  const myPick = myPicks[q.id];
-  const isLast = index >= total - 1;
+  const isLast = index >= CHRISTMAS_FACTS.length - 1;
   const canFinish = !locked && allAnswered;
 
+  /** Tallies for the current fact only (finished ballots) — same as Most Likely. */
   const tallies = useMemo(() => {
-    const counts = Object.fromEntries(FUN_LAB_ROSTER.map((p) => [p.name, 0])) as Record<
-      string,
-      number
-    >;
+    const counts: Record<string, number> = Object.fromEntries(
+      FUN_LAB_ROSTER.map((p) => [p.name, 0]),
+    );
     for (const entry of Object.values(state.officeFacts)) {
       if (!entry.finished) continue;
-      const chosen = entry.picks[q.id];
+      const chosen = entry.picks[fact.id];
       if (chosen && chosen in counts) counts[chosen] += 1;
     }
     return [...FUN_LAB_ROSTER]
-      .map((p) => ({ ...p, count: counts[p.name] ?? 0 }))
+      .map((p) => ({ ...p, count: counts[p.name] }))
       .sort((a, b) => b.count - a.count);
-  }, [state.officeFacts, q.id]);
+  }, [state.officeFacts, fact.id]);
 
   const voteTotal = tallies.reduce((sum, row) => sum + row.count, 0);
   const leaders = tallies.filter((row) => row.count > 0).slice(0, 3);
@@ -46,7 +45,7 @@ export default function ChristmasFactsDemo() {
   const pick = (nominee: string) => {
     if (!name || locked || finishing || !isFunLabName(nominee)) return;
     void vote("og-facts", {
-      picks: { ...myPicks, [q.id]: nominee },
+      picks: { ...myPicks, [fact.id]: nominee },
       finished: false,
     });
   };
@@ -71,7 +70,7 @@ export default function ChristmasFactsDemo() {
         <div>
           <p className="label text-[#B08F4C]">{t("Anonymous fact")}</p>
           <h3 className="mt-2 text-[1.35rem] leading-snug text-[#173D32]" style={{ fontWeight: 600 }}>
-            “{q.fact}”
+            “{fact.fact}”
           </h3>
           <p className="mt-2 text-[0.85rem] text-[#6E6A5E]">
             {locked
@@ -84,7 +83,10 @@ export default function ChristmasFactsDemo() {
           </p>
         </div>
         <p className="label text-[#6E6A5E]">
-          {t("Fact {number} of {total}", { number: index + 1, total })}
+          {t("Fact {number} of {total}", {
+            number: index + 1,
+            total: CHRISTMAS_FACTS.length,
+          })}
         </p>
       </div>
 
@@ -110,9 +112,7 @@ export default function ChristmasFactsDemo() {
               <img src={p.photo} alt={p.name} className="aspect-square w-full object-cover" />
               <div className="flex items-center justify-between gap-1 px-2 py-1.5">
                 <span className="truncate text-[0.78rem] capitalize text-[#173D32]">{p.name}</span>
-                {locked || voteTotal > 0 ? (
-                  <span className="label shrink-0 text-[0.65rem] text-[#B08F4C]">{count}</span>
-                ) : null}
+                <span className="label shrink-0 text-[0.65rem] text-[#B08F4C]">{count}</span>
               </div>
             </button>
           );
@@ -125,7 +125,7 @@ export default function ChristmasFactsDemo() {
           className="border border-[rgba(36,92,70,0.35)] bg-[rgba(36,92,70,0.12)] px-4 py-3 text-[0.9rem] text-[#173D32]"
           style={{ borderRadius: 2 }}
         >
-          {t("Vote locked — one ballot only. Browse questions below — results appear on the home page.")}
+          {t("Vote locked — one ballot only. Browse facts to see each tally — full results on the home page.")}
         </p>
       ) : myPick ? (
         <p
@@ -141,9 +141,9 @@ export default function ChristmasFactsDemo() {
         <p className="text-[0.85rem] text-[#6E6A5E]">{t("Tap a colleague to vote on this question.")}</p>
       )}
 
-      {leaders.length > 0 ? (
+      {voteTotal > 0 ? (
         <div className="border-t border-[rgba(23,61,50,0.15)] pt-4">
-          <p className="label text-[#6E6A5E]">{t("Top picks")}</p>
+          <p className="label text-[#6E6A5E]">{t("Top picks for this fact")}</p>
           <ol className="mt-3 flex flex-col gap-2">
             {leaders.map((p, i) => (
               <li key={p.name} className="flex items-center gap-3 text-[#173D32]">
@@ -163,31 +163,44 @@ export default function ChristmasFactsDemo() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           type="button"
-          className="btn btn-ghost !text-[#173D32] !border-[rgba(23,61,50,0.35)]"
-          disabled={index <= 0}
+          className="btn btn-ghost"
+          disabled={index === 0}
           onClick={() => setIndex((i) => Math.max(0, i - 1))}
         >
           {t("Previous")}
         </button>
-        {!isLast ? (
-          <button type="button" className="btn btn-dark" onClick={() => setIndex((i) => i + 1)}>
-            {t("Next fact")}
-          </button>
-        ) : locked ? (
-          <p className="text-[0.9rem] text-[#245C46]" style={{ fontWeight: 600 }}>
-            {t("Finished ✓")}
-          </p>
-        ) : (
-          <button
-            type="button"
-            className="btn btn-dark"
-            disabled={!canFinish || finishing}
-            onClick={() => void finish()}
-          >
-            {finishing ? t("Saving…") : t("Finish")}
-          </button>
-        )}
+        <div className="flex flex-wrap gap-3">
+          {!isLast ? (
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setIndex((i) => Math.min(CHRISTMAS_FACTS.length - 1, i + 1))}
+            >
+              {t("Next fact")}
+            </button>
+          ) : null}
+          {locked ? (
+            <button type="button" className="btn btn-dark" disabled>
+              {t("Finished ✓")}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-dark"
+              disabled={!canFinish || finishing}
+              onClick={() => void finish()}
+            >
+              {finishing ? t("Saving…") : t("Finish")}
+            </button>
+          )}
+        </div>
       </div>
+
+      {!locked && isLast && !allAnswered ? (
+        <p className="text-[0.8rem] text-[#6E6A5E]">
+          {t("Answer every question before tapping Finish.")}
+        </p>
+      ) : null}
     </div>
   );
 }

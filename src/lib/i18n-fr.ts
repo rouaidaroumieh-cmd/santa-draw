@@ -156,6 +156,9 @@ export const FR: Record<string, string> = {
     "PIN requis — vos meilleurs scores apparaissent sur les classements de l’accueil.",
   "Best fact scores": "Meilleurs scores faits",
   "Top guesses for each fact": "Meilleurs votes pour chaque fait",
+  "Top picks for this fact": "Top votes pour ce fait",
+  "Vote locked — one ballot only. Browse facts to see each tally — full results on the home page.":
+    "Vote verrouillé — un seul bulletin. Parcourez les faits pour voir chaque total — résultats complets sur la page d’accueil.",
   "Full fact votes": "Tous les votes faits",
   "Vote who you think each anonymous fact belongs to.":
     "Votez pour la personne à qui vous pensez que chaque fait anonyme appartient.",
