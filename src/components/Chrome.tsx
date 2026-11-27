@@ -8,7 +8,7 @@ import { type Lang } from "@/lib/i18n";
 import { setLang, useLang, useT } from "@/lib/language";
 import { useSyncError } from "@/lib/store";
 
-export type SectionKey = "home" | "calendar" | "participants" | "fun" | "admin";
+export type SectionKey = "home" | "calendar" | "participants" | "fun" | "fun-lab" | "admin";
 
 const NAV: { key: SectionKey; href: string; label: string }[] = [
   { key: "home", href: "/", label: "Home" },
