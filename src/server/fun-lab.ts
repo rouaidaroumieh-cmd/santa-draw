@@ -503,17 +503,20 @@ export async function loadFunLabPublicResults(): Promise<FunLabPublicResults> {
   const guessLeaders = leadersFromScores(state.guessElf, true);
   const factsFinished = Object.values(state.officeFacts).filter((b) => b.finished).length;
   const officeFacts = CHRISTMAS_FACTS.map((fact) => {
-    const counts = Object.fromEntries(fact.options.map((n) => [n, 0])) as Record<string, number>;
+    const counts = Object.fromEntries(FUN_LAB_ROSTER.map((p) => [p.name, 0])) as Record<
+      string,
+      number
+    >;
     for (const ballot of Object.values(state.officeFacts)) {
       if (!ballot.finished) continue;
       const chosen = ballot.picks[fact.id];
       if (chosen && chosen in counts) counts[chosen] += 1;
     }
-    const ranked = fact.options
-      .map((name) => ({
-        name,
-        photo: FUN_LAB_ROSTER.find((p) => p.name === name)?.photo ?? "",
-        count: counts[name] ?? 0,
+    const ranked = [...FUN_LAB_ROSTER]
+      .map((p) => ({
+        name: p.name,
+        photo: p.photo,
+        count: counts[p.name] ?? 0,
       }))
       .sort((a, b) => b.count - a.count)
       .filter((p) => p.count > 0);

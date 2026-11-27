@@ -2,17 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { fireConfetti } from "@/lib/confetti";
-import {
-  CHRISTMAS_FACTS,
-  colleagueName,
-  colleaguePhoto,
-  isFactsBallotComplete,
-} from "@/lib/office-games/christmas-facts";
-import { isFunLabName } from "@/lib/fun-lab-roster";
+import { CHRISTMAS_FACTS, isFactsBallotComplete } from "@/lib/office-games/christmas-facts";
+import { FUN_LAB_ROSTER, isFunLabName } from "@/lib/fun-lab-roster";
 import { useT } from "@/lib/language";
 import { useFunLab } from "./FunLabContext";
 
-/** “Who’s behind the Christmas fact?” — one ballot; Finish locks forever. */
+/** “Who’s behind the Christmas fact?” — vote among all 20; Finish locks forever. */
 export default function ChristmasFactsDemo() {
   const t = useT();
   const { name, state, vote } = useFunLab();
@@ -31,22 +26,25 @@ export default function ChristmasFactsDemo() {
   const canFinish = !locked && allAnswered;
 
   const tallies = useMemo(() => {
-    const counts = Object.fromEntries(q.options.map((n) => [n, 0])) as Record<string, number>;
+    const counts = Object.fromEntries(FUN_LAB_ROSTER.map((p) => [p.name, 0])) as Record<
+      string,
+      number
+    >;
     for (const entry of Object.values(state.officeFacts)) {
       if (!entry.finished) continue;
       const chosen = entry.picks[q.id];
       if (chosen && chosen in counts) counts[chosen] += 1;
     }
-    return q.options
-      .map((n) => ({ name: n, photo: colleaguePhoto(n), count: counts[n] ?? 0 }))
+    return [...FUN_LAB_ROSTER]
+      .map((p) => ({ ...p, count: counts[p.name] ?? 0 }))
       .sort((a, b) => b.count - a.count);
-  }, [state.officeFacts, q]);
+  }, [state.officeFacts, q.id]);
 
   const voteTotal = tallies.reduce((sum, row) => sum + row.count, 0);
+  const leaders = tallies.filter((row) => row.count > 0).slice(0, 3);
 
   const pick = (nominee: string) => {
     if (!name || locked || finishing || !isFunLabName(nominee)) return;
-    if (!q.options.includes(nominee)) return;
     void vote("og-facts", {
       picks: { ...myPicks, [q.id]: nominee },
       finished: false,
@@ -90,10 +88,10 @@ export default function ChristmasFactsDemo() {
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {q.options.map((optionName) => {
-          const selected = myPick === optionName;
-          const count = tallies.find((row) => row.name === optionName)?.count ?? 0;
+      <div className="grid grid-cols-5 gap-1.5 sm:grid-cols-6 lg:grid-cols-10">
+        {FUN_LAB_ROSTER.map((p) => {
+          const selected = myPick === p.name;
+          const count = tallies.find((row) => row.name === p.name)?.count ?? 0;
           const className = selected
             ? "overflow-hidden border border-[#173D32] text-left ring-2 ring-[#B08F4C] transition-colors"
             : locked
@@ -101,35 +99,68 @@ export default function ChristmasFactsDemo() {
               : "overflow-hidden border border-[rgba(23,61,50,0.25)] text-left transition-colors hover:border-[#B08F4C]";
           return (
             <button
-              key={optionName}
+              key={p.name}
               type="button"
               disabled={locked || finishing}
-              onClick={() => pick(optionName)}
+              onClick={() => pick(p.name)}
               className={className}
               style={{ borderRadius: 2 }}
             >
-              <span className="flex items-center gap-3 px-3.5 py-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={colleaguePhoto(optionName)}
-                  alt=""
-                  className="h-11 w-11 shrink-0 rounded-full object-cover"
-                />
-                <span className="min-w-0 flex-1 text-left">
-                  <span className="block capitalize text-[#173D32]" style={{ fontWeight: 600 }}>
-                    {colleagueName(optionName)}
-                  </span>
-                  {locked || voteTotal > 0 ? (
-                    <span className="block text-[0.8rem] text-[#6E6A5E]">
-                      {t("{count} votes", { count })}
-                    </span>
-                  ) : null}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.photo} alt={p.name} className="aspect-square w-full object-cover" />
+              <div className="flex items-center justify-between gap-0.5 px-1 py-1">
+                <span className="truncate text-[0.62rem] capitalize leading-tight text-[#173D32]">
+                  {p.name}
                 </span>
-              </span>
+                {locked || voteTotal > 0 ? (
+                  <span className="label shrink-0 text-[0.55rem] text-[#B08F4C]">{count}</span>
+                ) : null}
+              </div>
             </button>
           );
         })}
       </div>
+
+      {locked ? (
+        <p
+          role="status"
+          className="border border-[rgba(36,92,70,0.35)] bg-[rgba(36,92,70,0.12)] px-4 py-3 text-[0.9rem] text-[#173D32]"
+          style={{ borderRadius: 2 }}
+        >
+          {t("Vote locked — one ballot only. Browse questions below — results appear on the home page.")}
+        </p>
+      ) : myPick ? (
+        <p
+          role="status"
+          className="border border-[rgba(36,92,70,0.35)] bg-[rgba(36,92,70,0.12)] px-4 py-3 text-[0.9rem] text-[#173D32]"
+          style={{ borderRadius: 2 }}
+        >
+          {t("You picked {name}. You can still change answers until you Finish.", {
+            name: myPick,
+          })}
+        </p>
+      ) : (
+        <p className="text-[0.85rem] text-[#6E6A5E]">{t("Tap a colleague to vote on this question.")}</p>
+      )}
+
+      {leaders.length > 0 ? (
+        <div className="border-t border-[rgba(23,61,50,0.15)] pt-4">
+          <p className="label text-[#6E6A5E]">{t("Top picks")}</p>
+          <ol className="mt-3 flex flex-col gap-2">
+            {leaders.map((p, i) => (
+              <li key={p.name} className="flex items-center gap-3 text-[#173D32]">
+                <span className="label w-8 text-[#B08F4C]">#{i + 1}</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.photo} alt="" className="h-9 w-9 rounded-full object-cover" />
+                <span className="capitalize">{p.name}</span>
+                <span className="ml-auto text-[0.85rem] text-[#6E6A5E]">
+                  {t("{count} votes", { count: p.count })}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <button
